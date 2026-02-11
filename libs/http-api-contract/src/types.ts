@@ -154,6 +154,7 @@ export type BuildContractFromEndpointsInput = {
 
 export type LambdaJsGenerationOptions = {
   endpointModulePath: string;
+  externalModules?: string[];
   frameworkImportPath?: string;
 };
 

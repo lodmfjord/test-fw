@@ -1,4 +1,5 @@
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -30,12 +31,13 @@ function getHandlerFromSource(
   const transformedSource = source
     .replace(/export\s+async\s+function\s+handler\s*\(/, "async function handler(")
     .replace(/export\s*\{\s*handler\s*\};?/g, "");
+  const runtimeRequire = createRequire(import.meta.url);
 
-  const factory = new Function(`${transformedSource}\nreturn handler;`) as () => (
-    event: LambdaLikeEvent,
-  ) => Promise<LambdaLikeResponse>;
+  const factory = new Function("require", `${transformedSource}\nreturn handler;`) as (
+    runtimeRequire: (moduleName: string) => unknown,
+  ) => (event: LambdaLikeEvent) => Promise<LambdaLikeResponse>;
 
-  return factory();
+  return factory(runtimeRequire);
 }
 
 describe("generated lambda execution", () => {

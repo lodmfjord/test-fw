@@ -13,10 +13,15 @@ function resolveEndpointModulePath(endpointModulePath: string): string {
   return isAbsolute(source) ? source : resolve(process.cwd(), source);
 }
 
-async function bundleEntry(entryPath: string, absWorkingDirectory: string): Promise<string> {
+async function bundleEntry(
+  entryPath: string,
+  absWorkingDirectory: string,
+  externalModules: string[],
+): Promise<string> {
   const result = await build({
     absWorkingDir: absWorkingDirectory,
     bundle: true,
+    external: externalModules,
     entryPoints: [entryPath],
     format: "esm",
     logLevel: "silent",
@@ -35,6 +40,16 @@ async function bundleEntry(entryPath: string, absWorkingDirectory: string): Prom
   return bundled.text;
 }
 
+function resolveExternalModules(externalModules: string[] | undefined): string[] {
+  if (!externalModules) {
+    return [];
+  }
+
+  return externalModules
+    .map((moduleName) => moduleName.trim())
+    .filter((moduleName) => moduleName.length > 0);
+}
+
 function stripBundlerModuleMarkers(source: string): string {
   return source.replace(/^\/\/\s+(?:\.\.\/|\/).+\.(?:[cm]?[jt]s|tsx?)$/gm, "").trimStart();
 }
@@ -50,6 +65,7 @@ export async function writeLambdaJsFiles(
   }
 
   const endpointModulePath = resolveEndpointModulePath(options.endpointModulePath);
+  const externalModules = resolveExternalModules(options.externalModules);
   const endpointModuleSource = await readFile(endpointModulePath, "utf8");
   await mkdir(directory, { recursive: true });
 
@@ -69,7 +85,7 @@ export async function writeLambdaJsFiles(
       const entryPath = join(tempDirectory, `${fileName}.entry.ts`);
       const outputPath = join(directory, fileName);
       await writeFile(entryPath, source, "utf8");
-      const bundledSource = await bundleEntry(entryPath, tempDirectory);
+      const bundledSource = await bundleEntry(entryPath, tempDirectory, externalModules);
       await writeFile(outputPath, stripBundlerModuleMarkers(bundledSource), "utf8");
     }
   } finally {

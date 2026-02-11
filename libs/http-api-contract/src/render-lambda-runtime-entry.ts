@@ -23,15 +23,46 @@ function renderLambdaRuntimeSource(
   endpoint: EndpointRuntimeDefinition,
   importLines: string[],
   runtimeDbImportSpecifier: string,
+  handlerSource: string,
 ): string {
+  const usesHandlerDbContext = /\bdb\b/.test(handlerSource) || /\bdatabase\b/.test(handlerSource);
   const hasContextDatabase = Boolean(endpoint.context?.database);
-  const runtimeDbImport = hasContextDatabase
-    ? `import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from ${JSON.stringify(runtimeDbImportSpecifier)};`
-    : `import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from ${JSON.stringify(runtimeDbImportSpecifier)};`;
+  const hasRuntimeDb = hasContextDatabase || usesHandlerDbContext;
+  const runtimeDbImport = hasRuntimeDb
+    ? hasContextDatabase
+      ? `import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from ${JSON.stringify(runtimeDbImportSpecifier)};`
+      : `import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from ${JSON.stringify(runtimeDbImportSpecifier)};`
+    : "";
+  const runtimeDbState = hasRuntimeDb
+    ? `const db = createSimpleApiRuntimeDynamoDb();
+const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};`
+    : "";
+  const dbAccessSupport = hasRuntimeDb
+    ? `
+function toDbForAccess(client, access) {
+  if (access === "read") {
+    return {
+      read: client.read.bind(client)
+    };
+  }
+
+  return client;
+}
+`
+    : "";
+  const endpointDbLine = hasRuntimeDb
+    ? "const endpointDb = toDbForAccess(db, endpointDbAccess);"
+    : "const endpointDb = undefined;";
+  const endpointDatabaseBinding = hasContextDatabase
+    ? "const endpointDatabase = toDatabaseForContext(db, endpointDatabaseContext);"
+    : "";
+  const endpointDatabaseValue = hasContextDatabase ? "endpointDatabase" : "undefined";
+  const preludeLines = runtimeDbImport.length > 0 ? [...importLines, runtimeDbImport] : importLines;
+  const prelude = preludeLines.length > 0 ? `${preludeLines.join("\n")}\n\n` : "";
   const endpointDatabaseContextLine = hasContextDatabase
     ? `const endpointDatabaseContext = ${JSON.stringify(endpoint.context?.database ?? null)};\n`
     : "";
-  const contextDatabaseSupport = hasContextDatabase
+  const contextDatabaseHelper = hasContextDatabase
     ? `
 function toDatabaseForContext(client, config) {
   if (!config) {
@@ -55,14 +86,7 @@ function toDatabaseForContext(client, config) {
 }
 `
     : "";
-  const endpointDatabaseBinding = hasContextDatabase
-    ? "const endpointDatabase = toDatabaseForContext(db, endpointDatabaseContext);"
-    : "";
-  const endpointDatabaseValue = hasContextDatabase ? "endpointDatabase" : "undefined";
-  const preludeLines = [...importLines, runtimeDbImport];
-  const prelude = preludeLines.length > 0 ? `${preludeLines.join("\n")}\n\n` : "";
-  return `${prelude}const db = createSimpleApiRuntimeDynamoDb();
-const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};
+  return `${prelude}${runtimeDbState}
 ${endpointDatabaseContextLine}
 
 const endpointHandler = (${endpoint.handler.toString()});
@@ -89,16 +113,7 @@ function parseJsonBody(event) {
     return { ok: false, error: toJsonResponse(400, { error: "Invalid JSON body" }) };
   }
 }
-
-function toDbForAccess(client, access) {
-  if (access === "read") {
-    return {
-      read: client.read.bind(client)
-    };
-  }
-
-  return client;
-}
+${dbAccessSupport}
 
 function toHandlerOutput(output) {
   if (!output || typeof output !== "object" || !("value" in output)) {
@@ -115,7 +130,7 @@ function toHandlerOutput(output) {
     value: output.value
   };
 }
-${contextDatabaseSupport}
+${contextDatabaseHelper}
 
 export async function handler(event) {
   const bodyResult = parseJsonBody(event);
@@ -126,7 +141,7 @@ export async function handler(event) {
   const params = event?.pathParameters ?? {};
   const query = event?.queryStringParameters ?? {};
   const headers = event?.headers ?? {};
-  const endpointDb = toDbForAccess(db, endpointDbAccess);
+  ${endpointDbLine}
   ${endpointDatabaseBinding}
 
   try {
@@ -162,5 +177,5 @@ export function renderLambdaRuntimeEntrySource(
     handlerSource,
   );
   const runtimeDbImportSpecifier = resolveRuntimeDbImportSpecifier(endpointModulePath);
-  return renderLambdaRuntimeSource(endpoint, importLines, runtimeDbImportSpecifier);
+  return renderLambdaRuntimeSource(endpoint, importLines, runtimeDbImportSpecifier, handlerSource);
 }

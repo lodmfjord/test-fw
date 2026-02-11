@@ -5,16 +5,8 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.0.0",
     "@aws-sdk/util-dynamodb": "^3.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@aws-sdk/client-dynamodb": {
-      "optional": true
-    },
-    "@aws-sdk/util-dynamodb": {
-      "optional": true
-    }
   }
 }
