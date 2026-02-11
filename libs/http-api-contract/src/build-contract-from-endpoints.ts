@@ -1,0 +1,123 @@
+import { buildContract } from "./build-contract";
+import type { Schema } from "@simple-api/schema";
+import type {
+  BuildContractFromEndpointsInput,
+  Contract,
+  OpenApiDocument,
+  OpenApiOperation,
+  OpenApiParameter,
+  OpenApiPathItem,
+} from "./types";
+
+function toOpenApiMethod(method: string): keyof OpenApiPathItem {
+  return method.toLowerCase() as keyof OpenApiPathItem;
+}
+
+function toParameters(
+  location: OpenApiParameter["in"],
+  validator: Schema<unknown> | undefined,
+): OpenApiParameter[] {
+  if (!validator) {
+    return [];
+  }
+
+  if (validator.jsonSchema.type !== "object" || !validator.jsonSchema.properties) {
+    return [];
+  }
+
+  const required = new Set(validator.jsonSchema.required ?? []);
+
+  return Object.entries(validator.jsonSchema.properties).map(([name, itemSchema]) => ({
+    in: location,
+    name,
+    required: location === "path" ? true : required.has(name),
+    schema: itemSchema,
+  }));
+}
+
+function toOpenApiDocument(input: BuildContractFromEndpointsInput): OpenApiDocument {
+  const paths: Record<string, OpenApiPathItem> = {};
+
+  for (const endpoint of input.endpoints) {
+    const parameters = [
+      ...toParameters("path", endpoint.request.params),
+      ...toParameters("query", endpoint.request.query),
+      ...toParameters("header", endpoint.request.headers),
+    ];
+
+    const operation: OpenApiOperation = {
+      "x-simple-api": {
+        ...(endpoint.access ? { access: endpoint.access } : {}),
+        auth: endpoint.auth,
+        ...(endpoint.aws ? { aws: { ...endpoint.aws } } : {}),
+        handler: endpoint.handlerId,
+        routeId: endpoint.routeId,
+      },
+      ...(endpoint.description ? { description: endpoint.description } : {}),
+      operationId: endpoint.operationId,
+      ...(parameters.length > 0 ? { parameters } : {}),
+      ...(endpoint.request.body
+        ? {
+            requestBody: {
+              content: {
+                "application/json": {
+                  schema: endpoint.request.body.jsonSchema,
+                },
+              },
+              required: !endpoint.request.body.optional,
+            },
+          }
+        : {}),
+      responses: {
+        "200": {
+          content: {
+            "application/json": {
+              schema: endpoint.response.jsonSchema,
+            },
+          },
+          description: "Success",
+        },
+      },
+      ...(endpoint.summary ? { summary: endpoint.summary } : {}),
+      ...(endpoint.tags.length > 0 ? { tags: endpoint.tags } : {}),
+    };
+
+    const existingPathItem = paths[endpoint.path] ?? {};
+    existingPathItem[toOpenApiMethod(endpoint.method)] = operation;
+    paths[endpoint.path] = existingPathItem;
+  }
+
+  return {
+    info: {
+      title: input.apiName,
+      version: input.version,
+    },
+    openapi: "3.1.0",
+    paths,
+  };
+}
+
+export function buildContractFromEndpoints(input: BuildContractFromEndpointsInput): Contract {
+  const baseContract = buildContract({
+    apiName: input.apiName,
+    ...(input.env ? { env: input.env } : {}),
+    routes: input.endpoints.map((endpoint) => ({
+      auth: endpoint.auth,
+      ...(endpoint.aws ? { aws: { ...endpoint.aws } } : {}),
+      ...(endpoint.description ? { description: endpoint.description } : {}),
+      handler: endpoint.handlerId,
+      method: endpoint.method,
+      operationId: endpoint.operationId,
+      path: endpoint.path,
+      routeId: endpoint.routeId,
+      ...(endpoint.summary ? { summary: endpoint.summary } : {}),
+      tags: [...endpoint.tags],
+    })),
+    version: input.version,
+  });
+
+  return {
+    ...baseContract,
+    openapi: toOpenApiDocument(input),
+  };
+}

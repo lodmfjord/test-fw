@@ -1,0 +1,27 @@
+{
+  "name": "simple-api",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "tdd": "bun run test:watch",
+    "typecheck": "bunx tsc --noEmit",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint . --write",
+    "format": "biome format . --write",
+    "format:check": "biome format .",
+    "fix": "bun run format && bun run lint:fix",
+    "check:constraints": "bun run tools/check-constraints.ts",
+    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run check:constraints"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.14",
+    "@types/bun": "latest",
+    "typescript": "latest"
+  }
+}

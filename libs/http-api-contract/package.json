@@ -1,0 +1,13 @@
+{
+  "name": "@simple-api/http-api-contract",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@simple-api/dynamodb": "workspace:*",
+    "@simple-api/schema": "workspace:*",
+    "esbuild": "^0.25.12"
+  }
+}
