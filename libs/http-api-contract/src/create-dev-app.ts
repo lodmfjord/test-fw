@@ -2,7 +2,7 @@ import {
   createDynamoDatabase,
   createRuntimeDynamoDb,
   type DynamoDbClient,
-} from "@simple-api/dynamodb";
+} from "@babbstack/dynamodb";
 import type { EndpointHandlerOutput } from "./types";
 import type { EndpointRuntimeDefinition } from "./types";
 import type { CreateDevAppOptions } from "./types";

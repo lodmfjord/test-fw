@@ -8,7 +8,7 @@ import {
   listDefinedEndpoints,
   resetDefinedEndpoints,
   writeLambdaJsFiles,
-} from "@simple-api/http-api-contract";
+} from "@babbstack/http-api-contract";
 
 type LambdaLikeEvent = {
   body?: string;

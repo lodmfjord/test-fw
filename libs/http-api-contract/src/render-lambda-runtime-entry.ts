@@ -4,7 +4,7 @@ import { renderUsedImportLines } from "./render-used-import-lines";
 import type { EndpointRuntimeDefinition } from "./types";
 
 function resolveRuntimeDbImportSpecifier(endpointModulePath: string): string {
-  const moduleSpecifier = "@simple-api/dynamodb";
+  const moduleSpecifier = "@babbstack/dynamodb";
 
   try {
     const requireFromEndpoint = createRequire(endpointModulePath);

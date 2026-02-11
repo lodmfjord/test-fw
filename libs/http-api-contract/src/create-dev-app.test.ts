@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { createDevApp } from "./create-dev-app";
 import { defineEndpoint } from "./define-endpoint";
-import { schema } from "@simple-api/schema";
+import { schema } from "@babbstack/schema";
 
 describe("createDevApp", () => {
   it("runs many endpoints through one dev app", async () => {

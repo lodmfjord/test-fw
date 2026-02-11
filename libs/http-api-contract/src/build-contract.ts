@@ -33,7 +33,7 @@ function toOpenApiDocument(input: BuildContractInput): OpenApiDocument {
 
   for (const route of input.routes) {
     const operation: OpenApiOperation = {
-      "x-simple-api": {
+      "x-babbstack": {
         auth: route.auth,
         ...(route.aws ? { aws: { ...route.aws } } : {}),
         handler: route.handler,

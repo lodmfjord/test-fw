@@ -1,6 +1,6 @@
 import type { EndpointRuntimeDefinition } from "./types";
 
-const ENDPOINT_REGISTRY_KEY = Symbol.for("simple-api.endpoint-registry");
+const ENDPOINT_REGISTRY_KEY = Symbol.for("babbstack.endpoint-registry");
 
 type RegistryGlobal = typeof globalThis & {
   [ENDPOINT_REGISTRY_KEY]?: EndpointRuntimeDefinition[];

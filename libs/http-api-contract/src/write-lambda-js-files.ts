@@ -1,4 +1,5 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { isAbsolute, join, resolve } from "node:path";
 import { build } from "esbuild";
 import { renderLambdaRuntimeEntrySource } from "./render-lambda-runtime-entry";
@@ -40,14 +41,29 @@ async function bundleEntry(
   return bundled.text;
 }
 
-function resolveExternalModules(externalModules: string[] | undefined): string[] {
+function resolveExternalModules(
+  externalModules: string[] | undefined,
+  endpointModulePath: string,
+): string[] {
   if (!externalModules) {
     return [];
   }
 
-  return externalModules
+  const resolver = createRequire(endpointModulePath);
+  const expanded = new Set<string>();
+
+  for (const moduleName of externalModules
     .map((moduleName) => moduleName.trim())
-    .filter((moduleName) => moduleName.length > 0);
+    .filter((moduleName) => moduleName.length > 0)) {
+    expanded.add(moduleName);
+    expanded.add(`${moduleName}/*`);
+
+    try {
+      expanded.add(resolver.resolve(moduleName));
+    } catch {}
+  }
+
+  return [...expanded].sort((left, right) => left.localeCompare(right));
 }
 
 function stripBundlerModuleMarkers(source: string): string {
@@ -65,14 +81,14 @@ export async function writeLambdaJsFiles(
   }
 
   const endpointModulePath = resolveEndpointModulePath(options.endpointModulePath);
-  const externalModules = resolveExternalModules(options.externalModules);
+  const externalModules = resolveExternalModules(options.externalModules, endpointModulePath);
   const endpointModuleSource = await readFile(endpointModulePath, "utf8");
   await mkdir(directory, { recursive: true });
 
   const fileNames = endpoints
     .map((endpoint) => `${endpoint.routeId}.mjs`)
     .sort((left, right) => left.localeCompare(right));
-  const tempDirectory = await mkdtemp(join(process.cwd(), ".simple-api-lambda-entry-"));
+  const tempDirectory = await mkdtemp(join(process.cwd(), ".babbstack-lambda-entry-"));
 
   try {
     for (const endpoint of endpoints) {

@@ -1,5 +1,5 @@
-import { defineGet, definePatch, definePost } from "@simple-api/http-api-contract";
-import { schema } from "@simple-api/schema";
+import { defineGet, definePatch, definePost } from "@babbstack/http-api-contract";
+import { schema } from "@babbstack/schema";
 import slugify from "slugify";
 import { pointDatabase, titleDatabase } from "./db";
 

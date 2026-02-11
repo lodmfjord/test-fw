@@ -35,7 +35,7 @@ describe("buildContract", () => {
     });
 
     expect(contract.openapi.paths["/users/{id}"]?.get?.operationId).toBe("getUsersParamId");
-    expect(contract.openapi.paths["/users"]?.post?.["x-simple-api"]?.auth).toBe("jwt");
+    expect(contract.openapi.paths["/users"]?.post?.["x-babbstack"]?.auth).toBe("jwt");
 
     expect(contract.routesManifest.routes).toHaveLength(2);
     expect(contract.lambdasManifest.functions).toHaveLength(2);

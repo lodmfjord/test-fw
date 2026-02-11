@@ -1,4 +1,4 @@
-import { createDevApp, listDefinedEndpoints } from "@simple-api/http-api-contract";
+import { createDevApp, listDefinedEndpoints } from "@babbstack/http-api-contract";
 import "./endpoints";
 
 export const testAppFetch = createDevApp(listDefinedEndpoints());

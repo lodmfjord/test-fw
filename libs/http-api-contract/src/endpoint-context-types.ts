@@ -5,7 +5,7 @@ import type {
   DynamoDbItem,
   ReadBoundDynamoDatabase,
   WriteBoundDynamoDatabase,
-} from "@simple-api/dynamodb";
+} from "@babbstack/dynamodb";
 
 export type EndpointDbAccess = "read" | "write";
 

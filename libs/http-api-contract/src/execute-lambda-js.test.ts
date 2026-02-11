@@ -46,7 +46,7 @@ describe("generated lambda execution", () => {
   });
 
   it("executes bundled lambda source and returns expected response", async () => {
-    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "simple-api-exec-endpoint-"));
+    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
     await writeFile(
@@ -93,7 +93,7 @@ definePost({
     );
 
     await import(pathToFileURL(endpointModulePath).href);
-    const outputDirectory = await mkdtemp(join(tmpdir(), "simple-api-lambda-js-"));
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
     await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
       endpointModulePath,
       frameworkImportPath,
@@ -125,7 +125,7 @@ definePost({
   });
 
   it("enforces read-only db access for generated lambdas", async () => {
-    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "simple-api-exec-endpoint-"));
+    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
     await writeFile(
@@ -160,7 +160,7 @@ defineGet({
     );
 
     await import(pathToFileURL(endpointModulePath).href);
-    const outputDirectory = await mkdtemp(join(tmpdir(), "simple-api-lambda-js-"));
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
     await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
       endpointModulePath,
       frameworkImportPath,
@@ -180,7 +180,7 @@ defineGet({
   });
 
   it("enforces read-only context.database for generated lambdas", async () => {
-    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "simple-api-exec-endpoint-"));
+    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
     const dynamodbImportPath = fileURLToPath(
@@ -230,7 +230,7 @@ defineGet({
     );
 
     await import(pathToFileURL(endpointModulePath).href);
-    const outputDirectory = await mkdtemp(join(tmpdir(), "simple-api-lambda-js-"));
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
     await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
       endpointModulePath,
       frameworkImportPath,

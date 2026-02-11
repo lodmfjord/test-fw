@@ -75,7 +75,7 @@ import {
   defineEndpoint,
   schema,
   writeContractFiles,
-} from "@simple-api/http-api-contract";
+} from "@babbstack/http-api-contract";
 
 const endpoints = [
   defineEndpoint({

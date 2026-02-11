@@ -14,7 +14,8 @@ export { listDefinedEndpoints } from "./list-defined-endpoints";
 export { renderContractFiles } from "./render-contract-files";
 export { renderLambdaJsFiles } from "./render-lambda-js-files";
 export { resetDefinedEndpoints } from "./reset-defined-endpoints";
-export { schema } from "@simple-api/schema";
+export { runContractGeneratorFromSettings } from "./run-contract-generator-from-settings";
+export { schema } from "@babbstack/schema";
 export { writeContractFiles } from "./write-contract-files-export";
 export { writeLambdaJsFiles } from "./write-lambda-js-files-export";
 export type {
@@ -37,4 +38,11 @@ export type {
   RouteDefinition,
   RouteInput,
 } from "./types";
-export type { JsonSchema, Schema } from "@simple-api/schema";
+export type {
+  ContractGeneratorOutput,
+  ContractGeneratorSettings,
+  TerraformGeneratorSettings,
+  TerraformResourceSelection,
+  TerraformStateSettings,
+} from "./contract-generator-types";
+export type { JsonSchema, Schema } from "@babbstack/schema";

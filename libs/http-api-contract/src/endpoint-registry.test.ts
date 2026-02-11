@@ -3,7 +3,7 @@ import { defineGet } from "./define-get";
 import { definePost } from "./define-post";
 import { listDefinedEndpoints } from "./list-defined-endpoints";
 import { resetDefinedEndpoints } from "./reset-defined-endpoints";
-import { schema } from "@simple-api/schema";
+import { schema } from "@babbstack/schema";
 
 describe("endpoint registry", () => {
   beforeEach(() => {

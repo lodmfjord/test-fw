@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import { createDynamoDatabase } from "@simple-api/dynamodb";
+import { createDynamoDatabase } from "@babbstack/dynamodb";
 import { defineEndpoint } from "./define-endpoint";
-import { schema } from "@simple-api/schema";
+import { schema } from "@babbstack/schema";
 
 describe("defineEndpoint", () => {
   it("creates endpoint metadata with request and response schemas", () => {

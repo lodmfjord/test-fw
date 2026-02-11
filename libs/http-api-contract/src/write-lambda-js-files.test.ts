@@ -13,7 +13,7 @@ describe("writeLambdaJsFiles", () => {
   });
 
   it("writes bundled lambda js files to disk", async () => {
-    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "simple-api-endpoint-module-"));
+    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-endpoint-module-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
     await writeFile(
@@ -33,7 +33,7 @@ defineGet({
     );
 
     await import(pathToFileURL(endpointModulePath).href);
-    const outputDirectory = await mkdtemp(join(tmpdir(), "simple-api-lambda-js-"));
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
     const fileNames = await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
       endpointModulePath,
       frameworkImportPath,
@@ -58,7 +58,7 @@ defineGet({
   });
 
   it("supports external aws sdk modules for layer-based lambdas", async () => {
-    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "simple-api-endpoint-module-"));
+    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-endpoint-module-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
     await writeFile(
@@ -94,7 +94,7 @@ defineGet({
     );
 
     await import(pathToFileURL(endpointModulePath).href);
-    const outputDirectory = await mkdtemp(join(tmpdir(), "simple-api-lambda-js-"));
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
     const fileNames = await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
       endpointModulePath,
       externalModules: ["@aws-sdk/client-dynamodb", "@aws-sdk/util-dynamodb"],

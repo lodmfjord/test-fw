@@ -1,4 +1,4 @@
-# simple-api
+# babbstack
 
 Monorepo for a reusable API framework library.  
 The goal is to define typed HTTP endpoints once and generate deployable contract artifacts for API Gateway HTTP API v2 with one route per Lambda.
@@ -12,17 +12,17 @@ The goal is to define typed HTTP endpoints once and generate deployable contract
 
 ## Current Packages
 
-- `@simple-api/http-api-contract` (`libs/http-api-contract`)
+- `@babbstack/http-api-contract` (`libs/http-api-contract`)
   - Defines endpoint APIs (`defineGet`, `definePost`, `definePatch`, etc.)
   - Builds deploy contracts from endpoint declarations
   - Runs endpoints in one Bun dev app (`createDevApp`)
   - Generates one Lambda JS entry file per route (`writeLambdaJsFiles`)
-- `@simple-api/dynamodb` (`libs/dynamodb`)
+- `@babbstack/dynamodb` (`libs/dynamodb`)
   - Runtime DB adapters (in-memory and AWS-backed)
   - Typed table helpers and runtime-aware DB client selection
-- `@simple-api/schema` (`libs/schema`)
+- `@babbstack/schema` (`libs/schema`)
   - Schema builder + JSON Schema output + runtime parsing wrappers
-- `@simple-api/test-app` (`apps/test-app`)
+- `@babbstack/test-app` (`apps/test-app`)
   - Showcase consumer app for local development and artifact generation
 
 ## Generated Artifacts

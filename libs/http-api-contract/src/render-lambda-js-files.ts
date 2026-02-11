@@ -11,11 +11,11 @@ function renderFile(
   endpoint: EndpointRuntimeDefinition,
   options: LambdaJsGenerationOptions,
 ): string {
-  const frameworkImportPath = options.frameworkImportPath ?? "@simple-api/http-api-contract";
+  const frameworkImportPath = options.frameworkImportPath ?? "@babbstack/http-api-contract";
   const hasContextDatabase = Boolean(endpoint.context?.database);
   const runtimeDbImportLine = hasContextDatabase
-    ? 'import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@simple-api/dynamodb";'
-    : 'import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@simple-api/dynamodb";';
+    ? 'import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@babbstack/dynamodb";'
+    : 'import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@babbstack/dynamodb";';
   const endpointDatabaseContextLine = hasContextDatabase
     ? `const endpointDatabaseContext = ${JSON.stringify(endpoint.context?.database ?? null)};\n`
     : "";

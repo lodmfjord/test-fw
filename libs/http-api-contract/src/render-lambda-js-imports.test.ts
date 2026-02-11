@@ -3,7 +3,7 @@ import { defineGet } from "./define-get";
 import { listDefinedEndpoints } from "./list-defined-endpoints";
 import { renderLambdaJsFiles } from "./render-lambda-js-files";
 import { resetDefinedEndpoints } from "./reset-defined-endpoints";
-import { schema } from "@simple-api/schema";
+import { schema } from "@babbstack/schema";
 
 describe("renderLambdaJsFiles imports", () => {
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe("renderLambdaJsFiles imports", () => {
     const source = files["get_health.mjs"];
 
     expect(
-      source?.includes('import { listDefinedEndpoints } from "@simple-api/http-api-contract";'),
+      source?.includes('import { listDefinedEndpoints } from "@babbstack/http-api-contract";'),
     ).toBe(true);
     expect(source?.includes('await import("apps/test-app/src/endpoints.ts")')).toBe(true);
     expect(source?.includes("export async function handler")).toBe(true);

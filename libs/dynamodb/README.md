@@ -1,6 +1,6 @@
-# `@simple-api/dynamodb`
+# `@babbstack/dynamodb`
 
-DynamoDB adapters for simple-api endpoint runtimes.
+DynamoDB adapters for babbstack endpoint runtimes.
 
 - `createMemoryDynamoDb()`: in-memory fake DB for local development/tests.
 - `createAwsDynamoDb()`: AWS DynamoDB-backed DB (loads AWS SDK dynamically).
@@ -15,7 +15,7 @@ import {
   createRuntimeDynamoDb,
   createTypedDynamoDb,
   defineDynamoDbTable,
-} from "@simple-api/dynamodb";
+} from "@babbstack/dynamodb";
 
 type UserItem = {
   id: string;

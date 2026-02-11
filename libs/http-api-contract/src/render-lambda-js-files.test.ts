@@ -4,7 +4,7 @@ import { definePost } from "./define-post";
 import { listDefinedEndpoints } from "./list-defined-endpoints";
 import { renderLambdaJsFiles } from "./render-lambda-js-files";
 import { resetDefinedEndpoints } from "./reset-defined-endpoints";
-import { schema } from "@simple-api/schema";
+import { schema } from "@babbstack/schema";
 
 describe("renderLambdaJsFiles", () => {
   beforeEach(() => {

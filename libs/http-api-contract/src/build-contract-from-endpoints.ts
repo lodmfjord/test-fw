@@ -1,5 +1,5 @@
 import { buildContract } from "./build-contract";
-import type { Schema } from "@simple-api/schema";
+import type { Schema } from "@babbstack/schema";
 import type {
   BuildContractFromEndpointsInput,
   Contract,
@@ -46,7 +46,7 @@ function toOpenApiDocument(input: BuildContractFromEndpointsInput): OpenApiDocum
     ];
 
     const operation: OpenApiOperation = {
-      "x-simple-api": {
+      "x-babbstack": {
         ...(endpoint.access ? { access: endpoint.access } : {}),
         auth: endpoint.auth,
         ...(endpoint.aws ? { aws: { ...endpoint.aws } } : {}),

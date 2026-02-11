@@ -2,8 +2,8 @@ import {
   createDynamoDatabase,
   type ReadBoundDynamoDatabase,
   type WriteBoundDynamoDatabase,
-} from "@simple-api/dynamodb";
-import { schema } from "@simple-api/schema";
+} from "@babbstack/dynamodb";
+import { schema } from "@babbstack/schema";
 import { z } from "zod";
 
 const pointZodDefinition = z.object({

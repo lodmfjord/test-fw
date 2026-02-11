@@ -1,4 +1,4 @@
-import { buildContractFromEndpoints, listDefinedEndpoints } from "@simple-api/http-api-contract";
+import { buildContractFromEndpoints, listDefinedEndpoints } from "@babbstack/http-api-contract";
 import "./endpoints";
 
 export const testAppContract = buildContractFromEndpoints({

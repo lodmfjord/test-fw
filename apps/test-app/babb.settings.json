@@ -1,0 +1,20 @@
+{
+  "appName": "test-app",
+  "contractExportName": "testAppContract",
+  "contractModulePath": "./src/test-app-contract.ts",
+  "contractsOutputDirectory": "./dist/contracts",
+  "endpointModulePath": "./src/endpoints.ts",
+  "externalModules": ["@aws-sdk/client-dynamodb", "@aws-sdk/util-dynamodb"],
+  "lambdaOutputDirectory": "./dist/lambda-js",
+  "prefix": "babbstack",
+  "terraform": {
+    "enabled": true,
+    "outputDirectory": "./dist",
+    "region": "eu-west-1",
+    "resources": {
+      "apiGateway": true,
+      "dynamodb": true,
+      "lambdas": true
+    }
+  }
+}

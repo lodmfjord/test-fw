@@ -45,7 +45,7 @@ function toImportDescriptor(statement: ts.ImportDeclaration): ImportDescriptor |
   }
 
   const moduleSpecifier = moduleSpecifierNode.text.trim();
-  if (moduleSpecifier.length === 0 || moduleSpecifier === "@simple-api/http-api-contract") {
+  if (moduleSpecifier.length === 0 || moduleSpecifier === "@babbstack/http-api-contract") {
     return null;
   }
 

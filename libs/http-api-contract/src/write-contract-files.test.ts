@@ -8,7 +8,7 @@ import { writeContractFiles } from "./write-contract-files";
 
 describe("writeContractFiles", () => {
   it("writes contract files to disk", async () => {
-    const outputDirectory = await mkdtemp(join(tmpdir(), "simple-api-contract-"));
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-contract-"));
     const contract = buildContract({
       apiName: "write-api",
       version: "0.1.0",

@@ -1,13 +1,25 @@
 {
-  "name": "@simple-api/http-api-contract",
+  "name": "@babbstack/http-api-contract",
   "private": true,
   "type": "module",
+  "scripts": {
+    "build": "bun build src/index.ts src/generate-contracts-bin.ts --outdir dist --format esm --target node --packages external"
+  },
+  "bin": {
+    "babbstack-generate": "./dist/generate-contracts-bin.js",
+    "babstack-generator": "./dist/generate-contracts-bin.js",
+    "generate-contracts-bin.js": "./dist/generate-contracts-bin.js"
+  },
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "bun": "./src/index.ts",
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
   },
   "dependencies": {
-    "@simple-api/dynamodb": "workspace:*",
-    "@simple-api/schema": "workspace:*",
+    "@babbstack/dynamodb": "workspace:*",
+    "@babbstack/schema": "workspace:*",
     "esbuild": "^0.25.12"
   }
 }

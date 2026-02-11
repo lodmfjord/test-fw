@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { buildContractFromEndpoints } from "./build-contract-from-endpoints";
 import { defineEndpoint } from "./define-endpoint";
-import { schema } from "@simple-api/schema";
+import { schema } from "@babbstack/schema";
 
 describe("buildContractFromEndpoints", () => {
   it("builds one lambda per endpoint and includes input/output schemas in OpenAPI", () => {
@@ -51,7 +51,7 @@ describe("buildContractFromEndpoints", () => {
     const getOperation = contract.openapi.paths["/users/{id}"]?.get;
     expect(getOperation?.parameters?.[0]?.in).toBe("path");
     expect(getOperation?.parameters?.[0]?.name).toBe("id");
-    expect(getOperation?.["x-simple-api"].access?.db).toBe("read");
+    expect(getOperation?.["x-babbstack"].access?.db).toBe("read");
 
     const postOperation = contract.openapi.paths["/users"]?.post;
     expect(postOperation?.requestBody?.content["application/json"].schema.type).toBe("object");

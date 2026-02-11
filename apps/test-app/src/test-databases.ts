@@ -1,8 +1,4 @@
-import {
-  createTypedDynamoDb,
-  defineDynamoDbTable,
-  type DynamoDbClient,
-} from "@simple-api/dynamodb";
+import { createTypedDynamoDb, defineDynamoDbTable, type DynamoDbClient } from "@babbstack/dynamodb";
 
 type TestDbOneItem = {
   id: string;

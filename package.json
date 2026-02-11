@@ -1,5 +1,5 @@
 {
-  "name": "simple-api",
+  "name": "babbstack",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -7,6 +7,8 @@
     "libs/*"
   ],
   "scripts": {
+    "build:libs": "bun run --cwd libs/schema build && bun run --cwd libs/dynamodb build && bun run --cwd libs/http-api-contract build",
+    "build": "bun run build:libs",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "tdd": "bun run test:watch",

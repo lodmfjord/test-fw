@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "simple-api",
+      "name": "babbstack",
       "devDependencies": {
         "@biomejs/biome": "^2.3.14",
         "@types/bun": "latest",
@@ -10,32 +10,39 @@
       },
     },
     "apps/test-app": {
-      "name": "@simple-api/test-app",
+      "name": "@babbstack/test-app",
       "dependencies": {
-        "@simple-api/dynamodb": "workspace:*",
-        "@simple-api/http-api-contract": "workspace:*",
-        "@simple-api/schema": "workspace:*",
+        "@aws-sdk/client-dynamodb": "^3.988.0",
+        "@aws-sdk/util-dynamodb": "^3.988.0",
+        "@babbstack/dynamodb": "workspace:*",
+        "@babbstack/http-api-contract": "workspace:*",
+        "@babbstack/schema": "workspace:*",
         "slugify": "^1.6.6",
         "zod": "^4.3.6",
       },
     },
     "libs/dynamodb": {
-      "name": "@simple-api/dynamodb",
+      "name": "@babbstack/dynamodb",
       "dependencies": {
         "@aws-sdk/client-dynamodb": "^3.0.0",
         "@aws-sdk/util-dynamodb": "^3.0.0",
       },
     },
     "libs/http-api-contract": {
-      "name": "@simple-api/http-api-contract",
+      "name": "@babbstack/http-api-contract",
+      "bin": {
+        "babbstack-generate": "./dist/generate-contracts-bin.js",
+        "babstack-generator": "./dist/generate-contracts-bin.js",
+        "generate-contracts-bin.js": "./dist/generate-contracts-bin.js",
+      },
       "dependencies": {
-        "@simple-api/dynamodb": "workspace:*",
-        "@simple-api/schema": "workspace:*",
+        "@babbstack/dynamodb": "workspace:*",
+        "@babbstack/schema": "workspace:*",
         "esbuild": "^0.25.12",
       },
     },
     "libs/schema": {
-      "name": "@simple-api/schema",
+      "name": "@babbstack/schema",
       "dependencies": {
         "zod": "^4.3.6",
       },
@@ -108,6 +115,14 @@
 
     "@aws/lambda-invoke-store": ["@aws/lambda-invoke-store@0.2.3", "", {}, "sha512-oLvsaPMTBejkkmHhjf09xTgk71mOqyr/409NKhRIL08If7AhVfUsJhVsx386uJaqNd42v9kWamQ9lFbkoC2dYw=="],
 
+    "@babbstack/dynamodb": ["@babbstack/dynamodb@workspace:libs/dynamodb"],
+
+    "@babbstack/http-api-contract": ["@babbstack/http-api-contract@workspace:libs/http-api-contract"],
+
+    "@babbstack/schema": ["@babbstack/schema@workspace:libs/schema"],
+
+    "@babbstack/test-app": ["@babbstack/test-app@workspace:apps/test-app"],
+
     "@biomejs/biome": ["@biomejs/biome@2.3.14", "", { "optionalDependencies": { "@biomejs/cli-darwin-arm64": "2.3.14", "@biomejs/cli-darwin-x64": "2.3.14", "@biomejs/cli-linux-arm64": "2.3.14", "@biomejs/cli-linux-arm64-musl": "2.3.14", "@biomejs/cli-linux-x64": "2.3.14", "@biomejs/cli-linux-x64-musl": "2.3.14", "@biomejs/cli-win32-arm64": "2.3.14", "@biomejs/cli-win32-x64": "2.3.14" }, "bin": { "biome": "bin/biome" } }, "sha512-QMT6QviX0WqXJCaiqVMiBUCr5WRQ1iFSjvOLoTk6auKukJMvnMzWucXpwZB0e8F00/1/BsS9DzcKgWH+CLqVuA=="],
 
     "@biomejs/cli-darwin-arm64": ["@biomejs/cli-darwin-arm64@2.3.14", "", { "os": "darwin", "cpu": "arm64" }, "sha512-UJGPpvWJMkLxSRtpCAKfKh41Q4JJXisvxZL8ChN1eNW3m/WlPFJ6EFDCE7YfUb4XS8ZFi3C1dFpxUJ0Ety5n+A=="],
@@ -177,14 +192,6 @@
     "@esbuild/win32-ia32": ["@esbuild/win32-ia32@0.25.12", "", { "os": "win32", "cpu": "ia32" }, "sha512-HkqnmmBoCbCwxUKKNPBixiWDGCpQGVsrQfJoVGYLPT41XWF8lHuE5N6WhVia2n4o5QK5M4tYr21827fNhi4byQ=="],
 
     "@esbuild/win32-x64": ["@esbuild/win32-x64@0.25.12", "", { "os": "win32", "cpu": "x64" }, "sha512-alJC0uCZpTFrSL0CCDjcgleBXPnCrEAhTBILpeAp7M/OFgoqtAetfBzX0xM00MUsVVPpVjlPuMbREqnZCXaTnA=="],
-
-    "@simple-api/dynamodb": ["@simple-api/dynamodb@workspace:libs/dynamodb"],
-
-    "@simple-api/http-api-contract": ["@simple-api/http-api-contract@workspace:libs/http-api-contract"],
-
-    "@simple-api/schema": ["@simple-api/schema@workspace:libs/schema"],
-
-    "@simple-api/test-app": ["@simple-api/test-app@workspace:apps/test-app"],
 
     "@smithy/abort-controller": ["@smithy/abort-controller@4.2.8", "", { "dependencies": { "@smithy/types": "^4.12.0", "tslib": "^2.6.2" } }, "sha512-peuVfkYHAmS5ybKxWcfraK7WBBP0J+rkfUcbHJJKQ4ir3UAUNQI+Y4Vt/PqSzGqgloJ5O1dk7+WzNL8wcCSXbw=="],
 

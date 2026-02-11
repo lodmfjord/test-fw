@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { createDynamoDatabase } from "@simple-api/dynamodb";
-import { schema } from "@simple-api/schema";
+import { createDynamoDatabase } from "@babbstack/dynamodb";
+import { schema } from "@babbstack/schema";
 import { createDevApp } from "./create-dev-app";
 import { defineEndpoint } from "./define-endpoint";
 

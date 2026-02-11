@@ -1,4 +1,4 @@
-import type { DynamoDbClient } from "@simple-api/dynamodb";
+import type { DynamoDbClient } from "@babbstack/dynamodb";
 import type {
   EndpointAccess,
   EndpointContext,
@@ -6,7 +6,7 @@ import type {
   EndpointDbAccess,
   EndpointRuntimeContext,
 } from "./endpoint-context-types";
-import type { JsonSchema, Schema } from "@simple-api/schema";
+import type { JsonSchema, Schema } from "@babbstack/schema";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | "HEAD";
 
@@ -174,7 +174,7 @@ export type OpenApiParameter = {
 };
 
 export type OpenApiOperation = {
-  "x-simple-api": OpenApiExtension;
+  "x-babbstack": OpenApiExtension;
   description?: string;
   operationId: string;
   parameters?: OpenApiParameter[];
