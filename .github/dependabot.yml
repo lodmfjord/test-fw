@@ -11,8 +11,6 @@ updates:
       time: "06:00"
       timezone: "America/New_York"
     open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
     commit-message:
       prefix: "deps"
     groups:
@@ -31,9 +29,6 @@ updates:
       time: "06:30"
       timezone: "America/New_York"
     open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "github-actions"
     commit-message:
       prefix: "ci"
     groups:
