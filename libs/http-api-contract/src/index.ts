@@ -14,6 +14,7 @@ export { listDefinedEndpoints } from "./list-defined-endpoints";
 export { renderContractFiles } from "./render-contract-files";
 export { renderLambdaJsFiles } from "./render-lambda-js-files";
 export { resetDefinedEndpoints } from "./reset-defined-endpoints";
+export { runDevAppFromSettings } from "./run-dev-app-from-settings";
 export { runContractGeneratorFromSettings } from "./run-contract-generator-from-settings";
 export { schema } from "@babbstack/schema";
 export { writeContractFiles } from "./write-contract-files-export";

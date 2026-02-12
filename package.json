@@ -7,6 +7,7 @@
     "libs/*"
   ],
   "scripts": {
+    "dev": "bun run --cwd apps/test-app dev",
     "build:libs": "bun run --cwd libs/schema build && bun run --cwd libs/dynamodb build && bun run --cwd libs/http-api-contract build",
     "build": "bun run build:libs",
     "test": "bun test",

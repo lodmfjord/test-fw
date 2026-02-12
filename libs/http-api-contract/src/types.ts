@@ -69,8 +69,9 @@ export type EndpointHandler<
 }["bivarianceHack"];
 
 export type EndpointHandlerOutput<TResponse> = {
+  contentType?: string;
   statusCode?: number;
-  value: TResponse;
+  value: TResponse | Buffer;
 };
 
 export type EndpointInput<

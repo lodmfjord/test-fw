@@ -2,15 +2,10 @@ import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { beforeEach, describe, expect, it } from "bun:test";
-import { resetDefinedEndpoints } from "./reset-defined-endpoints";
+import { describe, expect, it } from "bun:test";
 import { runContractGeneratorFromSettings } from "./run-contract-generator-from-settings";
 
 describe("runContractGeneratorFromSettings", () => {
-  beforeEach(() => {
-    resetDefinedEndpoints();
-  });
-
   it("generates contract files and lambda files from a settings json file", async () => {
     const workspaceDirectory = await mkdtemp(join(tmpdir(), "babbstack-generator-settings-"));
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
@@ -23,7 +18,7 @@ describe("runContractGeneratorFromSettings", () => {
       `
 import { defineGet, schema } from "${frameworkImportPath}";
 
-defineGet({
+const getHealthEndpoint = defineGet({
   path: "/health",
   handler: () => ({
     value: {
@@ -34,19 +29,21 @@ defineGet({
     status: schema.string(),
   }),
 });
+
+export const endpoints = [getHealthEndpoint];
 `,
       "utf8",
     );
     await writeFile(
       contractPath,
       `
-import { buildContractFromEndpoints, listDefinedEndpoints } from "${frameworkImportPath}";
-import "./endpoints";
+import { buildContractFromEndpoints } from "${frameworkImportPath}";
+import { endpoints } from "./endpoints";
 
 export const contract = buildContractFromEndpoints({
   apiName: "settings-test-api",
   version: "1.0.0",
-  endpoints: listDefinedEndpoints(),
+  endpoints: endpoints.flat(),
 });
 `,
       "utf8",
@@ -103,7 +100,7 @@ export const contract = buildContractFromEndpoints({
       `
 import { defineGet, schema } from "${frameworkImportPath}";
 
-defineGet({
+const getUsersEndpoint = defineGet({
   path: "/users/{id}",
   handler: async ({ db, params }) => {
     const value = await db.read({
@@ -127,19 +124,21 @@ defineGet({
     id: schema.string(),
   }),
 });
+
+export const endpoints = [getUsersEndpoint];
 `,
       "utf8",
     );
     await writeFile(
       contractPath,
       `
-import { buildContractFromEndpoints, listDefinedEndpoints } from "${frameworkImportPath}";
-import "./endpoints";
+import { buildContractFromEndpoints } from "${frameworkImportPath}";
+import { endpoints } from "./endpoints";
 
 export const contract = buildContractFromEndpoints({
   apiName: "settings-test-api",
   version: "1.0.0",
-  endpoints: listDefinedEndpoints(),
+  endpoints: endpoints.flat(),
 });
 `,
       "utf8",
@@ -185,7 +184,7 @@ export const contract = buildContractFromEndpoints({
       `
 import { defineGet, schema } from "${frameworkImportPath}";
 
-defineGet({
+const getHealthEndpoint = defineGet({
   path: "/health",
   handler: () => ({
     value: {
@@ -196,19 +195,21 @@ defineGet({
     status: schema.string(),
   }),
 });
+
+export const endpoints = [getHealthEndpoint];
 `,
       "utf8",
     );
     await writeFile(
       contractPath,
       `
-import { buildContractFromEndpoints, listDefinedEndpoints } from "${frameworkImportPath}";
-import "./endpoints";
+import { buildContractFromEndpoints } from "${frameworkImportPath}";
+import { endpoints } from "./endpoints";
 
 export const contract = buildContractFromEndpoints({
   apiName: "settings-test-api",
   version: "1.0.0",
-  endpoints: listDefinedEndpoints(),
+  endpoints: endpoints.flat(),
 });
 `,
       "utf8",

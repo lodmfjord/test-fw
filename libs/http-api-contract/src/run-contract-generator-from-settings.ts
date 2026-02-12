@@ -8,11 +8,10 @@ import type {
   TerraformStateSettings,
 } from "./contract-generator-types";
 import { collectLambdaExternalModulesByRoute } from "./collect-lambda-external-modules-by-route";
-import { listDefinedEndpoints } from "./list-defined-endpoints";
+import { loadEndpointsFromModule } from "./load-endpoints-from-module";
 import { parseJsonc } from "./parse-jsonc";
 import { renderTerraformFiles } from "./render-terraform-files";
 import { resolvePathFromSettings } from "./resolve-path-from-settings";
-import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 import { toContract } from "./to-contract";
 import { toExternalModulesSetting } from "./to-external-modules-setting";
 import { toImportPath } from "./to-import-path";
@@ -52,11 +51,8 @@ function toStringSetting(
 }
 
 function toBooleanSetting(value: unknown, settingName: string): boolean {
-  if (typeof value !== "boolean") {
-    throw new Error(`Setting "${settingName}" must be a boolean`);
-  }
-
-  return value;
+  if (typeof value === "boolean") return value;
+  throw new Error(`Setting "${settingName}" must be a boolean`);
 }
 
 function toTerraformResources(value: unknown): TerraformResourceSelection {
@@ -189,6 +185,10 @@ function toSettings(value: unknown): ContractGeneratorSettings {
         required: true,
       },
     ),
+    endpointExportName: toStringSetting(source.endpointExportName, "endpointExportName", {
+      defaultValue: "endpoints",
+      required: false,
+    }),
     endpointModulePath: toStringSetting(source.endpointModulePath, "endpointModulePath", {
       required: true,
     }),
@@ -243,8 +243,7 @@ export async function runContractGeneratorFromSettings(
       ? resolvePathFromSettings(settings.terraform.outputDirectory, settingsDirectory)
       : undefined;
 
-  resetDefinedEndpoints();
-  await import(toImportPath(endpointModulePath));
+  const endpoints = await loadEndpointsFromModule(endpointModulePath, settings.endpointExportName);
   const contractModule = (await import(toImportPath(contractModulePath))) as Record<
     string,
     unknown
@@ -254,7 +253,6 @@ export async function runContractGeneratorFromSettings(
     settings.contractExportName ?? "contract",
   );
   const contractFiles = await writeContractFiles(contractsOutputDirectory, contract);
-  const endpoints = listDefinedEndpoints();
   const lambdaFiles = await writeLambdaJsFiles(lambdaOutputDirectory, endpoints, {
     endpointModulePath,
     ...(settings.externalModules ? { externalModules: settings.externalModules } : {}),

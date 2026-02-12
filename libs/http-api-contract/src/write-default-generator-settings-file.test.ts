@@ -16,10 +16,12 @@ describe("writeDefaultGeneratorSettingsFile", () => {
     expect(source.includes("//")).toBe(true);
     const parsed = parseJsonc(source) as {
       contractModulePath?: string;
+      endpointExportName?: string;
       endpointModulePath?: string;
       lambdaOutputDirectory?: string;
     };
     expect(parsed.contractModulePath).toBe("./src/contract.ts");
+    expect(parsed.endpointExportName).toBe("endpoints");
     expect(parsed.endpointModulePath).toBe("./src/endpoints.ts");
     expect(parsed.lambdaOutputDirectory).toBe("./dist/lambda-js");
   });

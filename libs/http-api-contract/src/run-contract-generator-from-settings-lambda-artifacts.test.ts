@@ -27,7 +27,7 @@ describe("runContractGeneratorFromSettings lambda artifacts", () => {
       `
 import { defineGet, schema } from "${frameworkImportPath}";
 
-defineGet({
+const getHealthEndpoint = defineGet({
   path: "/health",
   handler: () => ({
     value: {
@@ -38,19 +38,21 @@ defineGet({
     status: schema.string(),
   }),
 });
+
+export const endpoints = [getHealthEndpoint];
 `,
       "utf8",
     );
     await writeFile(
       contractPath,
       `
-import { buildContractFromEndpoints, listDefinedEndpoints } from "${frameworkImportPath}";
-import "./endpoints";
+import { buildContractFromEndpoints } from "${frameworkImportPath}";
+import { endpoints } from "./endpoints";
 
 export const contract = buildContractFromEndpoints({
   apiName: "settings-test-api",
   version: "1.0.0",
-  endpoints: listDefinedEndpoints(),
+  endpoints: endpoints.flat(),
 });
 `,
       "utf8",

@@ -81,13 +81,42 @@ async function loadEndpoint() {
   return endpointPromise;
 }
 
-function toJsonResponse(statusCode, payload) {
+function isBufferValue(payload) {
+  return typeof Buffer !== "undefined" && Buffer.isBuffer(payload);
+}
+
+function toResponseBody(payload, contentType) {
+  if (isBufferValue(payload)) {
+    return {
+      body: payload.toString("base64"),
+      isBase64Encoded: true
+    };
+  }
+
+  const normalized = String(contentType).toLowerCase();
+  if (normalized.includes("/json") || normalized.includes("+json")) {
+    return {
+      body: JSON.stringify(payload),
+      isBase64Encoded: false
+    };
+  }
+
+  return {
+    body: typeof payload === "string" ? payload : JSON.stringify(payload),
+    isBase64Encoded: false
+  };
+}
+
+function toResponse(statusCode, payload, contentType) {
+  const resolvedContentType = contentType ?? (isBufferValue(payload) ? "application/octet-stream" : "application/json");
+  const responseBody = toResponseBody(payload, resolvedContentType);
   return {
     statusCode,
     headers: {
-      "content-type": "application/json"
+      "content-type": resolvedContentType
     },
-    body: JSON.stringify(payload)
+    ...(responseBody.isBase64Encoded ? { isBase64Encoded: true } : {}),
+    body: responseBody.body
   };
 }
 
@@ -100,7 +129,7 @@ function parseJsonBody(event) {
   try {
     return { ok: true, value: JSON.parse(rawBody) };
   } catch {
-    return { ok: false, error: toJsonResponse(400, { error: "Invalid JSON body" }) };
+    return { ok: false, error: toResponse(400, { error: "Invalid JSON body" }) };
   }
 }
 
@@ -123,8 +152,13 @@ function toHandlerOutput(output) {
   if (!Number.isInteger(statusCode) || statusCode < 100 || statusCode > 599) {
     throw new Error("Handler output statusCode must be an integer between 100 and 599");
   }
+  const contentType = output.contentType;
+  if (contentType !== undefined && (typeof contentType !== "string" || contentType.trim().length === 0)) {
+    throw new Error("Handler output contentType must be a non-empty string");
+  }
 
   return {
+    ...(contentType ? { contentType: contentType.trim() } : {}),
     statusCode,
     value: output.value
   };
@@ -157,10 +191,10 @@ export async function handler(event) {
       }
     });
     const handlerOutput = toHandlerOutput(output);
-    return toJsonResponse(handlerOutput.statusCode, handlerOutput.value);
+    return toResponse(handlerOutput.statusCode, handlerOutput.value, handlerOutput.contentType);
   } catch (error) {
     console.error("Handler execution failed for ${endpoint.method} ${endpoint.path}", error);
-    return toJsonResponse(500, { error: "Handler execution failed" });
+    return toResponse(500, { error: "Handler execution failed" });
   }
 }
 `;

@@ -3,7 +3,7 @@ import { schema } from "@babbstack/schema";
 import slugify from "slugify";
 import { pointDatabase, titleDatabase } from "./db";
 
-defineGet({
+const getHealthEndpoint = defineGet({
   access: {
     db: "read",
   },
@@ -22,7 +22,7 @@ defineGet({
   tags: ["system"],
 });
 
-defineGet({
+const getHelloWorldEndpoint = defineGet({
   access: {
     db: "read",
   },
@@ -44,7 +44,7 @@ defineGet({
   tags: ["system"],
 });
 
-definePost({
+const postUsersEndpoint = definePost({
   access: {
     db: "write",
   },
@@ -67,7 +67,7 @@ definePost({
   tags: ["users"],
 });
 
-defineGet({
+const getTestDbOneEndpoint = defineGet({
   context: {
     database: {
       access: ["read"],
@@ -107,7 +107,7 @@ defineGet({
   tags: ["test-db-one"],
 });
 
-definePatch({
+const patchTestDbOneEndpoint = definePatch({
   context: {
     database: {
       access: ["write"],
@@ -155,7 +155,7 @@ definePatch({
   tags: ["test-db-one"],
 });
 
-defineGet({
+const getTestDbTwoEndpoint = defineGet({
   context: {
     database: {
       access: ["read"],
@@ -195,7 +195,7 @@ defineGet({
   tags: ["test-db-two"],
 });
 
-definePatch({
+const patchTestDbTwoEndpoint = definePatch({
   context: {
     database: {
       access: ["write"],
@@ -242,3 +242,10 @@ definePatch({
   }),
   tags: ["test-db-two"],
 });
+
+export const endpoints = [
+  [getHealthEndpoint, getHelloWorldEndpoint],
+  [postUsersEndpoint],
+  [getTestDbOneEndpoint, patchTestDbOneEndpoint],
+  [getTestDbTwoEndpoint, patchTestDbTwoEndpoint],
+];

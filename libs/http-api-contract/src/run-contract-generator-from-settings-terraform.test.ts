@@ -2,9 +2,8 @@ import { mkdtemp, readdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { beforeEach, describe, expect, it } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { createFakeLayerModulesForTest } from "./create-fake-layer-modules-for-test";
-import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 import { runContractGeneratorFromSettings } from "./run-contract-generator-from-settings";
 
 function toTerraformReference(expression: string): string {
@@ -12,10 +11,6 @@ function toTerraformReference(expression: string): string {
 }
 
 describe("runContractGeneratorFromSettings terraform", () => {
-  beforeEach(() => {
-    resetDefinedEndpoints();
-  });
-
   it("generates split terraform files with region and workspace-aware state backend", async () => {
     const workspaceDirectory = await mkdtemp(join(tmpdir(), "babbstack-generator-settings-"));
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
@@ -47,7 +42,7 @@ const usersTable = createDynamoDatabase(
   },
 );
 
-defineGet({
+const getUsersEndpoint = defineGet({
   path: "/users/{id}",
   context: {
     database: {
@@ -75,7 +70,7 @@ defineGet({
   }),
 });
 
-defineGet({
+const getUsersDetailsEndpoint = defineGet({
   path: "/users/{id}/details",
   handler: ({ params }) => {
     return {
@@ -94,7 +89,7 @@ defineGet({
   }),
 });
 
-defineGet({
+const getHealthEndpoint = defineGet({
   path: "/health",
   handler: () => ({
     value: {
@@ -105,19 +100,21 @@ defineGet({
     status: schema.string(),
   }),
 });
+
+export const endpoints = [getUsersEndpoint, [getUsersDetailsEndpoint], getHealthEndpoint];
 `,
       "utf8",
     );
     await writeFile(
       contractPath,
       `
-import { buildContractFromEndpoints, listDefinedEndpoints } from "${frameworkImportPath}";
-import "./endpoints";
+import { buildContractFromEndpoints } from "${frameworkImportPath}";
+import { endpoints } from "./endpoints";
 
 export const contract = buildContractFromEndpoints({
   apiName: "settings-test-api",
   version: "1.0.0",
-  endpoints: listDefinedEndpoints(),
+  endpoints: endpoints.flat(),
 });
 `,
       "utf8",
@@ -226,7 +223,7 @@ export const contract = buildContractFromEndpoints({
       `
 import { defineGet, schema } from "${frameworkImportPath}";
 
-defineGet({
+const getHealthEndpoint = defineGet({
   path: "/health",
   handler: () => ({
     value: {
@@ -237,19 +234,21 @@ defineGet({
     status: schema.string(),
   }),
 });
+
+export const endpoints = [getHealthEndpoint];
 `,
       "utf8",
     );
     await writeFile(
       contractPath,
       `
-import { buildContractFromEndpoints, listDefinedEndpoints } from "${frameworkImportPath}";
-import "./endpoints";
+import { buildContractFromEndpoints } from "${frameworkImportPath}";
+import { endpoints } from "./endpoints";
 
 export const contract = buildContractFromEndpoints({
   apiName: "settings-test-api",
   version: "1.0.0",
-  endpoints: listDefinedEndpoints(),
+  endpoints: endpoints.flat(),
 });
 `,
       "utf8",

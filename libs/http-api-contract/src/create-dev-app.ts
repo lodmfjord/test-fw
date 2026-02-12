@@ -6,23 +6,22 @@ import {
 import type { EndpointHandlerOutput } from "./types";
 import type { EndpointRuntimeDefinition } from "./types";
 import type { CreateDevAppOptions } from "./types";
+import { toHttpResponseParts } from "./to-http-response-parts";
 
-function toJsonResponse(status: number, payload: unknown): Response {
-  return new Response(JSON.stringify(payload), {
+function toResponse(status: number, payload: unknown, contentType?: string): Response {
+  const responseParts = toHttpResponseParts(payload, contentType);
+
+  return new Response(responseParts.body, {
     headers: {
-      "content-type": "application/json",
+      "content-type": responseParts.contentType,
     },
     status,
   });
 }
 
-function toPathSegments(path: string): string[] {
-  return path.split("/").filter((segment) => segment.length > 0);
-}
-
 function matchPath(templatePath: string, requestPath: string): Record<string, string> | null {
-  const templateSegments = toPathSegments(templatePath);
-  const requestSegments = toPathSegments(requestPath);
+  const templateSegments = templatePath.split("/").filter((segment) => segment.length > 0);
+  const requestSegments = requestPath.split("/").filter((segment) => segment.length > 0);
 
   if (templateSegments.length !== requestSegments.length) {
     return null;
@@ -88,6 +87,7 @@ function toHandlerOutput(output: unknown): EndpointHandlerOutput<unknown> {
   }
 
   const typedOutput = output as {
+    contentType?: unknown;
     statusCode?: unknown;
     value: unknown;
   };
@@ -104,7 +104,20 @@ function toHandlerOutput(output: unknown): EndpointHandlerOutput<unknown> {
     throw new Error("Handler output statusCode must be between 100 and 599");
   }
 
+  let contentType: string | undefined;
+  if (typedOutput.contentType !== undefined) {
+    if (
+      typeof typedOutput.contentType !== "string" ||
+      typedOutput.contentType.trim().length === 0
+    ) {
+      throw new Error("Handler output contentType must be a non-empty string");
+    }
+
+    contentType = typedOutput.contentType.trim();
+  }
+
   return {
+    ...(contentType ? { contentType } : {}),
     statusCode,
     value: typedOutput.value,
   };
@@ -187,7 +200,7 @@ export function createDevApp(
 
     const matched = findEndpoint(endpoints, method, url.pathname);
     if (!matched) {
-      return toJsonResponse(404, { error: "Not found" });
+      return toResponse(404, { error: "Not found" });
     }
 
     const { endpoint, params } = matched;
@@ -198,7 +211,7 @@ export function createDevApp(
         parsedBody = await readJsonBody(request);
       } catch (error) {
         const message = error instanceof Error ? error.message : "body: expected valid JSON";
-        return toJsonResponse(400, { error: message });
+        return toResponse(400, { error: message });
       }
     }
 
@@ -225,7 +238,7 @@ export function createDevApp(
         : validatedBody;
     } catch (error) {
       const message = error instanceof Error ? error.message : "input validation failed";
-      return toJsonResponse(400, { error: message });
+      return toResponse(400, { error: message });
     }
 
     let output: unknown;
@@ -252,15 +265,27 @@ export function createDevApp(
         request,
       });
     } catch {
-      return toJsonResponse(500, { error: "Handler execution failed" });
+      return toResponse(500, { error: "Handler execution failed" });
     }
 
     try {
       const handlerOutput = toHandlerOutput(output);
+      if (typeof Buffer !== "undefined" && Buffer.isBuffer(handlerOutput.value)) {
+        return toResponse(
+          handlerOutput.statusCode ?? 200,
+          handlerOutput.value,
+          handlerOutput.contentType,
+        );
+      }
+
       const validatedOutput = endpoint.response.parse(handlerOutput.value, "response");
-      return toJsonResponse(handlerOutput.statusCode ?? 200, validatedOutput);
+      return toResponse(
+        handlerOutput.statusCode ?? 200,
+        validatedOutput,
+        handlerOutput.contentType,
+      );
     } catch {
-      return toJsonResponse(500, { error: "Output validation failed" });
+      return toResponse(500, { error: "Output validation failed" });
     }
   };
 }

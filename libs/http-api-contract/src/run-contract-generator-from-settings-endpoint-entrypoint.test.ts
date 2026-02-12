@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,23 +6,24 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 import { runContractGeneratorFromSettings } from "./run-contract-generator-from-settings";
 
-describe("runContractGeneratorFromSettings terraform backend", () => {
+describe("runContractGeneratorFromSettings endpoint entrypoint", () => {
   beforeEach(() => {
     resetDefinedEndpoints();
   });
 
-  it("omits backend block when terraform.state.enabled is false", async () => {
+  it("loads endpoints from endpoint entrypoint export and flattens nested arrays", async () => {
     const workspaceDirectory = await mkdtemp(join(tmpdir(), "babbstack-generator-settings-"));
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
     const endpointsPath = join(workspaceDirectory, "endpoints.ts");
     const contractPath = join(workspaceDirectory, "contract.ts");
     const settingsPath = join(workspaceDirectory, "settings.json");
+
     await writeFile(
       endpointsPath,
       `
-import { defineGet, schema } from "${frameworkImportPath}";
+import { defineGet, resetDefinedEndpoints, schema } from "${frameworkImportPath}";
 
-const getHealthEndpoint = defineGet({
+const healthEndpoint = defineGet({
   path: "/health",
   handler: () => ({
     value: {
@@ -34,7 +35,8 @@ const getHealthEndpoint = defineGet({
   }),
 });
 
-export const endpoints = [getHealthEndpoint];
+export const endpoints = [[healthEndpoint]];
+resetDefinedEndpoints();
 `,
       "utf8",
     );
@@ -56,26 +58,11 @@ export const contract = buildContractFromEndpoints({
       settingsPath,
       JSON.stringify(
         {
-          appName: "test-app",
           contractExportName: "contract",
           contractModulePath: "./contract.ts",
           contractsOutputDirectory: "./dist/contracts",
           endpointModulePath: "./endpoints.ts",
           lambdaOutputDirectory: "./dist/lambda-js",
-          prefix: "babbstack",
-          terraform: {
-            enabled: true,
-            outputDirectory: "./dist/terraform",
-            region: "eu-west-1",
-            resources: {
-              apiGateway: true,
-              dynamodb: false,
-              lambdas: false,
-            },
-            state: {
-              enabled: false,
-            },
-          },
         },
         null,
         2,
@@ -83,13 +70,9 @@ export const contract = buildContractFromEndpoints({
       "utf8",
     );
 
-    await runContractGeneratorFromSettings(settingsPath);
-    const providerSource = await readFile(
-      join(workspaceDirectory, "dist/terraform/provider.tf.json"),
-      "utf8",
-    );
-    expect(providerSource.includes('"backend"')).toBe(false);
-    expect(providerSource.includes('"bucket": "')).toBe(false);
-    expect(providerSource.includes('"required_providers"')).toBe(true);
+    const output = await runContractGeneratorFromSettings(settingsPath);
+
+    expect(output.contractFiles.includes("openapi.json")).toBe(true);
+    expect(output.lambdaFiles).toEqual(["get_health.mjs"]);
   });
 });

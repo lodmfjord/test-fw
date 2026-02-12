@@ -3,6 +3,7 @@
   "contractExportName": "testAppContract",
   "contractModulePath": "./src/test-app-contract.ts",
   "contractsOutputDirectory": "./dist/contracts",
+  "endpointExportName": "endpoints",
   "endpointModulePath": "./src/endpoints.ts",
   "externalModules": ["@aws-sdk/client-dynamodb", "@aws-sdk/util-dynamodb"],
   "lambdaOutputDirectory": "./dist/lambda-js",

@@ -31,8 +31,9 @@
     "libs/http-api-contract": {
       "name": "@babbstack/http-api-contract",
       "bin": {
+        "babbstack-dev": "./dist/dev-bin.js",
         "babbstack-generate": "./dist/generate-contracts-bin.js",
-        "babstack-generator": "./dist/generate-contracts-bin.js",
+        "babbstack-generator": "./dist/generate-contracts-bin.js",
         "generate-contracts-bin.js": "./dist/generate-contracts-bin.js",
       },
       "dependencies": {

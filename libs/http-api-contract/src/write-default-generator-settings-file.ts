@@ -6,6 +6,8 @@ const DEFAULT_SETTINGS_TEMPLATE = `{
   "contractExportName": "contract",
   "contractModulePath": "./src/contract.ts",
   "contractsOutputDirectory": "./dist/contracts",
+  // endpoint module should export an array named "endpoints" (nested arrays are supported)
+  "endpointExportName": "endpoints",
   "endpointModulePath": "./src/endpoints.ts",
   // packages must be installed in this app and are layered only for lambdas that need them
   "externalModules": ["@aws-sdk/client-dynamodb", "@aws-sdk/util-dynamodb"],

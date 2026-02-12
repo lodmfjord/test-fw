@@ -31,6 +31,7 @@ export type ContractGeneratorSettings = {
   contractExportName?: string;
   contractModulePath: string;
   contractsOutputDirectory: string;
+  endpointExportName: string;
   endpointModulePath: string;
   externalModules?: string[];
   lambdaOutputDirectory: string;

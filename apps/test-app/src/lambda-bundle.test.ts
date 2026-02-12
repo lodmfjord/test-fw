@@ -4,11 +4,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "bun:test";
-import {
-  listDefinedEndpoints,
-  resetDefinedEndpoints,
-  writeLambdaJsFiles,
-} from "@babbstack/http-api-contract";
+import { writeLambdaJsFiles } from "@babbstack/http-api-contract";
+import { endpoints } from "./endpoints";
 
 type LambdaLikeEvent = {
   body?: string;
@@ -166,12 +163,9 @@ function getEndpointExecutionCases(): Record<string, EndpointExecutionCase> {
 
 describe("generated lambda bundle", () => {
   it("executes every generated endpoint lambda in enclosed runtime", async () => {
-    resetDefinedEndpoints();
     const endpointModulePath = fileURLToPath(new URL("./endpoints.ts", import.meta.url));
-    await import(`./endpoints?test=${Date.now()}`);
-
     const outputDirectory = await mkdtemp(join(tmpdir(), "test-app-lambda-bundle-"));
-    const fileNames = await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
+    const fileNames = await writeLambdaJsFiles(outputDirectory, endpoints.flat(), {
       endpointModulePath,
     });
     const executionCases = getEndpointExecutionCases();

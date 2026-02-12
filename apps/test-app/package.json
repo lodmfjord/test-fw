@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun run src/dev-app.ts",
-    "generate:contracts": "bun run --cwd ../../libs/http-api-contract build && babstack-generator",
+    "dev": "bun run --cwd ../../libs/http-api-contract build && bun ../../libs/http-api-contract/dist/dev-bin.js --settings ./babb.settings.json",
+    "generate:contracts": "bun run --cwd ../../libs/http-api-contract build && bun ../../libs/http-api-contract/dist/generate-contracts-bin.js --settings ./babb.settings.json",
     "smoke:deployed": "bun run src/smoke-test-deployed-api.ts"
   },
   "dependencies": {

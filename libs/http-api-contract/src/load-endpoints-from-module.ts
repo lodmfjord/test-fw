@@ -1,0 +1,52 @@
+import { toImportPath } from "./to-import-path";
+import type { EndpointRuntimeDefinition } from "./types";
+
+function appendEndpoint(
+  result: EndpointRuntimeDefinition[],
+  value: unknown,
+  exportName: string,
+): void {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      appendEndpoint(result, item, exportName);
+    }
+
+    return;
+  }
+
+  if (!value || typeof value !== "object") {
+    throw new Error(
+      `Endpoint export "${exportName}" must contain endpoints or nested endpoint arrays`,
+    );
+  }
+
+  const candidate = value as Partial<EndpointRuntimeDefinition>;
+  if (
+    typeof candidate.routeId !== "string" ||
+    typeof candidate.method !== "string" ||
+    typeof candidate.path !== "string" ||
+    typeof candidate.handler !== "function" ||
+    !candidate.request ||
+    !candidate.response
+  ) {
+    throw new Error(`Invalid endpoint found in export "${exportName}"`);
+  }
+
+  result.push(candidate as EndpointRuntimeDefinition);
+}
+
+export async function loadEndpointsFromModule(
+  endpointModulePath: string,
+  endpointExportName: string,
+): Promise<EndpointRuntimeDefinition[]> {
+  const module = (await import(toImportPath(endpointModulePath))) as Record<string, unknown>;
+  const exported = module[endpointExportName];
+
+  if (exported === undefined) {
+    throw new Error(`Endpoint export "${endpointExportName}" was not found`);
+  }
+
+  const endpoints: EndpointRuntimeDefinition[] = [];
+  appendEndpoint(endpoints, exported, endpointExportName);
+  return endpoints;
+}
