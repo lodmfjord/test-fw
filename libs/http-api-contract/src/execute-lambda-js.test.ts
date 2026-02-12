@@ -168,15 +168,24 @@ defineGet({
     const source = await readFile(join(outputDirectory, "get_users.mjs"), "utf8");
 
     const handler = getHandlerFromSource(source);
+    const capturedErrors: string[] = [];
+    const originalConsoleError = console.error;
+    console.error = (...args: unknown[]) => {
+      capturedErrors.push(args.map((value) => String(value)).join(" "));
+    };
     const response = await handler({
       body: "",
       headers: {},
       pathParameters: {},
       queryStringParameters: {},
     });
+    console.error = originalConsoleError;
 
     expect(response.statusCode).toBe(500);
     expect(JSON.parse(response.body)).toEqual({ error: "Handler execution failed" });
+    expect(
+      capturedErrors.some((entry) => entry.includes("Handler execution failed for GET /users")),
+    ).toBe(true);
   });
 
   it("enforces read-only context.database for generated lambdas", async () => {

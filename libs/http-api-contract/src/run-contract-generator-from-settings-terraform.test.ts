@@ -177,10 +177,12 @@ export const contract = buildContractFromEndpoints({
       "utf8",
     );
 
-    expect(providerSource.includes('"bucket": "babbstack-terraform-state"')).toBe(true);
+    expect(providerSource.includes('"bucket": "babbstack-test-app-terraform-state"')).toBe(true);
     expect(providerSource.includes('"key": "terraform.tfstate"')).toBe(true);
     expect(providerSource.includes('"workspace_key_prefix": "babbstack/test-app"')).toBe(true);
-    expect(providerSource.includes('"dynamodb_table": "babbstack-terraform-locks"')).toBe(true);
+    expect(providerSource.includes('"dynamodb_table": "babbstack-test-app-terraform-locks"')).toBe(
+      true,
+    );
     expect(providerSource.includes('"default": "eu-west-1"')).toBe(true);
     expect(providerSource.includes('"default": "test-app"')).toBe(true);
     expect(providerSource.includes('"default": "babbstack"')).toBe(true);
@@ -193,8 +195,8 @@ export const contract = buildContractFromEndpoints({
     const layerArtifacts = await readdir(
       join(workspaceDirectory, "dist/terraform/layer-artifacts"),
     );
-    expect(layerArtifacts.length).toBe(1);
-    expect(layerArtifacts[0]?.endsWith(".zip")).toBe(true);
+    expect(layerArtifacts.some((fileName) => fileName.endsWith(".zip"))).toBe(true);
+    expect(layerArtifacts.includes("source-code-hashes.json")).toBe(true);
 
     expect(
       apiGatewaySource.includes(

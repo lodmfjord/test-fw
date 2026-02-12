@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "bun run src/dev-app.ts",
-    "generate:contracts": "bun run --cwd ../../libs/http-api-contract build && babstack-generator"
+    "generate:contracts": "bun run --cwd ../../libs/http-api-contract build && babstack-generator",
+    "smoke:deployed": "bun run src/smoke-test-deployed-api.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.988.0",

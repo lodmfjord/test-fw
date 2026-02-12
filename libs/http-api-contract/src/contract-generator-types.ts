@@ -4,12 +4,19 @@ export type TerraformResourceSelection = {
   lambdas: boolean;
 };
 
-export type TerraformStateSettings = {
+type TerraformDisabledStateSettings = {
+  enabled: false;
+};
+
+type TerraformEnabledStateSettings = {
+  enabled?: true;
   bucket: string;
   encrypt: boolean;
   keyPrefix: string;
   lockTableName?: string;
 };
+
+export type TerraformStateSettings = TerraformDisabledStateSettings | TerraformEnabledStateSettings;
 
 export type TerraformGeneratorSettings = {
   enabled: boolean;

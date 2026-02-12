@@ -36,17 +36,31 @@ function toTerraformReference(expression: string): string {
 function toResolvedStateSettings(
   settings: TerraformRenderSettings,
   appName: string,
-): TerraformResolvedState {
+): TerraformResolvedState | undefined {
   if (settings.state) {
-    return settings.state;
+    if (settings.state.enabled === false) {
+      return undefined;
+    }
+
+    return {
+      bucket: settings.state.bucket,
+      encrypt: settings.state.encrypt,
+      keyPrefix: settings.state.keyPrefix,
+      ...(settings.state.lockTableName
+        ? {
+            lockTableName: settings.state.lockTableName,
+          }
+        : {}),
+    };
   }
 
-  const resourcePrefix = settings.prefix.length > 0 ? settings.prefix : appName;
+  const stateResourcePrefix =
+    settings.prefix.length > 0 ? `${settings.prefix}-${appName}` : appName;
   return {
-    bucket: `${resourcePrefix}-terraform-state`,
+    bucket: `${stateResourcePrefix}-terraform-state`,
     encrypt: true,
     keyPrefix: settings.prefix.length > 0 ? `${settings.prefix}/${appName}` : appName,
-    lockTableName: `${resourcePrefix}-terraform-locks`,
+    lockTableName: `${stateResourcePrefix}-terraform-locks`,
   };
 }
 
@@ -60,19 +74,24 @@ function toTerraformBlock(settings: TerraformRenderSettings, appName: string): T
       },
     },
     required_version: ">= 1.5.0",
-    backend: {
-      s3: {
-        bucket: state.bucket,
-        encrypt: state.encrypt,
-        key: toStateKey(state),
-        region: settings.region,
-        workspace_key_prefix: state.keyPrefix.replace(/\/+$/g, ""),
-        ...(state.lockTableName
-          ? {
-              dynamodb_table: state.lockTableName,
-            }
-          : {}),
-      },
+  };
+
+  if (!state) {
+    return terraformBlock;
+  }
+
+  terraformBlock.backend = {
+    s3: {
+      bucket: state.bucket,
+      encrypt: state.encrypt,
+      key: toStateKey(state),
+      region: settings.region,
+      workspace_key_prefix: state.keyPrefix.replace(/\/+$/g, ""),
+      ...(state.lockTableName
+        ? {
+            dynamodb_table: state.lockTableName,
+          }
+        : {}),
     },
   };
 
@@ -123,7 +142,9 @@ function createApiGatewayTerraformJson(contract: Contract): TerraformJson {
         default: {
           api_id: toTerraformReference("aws_apigatewayv2_api.http_api.id"),
           auto_deploy: true,
-          name: `${toTerraformReference("local.resource_name_prefix")}${toTerraformReference("var.stage_name")}`,
+          name: toTerraformReference(
+            'var.stage_name == "$default" ? var.stage_name : join("", [local.resource_name_prefix, var.stage_name])',
+          ),
         },
       },
     },
@@ -217,7 +238,12 @@ export function renderTerraformFiles(
 
   if (resources.lambdas) {
     files["lambdas.tf.json"] = toTerraformString(
-      createLambdasTerraformJson(contract, settings.lambdaExternalModulesByRoute),
+      createLambdasTerraformJson(
+        contract,
+        endpoints,
+        settings.lambdaExternalModulesByRoute,
+        resources.dynamodb,
+      ),
     );
   }
 

@@ -69,6 +69,9 @@ function toDatabaseForContext(client, config) {
     return undefined;
   }
 
+  const tableNamePrefix = typeof process === "undefined" || !process.env
+    ? ""
+    : process.env.SIMPLE_API_DYNAMODB_TABLE_NAME_PREFIX ?? "";
   const scopedDb = Array.isArray(config.access) && config.access.includes("write")
     ? client
     : {
@@ -80,7 +83,7 @@ function toDatabaseForContext(client, config) {
     }
   };
   const database = createSimpleApiCreateDynamoDatabase(parser, config.runtime.keyField, {
-    tableName: config.runtime.tableName
+    tableName: tableNamePrefix + config.runtime.tableName
   });
   return database.bind(scopedDb);
 }
@@ -158,7 +161,8 @@ export async function handler(event) {
     });
     const handlerOutput = toHandlerOutput(output);
     return toJsonResponse(handlerOutput.statusCode, handlerOutput.value);
-  } catch {
+  } catch (error) {
+    console.error("Handler execution failed for ${endpoint.method} ${endpoint.path}", error);
     return toJsonResponse(500, { error: "Handler execution failed" });
   }
 }

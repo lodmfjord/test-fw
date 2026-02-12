@@ -11,6 +11,9 @@
     "enabled": true,
     "outputDirectory": "./dist",
     "region": "eu-west-1",
+    "state": {
+      "enabled": false
+    },
     "resources": {
       "apiGateway": true,
       "dynamodb": true,

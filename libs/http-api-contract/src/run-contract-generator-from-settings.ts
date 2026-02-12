@@ -19,9 +19,9 @@ import { toImportPath } from "./to-import-path";
 import { toLambdaLayerMetadata } from "./to-lambda-layer-metadata";
 import { writeContractFiles } from "./write-contract-files-export";
 import { writeLambdaLayerArtifacts } from "./write-lambda-layer-artifacts";
+import { writeLambdaFunctionArtifacts } from "./write-lambda-function-artifacts";
 import { writeLambdaJsFiles } from "./write-lambda-js-files-export";
 import { writeTerraformFiles } from "./write-terraform-files";
-
 function toStringSetting(
   value: unknown,
   settingName: string,
@@ -94,11 +94,15 @@ function toTerraformState(value: unknown): TerraformStateSettings | undefined {
     return undefined;
   }
 
+  if (value === false) return { enabled: false };
+
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error('Setting "terraform.state" must be an object');
+    throw new Error('Setting "terraform.state" must be an object or false');
   }
 
   const source = value as Record<string, unknown>;
+  if (source.enabled === false) return { enabled: false };
+
   return {
     bucket: toStringSetting(source.bucket, "terraform.state.bucket", { required: true }),
     encrypt:
@@ -249,7 +253,6 @@ export async function runContractGeneratorFromSettings(
     contractModule[settings.contractExportName ?? "contract"],
     settings.contractExportName ?? "contract",
   );
-
   const contractFiles = await writeContractFiles(contractsOutputDirectory, contract);
   const endpoints = listDefinedEndpoints();
   const lambdaFiles = await writeLambdaJsFiles(lambdaOutputDirectory, endpoints, {
@@ -264,6 +267,11 @@ export async function runContractGeneratorFromSettings(
   );
   const lambdaLayerMetadata = toLambdaLayerMetadata(lambdaExternalModulesByRoute);
   if (terraformOutputDirectory && settings.terraform?.resources.lambdas) {
+    await writeLambdaFunctionArtifacts(
+      resolvePathFromSettings("lambda-artifacts", terraformOutputDirectory),
+      contract.lambdasManifest,
+      lambdaOutputDirectory,
+    );
     await writeLambdaLayerArtifacts(
       resolvePathFromSettings("layer-artifacts", terraformOutputDirectory),
       lambdaLayerMetadata,
