@@ -151,9 +151,7 @@ function toSqsForContext(client, config) {
 ${runtimeSqsState}
 ${endpointDatabaseContextLine}
 ${endpointSqsContextLine}
-
 const endpointHandler = (${endpoint.handler.toString()});
-
 function isBufferValue(payload) {
   return typeof Buffer !== "undefined" && Buffer.isBuffer(payload);
 }
@@ -180,12 +178,13 @@ function toResponseBody(payload, contentType) {
   };
 }
 
-function toResponse(statusCode, payload, contentType) {
+function toResponse(statusCode, payload, contentType, headers) {
   const resolvedContentType = contentType ?? (isBufferValue(payload) ? "application/octet-stream" : "application/json");
   const responseBody = toResponseBody(payload, resolvedContentType);
   return {
     statusCode,
     headers: {
+      ...(headers ?? {}),
       "content-type": resolvedContentType
     },
     ...(responseBody.isBase64Encoded ? { isBase64Encoded: true } : {}),
@@ -198,7 +197,6 @@ function parseJsonBody(event) {
   if (rawBody.trim().length === 0) {
     return { ok: true, value: undefined };
   }
-
   try {
     return { ok: true, value: JSON.parse(rawBody) };
   } catch {
@@ -220,9 +218,21 @@ function toHandlerOutput(output) {
   if (contentType !== undefined && (typeof contentType !== "string" || contentType.trim().length === 0)) {
     throw new Error("Handler output contentType must be a non-empty string");
   }
+  const outputHeaders = output.headers;
+  if (outputHeaders !== undefined && (!outputHeaders || typeof outputHeaders !== "object" || Array.isArray(outputHeaders))) {
+    throw new Error("Handler output headers must be an object with string values");
+  }
+  const headers = {};
+  for (const [key, value] of Object.entries(outputHeaders ?? {})) {
+    if (typeof value !== "string") {
+      throw new Error("Handler output headers must be an object with string values");
+    }
+    headers[key] = value;
+  }
 
   return {
     ...(contentType ? { contentType: contentType.trim() } : {}),
+    ...(Object.keys(headers).length > 0 ? { headers } : {}),
     statusCode,
     value: output.value
   };
@@ -257,7 +267,7 @@ export async function handler(event) {
       sqs: ${endpointSqsValue}
     });
     const handlerOutput = toHandlerOutput(output);
-    return toResponse(handlerOutput.statusCode, handlerOutput.value, handlerOutput.contentType);
+    return toResponse(handlerOutput.statusCode, handlerOutput.value, handlerOutput.contentType, handlerOutput.headers);
   } catch (error) {
     console.error("Handler execution failed for ${endpoint.method} ${endpoint.path}", error);
     return toResponse(500, { error: "Handler execution failed" });

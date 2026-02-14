@@ -11,6 +11,7 @@ import { toContractGeneratorSettings } from "./to-contract-generator-settings";
 import { toContract } from "./to-contract";
 import { toImportPath } from "./to-import-path";
 import { toLambdaLayerMetadata } from "./to-lambda-layer-metadata";
+import { toRuntimeEndpointsWithGlobalCorsOptions } from "./to-runtime-endpoints-with-global-cors-options";
 import { writeContractFiles } from "./write-contract-files-export";
 import { writeLambdaLayerArtifacts } from "./write-lambda-layer-artifacts";
 import { writeLambdaFunctionArtifacts } from "./write-lambda-function-artifacts";
@@ -71,11 +72,16 @@ export async function runContractGeneratorFromSettings(
     contractModule[settings.contractExportName ?? "contract"],
     settings.contractExportName ?? "contract",
   );
+  const endpointsWithCorsOptions = toRuntimeEndpointsWithGlobalCorsOptions(contract, endpoints);
   const contractFiles = await writeContractFiles(contractsOutputDirectory, contract);
-  const routeLambdaFiles = await writeLambdaJsFiles(lambdaOutputDirectory, endpoints, {
-    endpointModulePath,
-    ...(settings.externalModules ? { externalModules: settings.externalModules } : {}),
-  });
+  const routeLambdaFiles = await writeLambdaJsFiles(
+    lambdaOutputDirectory,
+    endpointsWithCorsOptions,
+    {
+      endpointModulePath,
+      ...(settings.externalModules ? { externalModules: settings.externalModules } : {}),
+    },
+  );
   const sqsListenerLambdaFiles = await writeSqsListenerJsFiles(
     lambdaOutputDirectory,
     sqsListeners,
@@ -111,7 +117,7 @@ export async function runContractGeneratorFromSettings(
     terraformOutputDirectory && settings.terraform
       ? await writeTerraformFiles(
           terraformOutputDirectory,
-          renderTerraformFiles(contract, endpoints, sqsListeners, {
+          renderTerraformFiles(contract, endpointsWithCorsOptions, sqsListeners, {
             appName: settings.appName ?? "",
             lambdaExternalModulesByRoute,
             prefix: settings.prefix ?? "",

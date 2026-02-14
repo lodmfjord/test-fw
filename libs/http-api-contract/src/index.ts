@@ -40,6 +40,7 @@ export type {
   RouteDefinition,
   RouteInput,
 } from "./types";
+export type { GlobalCors } from "./cors-types";
 export type {
   ContractGeneratorOutput,
   ContractGeneratorSettings,

@@ -10,6 +10,7 @@ describe("test-app showcase", () => {
       new Request("http://local/last-update", { method: "GET" }),
     );
     expect(firstResponse.status).toBe(200);
+    expect(firstResponse.headers.get("x-test-app")).toBe("simple-api");
     const firstPayload = (await firstResponse.json()) as { time?: string };
     expect(typeof firstPayload.time).toBe("string");
     if (!firstPayload.time) {
@@ -24,6 +25,7 @@ describe("test-app showcase", () => {
       new Request("http://local/last-update", { method: "GET" }),
     );
     expect(secondResponse.status).toBe(200);
+    expect(secondResponse.headers.get("x-test-app")).toBe("simple-api");
     const secondPayload = (await secondResponse.json()) as { time?: string };
     expect(typeof secondPayload.time).toBe("string");
     if (!secondPayload.time) {
@@ -42,6 +44,7 @@ describe("test-app showcase", () => {
       "get_last_update",
       "post_s3_demo_files",
       "get_s3_demo_files",
+      "get_s3_demo_files_raw",
       "get_s3_demo_files_list",
       "get_s3_demo_secure_link",
     ]);
@@ -92,6 +95,18 @@ describe("test-app showcase", () => {
       key,
       size: content.length,
     });
+
+    const rawResponse = await testAppFetch(
+      new Request(
+        `http://local/s3-demo/files/raw?bucketName=${encodeURIComponent(bucketName)}&key=${encodeURIComponent(key)}`,
+        {
+          method: "GET",
+        },
+      ),
+    );
+    expect(rawResponse.status).toBe(200);
+    expect(rawResponse.headers.get("content-type")).toBe(contentType);
+    expect(Buffer.from(await rawResponse.arrayBuffer()).toString("utf8")).toBe(content);
 
     const listResponse = await testAppFetch(
       new Request(

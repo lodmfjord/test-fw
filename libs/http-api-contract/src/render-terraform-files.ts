@@ -2,6 +2,7 @@ import type {
   TerraformGeneratorSettings,
   TerraformResourceSelection,
 } from "./contract-generator-types";
+import { createApiGatewayTerraformJson } from "./create-api-gateway-terraform-json";
 import { createLambdasTerraformJson } from "./create-lambdas-terraform-json";
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import { toDynamodbTables } from "./to-dynamodb-tables";
@@ -125,35 +126,6 @@ function createProviderTerraformJson(
       },
       prefix: {
         default: settings.prefix,
-        type: "string",
-      },
-    },
-  };
-}
-
-function createApiGatewayTerraformJson(contract: Contract): TerraformJson {
-  return {
-    resource: {
-      aws_apigatewayv2_api: {
-        http_api: {
-          name: `${toTerraformReference("local.resource_name_prefix")}${toTerraformReference("var.api_name")}`,
-          protocol_type: "HTTP",
-        },
-      },
-      aws_apigatewayv2_stage: {
-        default: {
-          api_id: toTerraformReference("aws_apigatewayv2_api.http_api.id"),
-          auto_deploy: true,
-          name: toTerraformReference(
-            'var.stage_name == "$default" ? var.stage_name : join("", [local.resource_name_prefix, var.stage_name])',
-          ),
-        },
-      },
-    },
-    variable: {
-      api_name: { default: contract.deployContract.apiName, type: "string" },
-      stage_name: {
-        default: contract.deployContract.apiGateway.stageName,
         type: "string",
       },
     },

@@ -97,9 +97,40 @@ function toOpenApiDocument(input: BuildContractFromEndpointsInput): OpenApiDocum
   };
 }
 
+function withOptionsOperations(
+  contractOpenApi: OpenApiDocument,
+  openApiWithSchemas: OpenApiDocument,
+): OpenApiDocument {
+  const paths: OpenApiDocument["paths"] = {};
+
+  const allPaths = new Set<string>([
+    ...Object.keys(contractOpenApi.paths),
+    ...Object.keys(openApiWithSchemas.paths),
+  ]);
+  for (const path of allPaths) {
+    const contractPathItem = contractOpenApi.paths[path] ?? {};
+    const schemaPathItem = openApiWithSchemas.paths[path] ?? {};
+
+    paths[path] = {
+      ...schemaPathItem,
+      ...(schemaPathItem.options
+        ? {}
+        : contractPathItem.options
+          ? { options: contractPathItem.options }
+          : {}),
+    };
+  }
+
+  return {
+    ...openApiWithSchemas,
+    paths,
+  };
+}
+
 export function buildContractFromEndpoints(input: BuildContractFromEndpointsInput): Contract {
   const baseContract = buildContract({
     apiName: input.apiName,
+    ...(input.cors ? { cors: { ...input.cors } } : {}),
     ...(input.env ? { env: input.env } : {}),
     routes: input.endpoints.map((endpoint) => ({
       auth: endpoint.auth,
@@ -115,9 +146,10 @@ export function buildContractFromEndpoints(input: BuildContractFromEndpointsInpu
     })),
     version: input.version,
   });
+  const openApiWithSchemas = toOpenApiDocument(input);
 
   return {
     ...baseContract,
-    openapi: toOpenApiDocument(input),
+    openapi: withOptionsOperations(baseContract.openapi, openApiWithSchemas),
   };
 }

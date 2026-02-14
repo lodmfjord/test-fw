@@ -4,17 +4,23 @@ import {
   type DynamoDbClient,
 } from "@babbstack/dynamodb";
 import { createRuntimeSqs } from "@babbstack/sqs";
-import type { EndpointHandlerOutput } from "./types";
-import type { EndpointRuntimeDefinition } from "./types";
 import type { CreateDevAppOptions } from "./types";
+import type { EndpointRuntimeDefinition } from "./types";
 import { toEndpointSqsContext } from "./to-endpoint-sqs-context";
+import { toEndpointHandlerOutput } from "./to-endpoint-handler-output";
 import { toHttpResponseParts } from "./to-http-response-parts";
 
-function toResponse(status: number, payload: unknown, contentType?: string): Response {
+function toResponse(
+  status: number,
+  payload: unknown,
+  contentType?: string,
+  headers?: Record<string, string>,
+): Response {
   const responseParts = toHttpResponseParts(payload, contentType);
 
   return new Response(responseParts.body, {
     headers: {
+      ...(headers ?? {}),
       "content-type": responseParts.contentType,
     },
     status,
@@ -81,48 +87,6 @@ async function readJsonBody(request: Request): Promise<unknown> {
   } catch {
     throw new Error("body: expected valid JSON");
   }
-}
-
-function toHandlerOutput(output: unknown): EndpointHandlerOutput<unknown> {
-  if (!output || typeof output !== "object" || !("value" in output)) {
-    throw new Error("Handler output must include value");
-  }
-
-  const typedOutput = output as {
-    contentType?: unknown;
-    statusCode?: unknown;
-    value: unknown;
-  };
-  let statusCode = 200;
-  if (typedOutput.statusCode !== undefined) {
-    if (!Number.isInteger(typedOutput.statusCode)) {
-      throw new Error("Handler output statusCode must be an integer");
-    }
-
-    statusCode = typedOutput.statusCode as number;
-  }
-
-  if (statusCode < 100 || statusCode > 599) {
-    throw new Error("Handler output statusCode must be between 100 and 599");
-  }
-
-  let contentType: string | undefined;
-  if (typedOutput.contentType !== undefined) {
-    if (
-      typeof typedOutput.contentType !== "string" ||
-      typedOutput.contentType.trim().length === 0
-    ) {
-      throw new Error("Handler output contentType must be a non-empty string");
-    }
-
-    contentType = typedOutput.contentType.trim();
-  }
-
-  return {
-    ...(contentType ? { contentType } : {}),
-    statusCode,
-    value: typedOutput.value,
-  };
 }
 
 function findEndpoint(
@@ -275,12 +239,13 @@ export function createDevApp(
     }
 
     try {
-      const handlerOutput = toHandlerOutput(output);
+      const handlerOutput = toEndpointHandlerOutput(output);
       if (typeof Buffer !== "undefined" && Buffer.isBuffer(handlerOutput.value)) {
         return toResponse(
           handlerOutput.statusCode ?? 200,
           handlerOutput.value,
           handlerOutput.contentType,
+          handlerOutput.headers,
         );
       }
 
@@ -289,6 +254,7 @@ export function createDevApp(
         handlerOutput.statusCode ?? 200,
         validatedOutput,
         handlerOutput.contentType,
+        handlerOutput.headers,
       );
     } catch {
       return toResponse(500, { error: "Output validation failed" });

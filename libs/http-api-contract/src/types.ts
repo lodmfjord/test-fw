@@ -1,5 +1,6 @@
 import type { DynamoDbClient } from "@babbstack/dynamodb";
 import type { SqsClient } from "@babbstack/sqs";
+import type { GlobalCors } from "./cors-types";
 import type {
   EndpointAccess,
   EndpointContext,
@@ -71,6 +72,7 @@ export type EndpointHandler<
 
 export type EndpointHandlerOutput<TResponse> = {
   contentType?: string;
+  headers?: Record<string, string>;
   statusCode?: number;
   value: TResponse | Buffer;
 };
@@ -142,6 +144,7 @@ export type EnvVarDefinition = {
 
 export type BuildContractInput = {
   apiName: string;
+  cors?: GlobalCors;
   env?: EnvVarDefinition[];
   routes: RouteDefinition[];
   version: string;
@@ -149,6 +152,7 @@ export type BuildContractInput = {
 
 export type BuildContractFromEndpointsInput = {
   apiName: string;
+  cors?: GlobalCors;
   endpoints: ReadonlyArray<EndpointContractDefinition>;
   env?: EnvVarDefinition[];
   version: string;
@@ -251,6 +255,7 @@ export type LambdasManifest = {
 
 export type DeployContract = {
   apiGateway: {
+    cors?: GlobalCors;
     stageName: "$default";
     type: "http-api-v2";
   };

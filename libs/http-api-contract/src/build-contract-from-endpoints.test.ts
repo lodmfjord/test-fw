@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { buildContractFromEndpoints } from "./build-contract-from-endpoints";
 import { defineEndpoint } from "./define-endpoint";
+import { defineOptions } from "./define-options";
 import { schema } from "@babbstack/schema";
 
 describe("buildContractFromEndpoints", () => {
@@ -58,5 +59,91 @@ describe("buildContractFromEndpoints", () => {
     expect(postOperation?.responses["200"]?.content?.["application/json"]?.schema.type).toBe(
       "object",
     );
+  });
+
+  it("adds one synthetic OPTIONS endpoint per unique path when global cors is enabled", () => {
+    const contract = buildContractFromEndpoints({
+      apiName: "users-api",
+      cors: {
+        allowOrigin: "https://app.example.com",
+      },
+      version: "1.0.0",
+      endpoints: [
+        defineEndpoint({
+          method: "GET",
+          path: "/users",
+          handler: () => ({ value: { ok: true } }),
+          response: schema.object({
+            ok: schema.boolean(),
+          }),
+        }),
+        defineEndpoint({
+          method: "POST",
+          path: "/users",
+          handler: () => ({ value: { ok: true } }),
+          response: schema.object({
+            ok: schema.boolean(),
+          }),
+        }),
+        defineEndpoint({
+          method: "PATCH",
+          path: "/users",
+          handler: () => ({ value: { ok: true } }),
+          response: schema.object({
+            ok: schema.boolean(),
+          }),
+        }),
+        defineEndpoint({
+          method: "GET",
+          path: "/health",
+          handler: () => ({ value: { ok: true } }),
+          response: schema.object({
+            ok: schema.boolean(),
+          }),
+        }),
+      ],
+    });
+
+    const optionRoutes = contract.routesManifest.routes.filter(
+      (route) => route.method === "OPTIONS",
+    );
+    expect(optionRoutes).toHaveLength(2);
+    expect(
+      optionRoutes.map((route) => route.path).sort((left, right) => left.localeCompare(right)),
+    ).toEqual(["/health", "/users"]);
+    expect(contract.openapi.paths["/users"]?.options?.operationId).toBe("optionsUsers");
+    expect(
+      contract.lambdasManifest.functions.some((item) => item.routeId === "options_users"),
+    ).toBe(true);
+  });
+
+  it("does not add a synthetic OPTIONS endpoint when one already exists", () => {
+    const contract = buildContractFromEndpoints({
+      apiName: "users-api",
+      cors: {
+        allowOrigin: "*",
+      },
+      version: "1.0.0",
+      endpoints: [
+        defineEndpoint({
+          method: "GET",
+          path: "/users",
+          handler: () => ({ value: { ok: true } }),
+          response: schema.object({
+            ok: schema.boolean(),
+          }),
+        }),
+        defineOptions({
+          path: "/users",
+          handler: () => ({ value: {} }),
+          response: schema.object({}),
+        }),
+      ],
+    });
+
+    const optionRoutes = contract.routesManifest.routes.filter(
+      (route) => route.method === "OPTIONS" && route.path === "/users",
+    );
+    expect(optionRoutes).toHaveLength(1);
   });
 });

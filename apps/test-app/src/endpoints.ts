@@ -47,6 +47,9 @@ const getLastUpdateEndpoint = defineGet({
     });
 
     return {
+      headers: {
+        "x-test-app": "simple-api",
+      },
       value: {
         time: lastUpdateStore.read(),
       },
@@ -126,6 +129,32 @@ const getS3DemoFileEndpoint = defineGet({
   tags: ["s3-demo"],
 });
 
+const getS3DemoRawFileEndpoint = defineGet({
+  path: "/s3-demo/files/raw",
+  handler: async ({ query }) => {
+    const object = await s3.get({
+      bucketName: query.bucketName,
+      key: query.key,
+    });
+    if (!object) {
+      throw new Error("S3 object not found");
+    }
+
+    return {
+      contentType: object.contentType,
+      value: Buffer.from(object.body),
+    };
+  },
+  request: {
+    query: schema.object({
+      bucketName: schema.string(),
+      key: schema.string(),
+    }),
+  },
+  response: schema.string(),
+  tags: ["s3-demo"],
+});
+
 const listS3DemoFilesEndpoint = defineGet({
   path: "/s3-demo/files/list",
   handler: async ({ query }) => {
@@ -200,6 +229,7 @@ export const endpoints = [
   [
     putS3DemoFileEndpoint,
     getS3DemoFileEndpoint,
+    getS3DemoRawFileEndpoint,
     listS3DemoFilesEndpoint,
     getS3DemoSecureLinkEndpoint,
   ],

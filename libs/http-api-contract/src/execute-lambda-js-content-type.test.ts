@@ -130,4 +130,51 @@ defineGet({
     expect(response.isBase64Encoded).toBe(true);
     expect(response.body).toBe(Buffer.from([0, 1, 2, 3]).toString("base64"));
   });
+
+  it("returns custom headers from handler output", async () => {
+    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
+    const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
+    const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
+    await writeFile(
+      endpointModulePath,
+      `
+import { defineGet, schema } from "${frameworkImportPath}";
+
+defineGet({
+  path: "/headers",
+  handler: () => ({
+    headers: {
+      "x-trace-id": "abc-123",
+    },
+    value: { ok: true },
+  }),
+  response: schema.object({
+    ok: schema.boolean(),
+  }),
+});
+`,
+      "utf8",
+    );
+
+    await import(pathToFileURL(endpointModulePath).href);
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
+    await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
+      endpointModulePath,
+      frameworkImportPath,
+    });
+    const source = await readFile(join(outputDirectory, "get_headers.mjs"), "utf8");
+
+    const handler = getHandlerFromSource(source);
+    const response = await handler({
+      body: "",
+      headers: {},
+      pathParameters: {},
+      queryStringParameters: {},
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers["x-trace-id"]).toBe("abc-123");
+    expect(response.headers["content-type"]).toBe("application/json");
+    expect(JSON.parse(response.body)).toEqual({ ok: true });
+  });
 });

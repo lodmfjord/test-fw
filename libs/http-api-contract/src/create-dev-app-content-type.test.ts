@@ -43,4 +43,27 @@ describe("createDevApp contentType", () => {
     expect(response.headers.get("content-type")).toBe("application/octet-stream");
     expect(Buffer.from(await response.arrayBuffer())).toEqual(Buffer.from([0, 1, 2, 3]));
   });
+
+  it("returns custom headers from handler output", async () => {
+    const fetch = createDevApp([
+      defineEndpoint({
+        method: "GET",
+        path: "/headers",
+        handler: () => ({
+          headers: {
+            "x-trace-id": "abc-123",
+          },
+          value: "ok",
+        }),
+        response: schema.string(),
+      }),
+    ]);
+
+    const response = await fetch(new Request("http://local/headers", { method: "GET" }));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-trace-id")).toBe("abc-123");
+    expect(response.headers.get("content-type")).toBe("application/json");
+    expect(await response.text()).toBe('"ok"');
+  });
 });
