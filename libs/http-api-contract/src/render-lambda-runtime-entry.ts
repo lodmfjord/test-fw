@@ -1,39 +1,7 @@
-import { createRequire } from "node:module";
-import { fileURLToPath } from "node:url";
+import { renderLambdaEnvBootstrapSource } from "./render-lambda-env-bootstrap-source";
 import { renderUsedImportLines } from "./render-used-import-lines";
+import { resolveRuntimeModuleSpecifier } from "./resolve-runtime-module-specifier";
 import type { EndpointRuntimeDefinition } from "./types";
-
-function resolveRuntimeDbImportSpecifier(endpointModulePath: string): string {
-  const moduleSpecifier = "@babbstack/dynamodb";
-
-  try {
-    const requireFromEndpoint = createRequire(endpointModulePath);
-    return requireFromEndpoint.resolve(moduleSpecifier);
-  } catch {}
-
-  try {
-    const requireFromFramework = createRequire(import.meta.url);
-    return requireFromFramework.resolve(moduleSpecifier);
-  } catch {
-    return fileURLToPath(new URL("../../dynamodb/src/index.ts", import.meta.url));
-  }
-}
-
-function resolveRuntimeSqsImportSpecifier(endpointModulePath: string): string {
-  const moduleSpecifier = "@babbstack/sqs";
-
-  try {
-    const requireFromEndpoint = createRequire(endpointModulePath);
-    return requireFromEndpoint.resolve(moduleSpecifier);
-  } catch {}
-
-  try {
-    const requireFromFramework = createRequire(import.meta.url);
-    return requireFromFramework.resolve(moduleSpecifier);
-  } catch {
-    return fileURLToPath(new URL("../../sqs/src/index.ts", import.meta.url));
-  }
-}
 
 function renderLambdaRuntimeSource(
   endpoint: EndpointRuntimeDefinition,
@@ -85,6 +53,7 @@ function toDbForAccess(client, access) {
     ? "const endpointSqs = toSqsForContext(sqs, endpointSqsContext);"
     : "";
   const endpointSqsValue = hasContextSqs ? "endpointSqs" : "undefined";
+  const envBootstrapSource = renderLambdaEnvBootstrapSource(endpoint);
   const preludeLines = [
     ...importLines,
     ...(runtimeDbImport.length > 0 ? [runtimeDbImport] : []),
@@ -149,6 +118,7 @@ function toSqsForContext(client, config) {
     : "";
   return `${prelude}${runtimeDbState}
 ${runtimeSqsState}
+const endpointSuccessStatusCode = ${JSON.stringify(endpoint.successStatusCode)};
 ${endpointDatabaseContextLine}
 ${endpointSqsContextLine}
 const endpointHandler = (${handlerSource});
@@ -205,12 +175,12 @@ function parseJsonBody(event) {
 }
 ${dbAccessSupport}
 
-function toHandlerOutput(output) {
+function toHandlerOutput(output, defaultStatusCode) {
   if (!output || typeof output !== "object" || !("value" in output)) {
     throw new Error("Handler output must include value");
   }
 
-  const statusCode = output.statusCode === undefined ? 200 : output.statusCode;
+  const statusCode = output.statusCode === undefined ? defaultStatusCode : output.statusCode;
   if (!Number.isInteger(statusCode) || statusCode < 100 || statusCode > 599) {
     throw new Error("Handler output statusCode must be an integer between 100 and 599");
   }
@@ -239,8 +209,10 @@ function toHandlerOutput(output) {
 }
 ${contextDatabaseHelper}
 ${contextSqsHelper}
+${envBootstrapSource}
 
 export async function handler(event) {
+  await ensureEndpointEnvLoaded();
   const bodyResult = parseJsonBody(event);
   if (!bodyResult.ok) {
     return bodyResult.error;
@@ -266,7 +238,7 @@ export async function handler(event) {
       },
       sqs: ${endpointSqsValue}
     });
-    const handlerOutput = toHandlerOutput(output);
+    const handlerOutput = toHandlerOutput(output, endpointSuccessStatusCode);
     return toResponse(handlerOutput.statusCode, handlerOutput.value, handlerOutput.contentType, handlerOutput.headers);
   } catch (error) {
     console.error("Handler execution failed for ${endpoint.method} ${endpoint.path}", error);
@@ -287,8 +259,16 @@ export function renderLambdaRuntimeEntrySource(
     endpointModuleSource,
     handlerSource,
   );
-  const runtimeDbImportSpecifier = resolveRuntimeDbImportSpecifier(endpointModulePath);
-  const runtimeSqsImportSpecifier = resolveRuntimeSqsImportSpecifier(endpointModulePath);
+  const runtimeDbImportSpecifier = resolveRuntimeModuleSpecifier(
+    endpointModulePath,
+    "@babbstack/dynamodb",
+    "../../dynamodb/src/index.ts",
+  );
+  const runtimeSqsImportSpecifier = resolveRuntimeModuleSpecifier(
+    endpointModulePath,
+    "@babbstack/sqs",
+    "../../sqs/src/index.ts",
+  );
   return renderLambdaRuntimeSource(
     endpoint,
     importLines,

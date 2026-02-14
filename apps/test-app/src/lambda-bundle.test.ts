@@ -53,6 +53,7 @@ describe("generated lambda bundle", () => {
     });
 
     expect(fileNames).toEqual([
+      "get_env_demo.mjs",
       "get_last_update.mjs",
       "get_s3_demo_files_list.mjs",
       "get_s3_demo_files_raw.mjs",

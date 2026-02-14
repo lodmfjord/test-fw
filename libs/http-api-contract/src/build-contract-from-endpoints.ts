@@ -70,7 +70,7 @@ function toOpenApiDocument(input: BuildContractFromEndpointsInput): OpenApiDocum
           }
         : {}),
       responses: {
-        "200": {
+        [String(endpoint.successStatusCode)]: {
           content: {
             "application/json": {
               schema: endpoint.response.jsonSchema,
@@ -137,6 +137,7 @@ export function buildContractFromEndpoints(input: BuildContractFromEndpointsInpu
       auth: endpoint.auth,
       ...(endpoint.aws ? { aws: { ...endpoint.aws } } : {}),
       ...(endpoint.description ? { description: endpoint.description } : {}),
+      ...(endpoint.env ? { env: { ...endpoint.env } } : {}),
       execution: endpoint.execution ?? { kind: "lambda" },
       handler: endpoint.handlerId,
       method: endpoint.method,

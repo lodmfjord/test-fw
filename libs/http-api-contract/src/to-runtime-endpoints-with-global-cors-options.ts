@@ -81,6 +81,7 @@ export function toRuntimeEndpointsWithGlobalCorsOptions(
       path: route.path,
       request: {},
       response: schema.object({}),
+      successStatusCode: 204,
       routeId: route.routeId,
       ...(route.summary ? { summary: route.summary } : {}),
       tags: [...route.tags],

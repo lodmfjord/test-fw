@@ -1,4 +1,6 @@
 import { describe, expect, it } from "bun:test";
+import { createEnv } from "./create-env";
+import { createSecret } from "./create-secret";
 import { defineRoute } from "./define-route";
 
 describe("defineRoute", () => {
@@ -36,5 +38,24 @@ describe("defineRoute", () => {
         handler: "src/status.ts#handler",
       }),
     ).toThrow("Path is required");
+  });
+
+  it("merges env values in declaration order", () => {
+    const sharedEnv = createEnv({
+      APP_NAME: "demo",
+      SECRET_TOKEN: createSecret("/demo/token"),
+    });
+    const route = defineRoute({
+      env: [sharedEnv, { APP_NAME: "demo-v2", FEATURE_FLAG: "on" }],
+      method: "GET",
+      path: "/status",
+      handler: "src/status.ts#handler",
+    });
+
+    expect(route.env).toEqual({
+      APP_NAME: "demo-v2",
+      FEATURE_FLAG: "on",
+      SECRET_TOKEN: "simple-api:ssm:/demo/token",
+    });
   });
 });

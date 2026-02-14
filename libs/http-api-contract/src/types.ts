@@ -26,6 +26,7 @@ export type RouteInput = {
   auth?: RouteAuth;
   aws?: AwsRouteOptions;
   description?: string;
+  env?: Array<Record<string, string>>;
   execution?: RouteExecutionInput;
   handler: string;
   method: string;
@@ -39,6 +40,7 @@ export type RouteDefinition = {
   auth: RouteAuth;
   aws?: AwsRouteOptions;
   description?: string;
+  env?: Record<string, string>;
   execution: RouteExecution;
   handler: string;
   method: HttpMethod;
@@ -97,6 +99,7 @@ export type EndpointInput<
   aws?: AwsRouteOptions;
   context?: TContextInput;
   description?: string;
+  env?: Array<Record<string, string>>;
   execution?: RouteExecutionInput;
   handler?: EndpointHandler<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput>;
   handlerId?: string;
@@ -105,6 +108,7 @@ export type EndpointInput<
   path: string;
   request?: EndpointRequest<TParams, TQuery, THeaders, TBody>;
   response: Schema<TResponse>;
+  successStatusCode?: number;
   summary?: string;
   tags?: string[];
 };
@@ -113,6 +117,7 @@ export type EndpointMetadata = Omit<RouteDefinition, "handler"> & {
   access?: EndpointAccess<EndpointDbAccess>;
   context?: EndpointRuntimeContext;
   handlerId: string;
+  successStatusCode: number;
 };
 
 export type EndpointDefinition<

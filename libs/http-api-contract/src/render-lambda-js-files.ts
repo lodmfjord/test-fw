@@ -1,4 +1,5 @@
 import { assertUniqueRouteIds } from "./assert-unique-route-ids";
+import { renderLambdaEnvBootstrapSource } from "./render-lambda-env-bootstrap-source";
 import type { EndpointRuntimeDefinition, LambdaJsGenerationOptions } from "./types";
 
 function renderEndpointLookup(routeId: string, method: string, variableName: string): string {
@@ -88,6 +89,7 @@ function toSqsForContext(client, config) {
     ? "const endpointSqs = toSqsForContext(sqs, endpointSqsContext);"
     : "";
   const endpointSqsValue = hasContextSqs ? "endpointSqs" : "undefined";
+  const envBootstrapSource = renderLambdaEnvBootstrapSource(endpoint);
 
   return `${runtimeImportLines}
 import { listDefinedEndpoints } from "${frameworkImportPath}";
@@ -96,6 +98,7 @@ let endpointPromise;
 const db = createSimpleApiRuntimeDynamoDb();
 ${endpointSqsStateLine}
 const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};
+const endpointSuccessStatusCode = ${JSON.stringify(endpoint.successStatusCode)};
 ${endpointDatabaseContextLine}
 ${endpointSqsContextLine}
 
@@ -184,12 +187,12 @@ function toDbForAccess(client, access) {
   return client;
 }
 
-function toHandlerOutput(output) {
+function toHandlerOutput(output, defaultStatusCode) {
   if (!output || typeof output !== "object" || !("value" in output)) {
     throw new Error("Handler output must include value");
   }
 
-  const statusCode = output.statusCode === undefined ? 200 : output.statusCode;
+  const statusCode = output.statusCode === undefined ? defaultStatusCode : output.statusCode;
   if (!Number.isInteger(statusCode) || statusCode < 100 || statusCode > 599) {
     throw new Error("Handler output statusCode must be an integer between 100 and 599");
   }
@@ -218,8 +221,10 @@ function toHandlerOutput(output) {
 }
 ${contextDatabaseSupport}
 ${contextSqsSupport}
+${envBootstrapSource}
 
 export async function handler(event) {
+  await ensureEndpointEnvLoaded();
   const bodyResult = parseJsonBody(event);
   if (!bodyResult.ok) {
     return bodyResult.error;
@@ -246,7 +251,7 @@ export async function handler(event) {
       },
       sqs: ${endpointSqsValue}
     });
-    const handlerOutput = toHandlerOutput(output);
+    const handlerOutput = toHandlerOutput(output, endpointSuccessStatusCode);
     return toResponse(handlerOutput.statusCode, handlerOutput.value, handlerOutput.contentType, handlerOutput.headers);
   } catch (error) {
     console.error("Handler execution failed for ${endpoint.method} ${endpoint.path}", error);

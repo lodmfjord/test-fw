@@ -7,6 +7,7 @@ import type {
   EndpointDefinition,
   EndpointInput,
 } from "./types";
+import type { RouteExecution } from "./route-execution-types";
 
 function toHandlerId(routeId: string, providedHandlerId: string | undefined): string {
   const base = providedHandlerId ? providedHandlerId.trim() : `${routeId}_handler`;
@@ -17,6 +18,23 @@ function toHandlerId(routeId: string, providedHandlerId: string | undefined): st
   }
 
   return normalized;
+}
+
+function toDefaultSuccessStatusCode(execution: RouteExecution): number {
+  if (execution.kind === "step-function" && execution.invocationType === "async") {
+    return 202;
+  }
+
+  return 200;
+}
+
+function toSuccessStatusCode(value: number | undefined, execution: RouteExecution): number {
+  const resolved = value ?? toDefaultSuccessStatusCode(execution);
+  if (!Number.isInteger(resolved) || resolved < 200 || resolved > 299) {
+    throw new Error("successStatusCode must be an integer between 200 and 299");
+  }
+
+  return resolved;
 }
 
 export function defineEndpoint<
@@ -77,6 +95,7 @@ export function defineEndpoint<
     ...(input.auth ? { auth: input.auth } : {}),
     ...(input.aws ? { aws: input.aws } : {}),
     ...(input.description ? { description: input.description } : {}),
+    ...(input.env ? { env: input.env } : {}),
     ...(input.execution ? { execution: input.execution } : {}),
     handler: "_placeholder_handler",
     method: input.method,
@@ -119,6 +138,7 @@ export function defineEndpoint<
     auth: baseRoute.auth,
     ...(baseRoute.aws ? { aws: baseRoute.aws } : {}),
     ...(baseRoute.description ? { description: baseRoute.description } : {}),
+    ...(baseRoute.env ? { env: baseRoute.env } : {}),
     execution: baseRoute.execution,
     ...(hasHandler ? { handler: input.handler } : {}),
     handlerId,
@@ -133,6 +153,7 @@ export function defineEndpoint<
       ...(input.request?.query ? { query: input.request.query } : {}),
     },
     response: input.response,
+    successStatusCode: toSuccessStatusCode(input.successStatusCode, baseRoute.execution),
     routeId: baseRoute.routeId,
     ...(baseRoute.summary ? { summary: baseRoute.summary } : {}),
     tags: baseRoute.tags,

@@ -1,6 +1,6 @@
 import { createSqsQueue } from "@babbstack/sqs";
 import { createRuntimeS3 } from "@babbstack/s3";
-import { defineGet, definePost } from "@babbstack/http-api-contract";
+import { createEnv, createSecret, defineGet, definePost } from "@babbstack/http-api-contract";
 import { schema } from "@babbstack/schema";
 import { z } from "zod";
 import { lastUpdateStore } from "./last-update-store";
@@ -35,6 +35,35 @@ export const lastUpdateListener = lastUpdateQueue.addListener({
 });
 
 const s3 = createRuntimeS3();
+const sharedEnvDemo = createEnv({
+  SIMPLE_API_TEST_APP_ENV_PLAIN: "plain-value-from-create-env",
+  SIMPLE_API_TEST_APP_ENV_SECRET: createSecret("/simple-api/test-app/env-secret", {
+    localEnvName: "SECRET_BLE",
+  }),
+});
+
+const getEnvDemoEndpoint = defineGet({
+  env: [
+    sharedEnvDemo,
+    {
+      SIMPLE_API_TEST_APP_ENV_PLAIN: "plain-value-from-endpoint-override",
+    },
+  ],
+  path: "/env-demo",
+  handler: () => {
+    return {
+      value: {
+        plain: process.env.SIMPLE_API_TEST_APP_ENV_PLAIN ?? "",
+        secret: process.env.SIMPLE_API_TEST_APP_ENV_SECRET ?? "",
+      },
+    };
+  },
+  response: schema.object({
+    plain: schema.string(),
+    secret: schema.string(),
+  }),
+  tags: ["env-demo"],
+});
 
 const getLastUpdateEndpoint = defineGet({
   path: "/last-update",
@@ -231,7 +260,7 @@ const getS3DemoSecureLinkEndpoint = defineGet({
 });
 
 export const endpoints = [
-  [getLastUpdateEndpoint],
+  [getLastUpdateEndpoint, getEnvDemoEndpoint],
   [
     putS3DemoFileEndpoint,
     getS3DemoFileEndpoint,

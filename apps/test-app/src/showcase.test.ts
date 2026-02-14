@@ -1,10 +1,33 @@
 import { describe, expect, it } from "bun:test";
+import { createDevApp } from "@babbstack/http-api-contract";
 import { runSqsQueueListener } from "@babbstack/sqs";
 import { testAppFetch, testAppSqs } from "./dev-app";
-import { lastUpdateListener, stepFunctionEventsListener } from "./endpoints";
+import { endpoints, lastUpdateListener, stepFunctionEventsListener } from "./endpoints";
 import { testAppContract } from "./test-app-contract";
 
 describe("test-app showcase", () => {
+  it("returns endpoint env values for /env-demo", async () => {
+    const previousSecret = process.env.SIMPLE_API_TEST_APP_ENV_SECRET;
+    const previousSecretBle = process.env.SECRET_BLE;
+    delete process.env.SIMPLE_API_TEST_APP_ENV_SECRET;
+    process.env.SECRET_BLE = "local-secret-ble";
+
+    const envFetch = createDevApp(endpoints.flat(), {
+      sqs: testAppSqs,
+    });
+    const response = await envFetch(new Request("http://local/env-demo", { method: "GET" }));
+    if (previousSecret === undefined) delete process.env.SIMPLE_API_TEST_APP_ENV_SECRET;
+    else process.env.SIMPLE_API_TEST_APP_ENV_SECRET = previousSecret;
+    if (previousSecretBle === undefined) delete process.env.SECRET_BLE;
+    else process.env.SECRET_BLE = previousSecretBle;
+
+    expect(response.status).toBe(200);
+    expect((await response.json()) as { plain?: string; secret?: string }).toEqual({
+      plain: "plain-value-from-endpoint-override",
+      secret: "local-secret-ble",
+    });
+  });
+
   it("runs /last-update and updates via sqs listener", async () => {
     const firstResponse = await testAppFetch(
       new Request("http://local/last-update", { method: "GET" }),
@@ -42,6 +65,7 @@ describe("test-app showcase", () => {
 
     expect(functionIds).toEqual([
       "get_last_update",
+      "get_env_demo",
       "post_s3_demo_files",
       "get_s3_demo_files",
       "get_s3_demo_files_raw",

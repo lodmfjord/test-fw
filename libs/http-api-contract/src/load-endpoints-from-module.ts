@@ -23,13 +23,18 @@ function appendEndpoint(
   const candidate = value as Partial<EndpointRuntimeDefinition>;
   const isStepFunctionEndpoint = candidate.execution?.kind === "step-function";
   const hasValidHandler = isStepFunctionEndpoint || typeof candidate.handler === "function";
+  const hasValidSuccessStatusCode =
+    Number.isInteger(candidate.successStatusCode) &&
+    (candidate.successStatusCode as number) >= 200 &&
+    (candidate.successStatusCode as number) <= 299;
   if (
     typeof candidate.routeId !== "string" ||
     typeof candidate.method !== "string" ||
     typeof candidate.path !== "string" ||
     !hasValidHandler ||
     !candidate.request ||
-    !candidate.response
+    !candidate.response ||
+    !hasValidSuccessStatusCode
   ) {
     throw new Error(`Invalid endpoint found in export "${exportName}"`);
   }

@@ -82,6 +82,26 @@ function toOperationId(routeId: string): string {
   return `${head}${tail}`;
 }
 
+function toRouteEnv(input: RouteInput["env"]): Record<string, string> | undefined {
+  if (!input || input.length === 0) {
+    return undefined;
+  }
+
+  const env: Record<string, string> = {};
+  for (const source of input) {
+    for (const [name, value] of Object.entries(source)) {
+      const normalizedName = name.trim();
+      if (normalizedName.length === 0) {
+        throw new Error("Environment variable name is required");
+      }
+
+      env[normalizedName] = value;
+    }
+  }
+
+  return Object.keys(env).length > 0 ? env : undefined;
+}
+
 export function defineRoute(input: RouteInput): RouteDefinition {
   const method = normalizeMethod(input.method);
   const path = normalizePath(input.path);
@@ -94,11 +114,13 @@ export function defineRoute(input: RouteInput): RouteDefinition {
 
   const tags = input.tags ? [...input.tags] : [];
   const execution = toRouteExecution(input.execution);
+  const env = toRouteEnv(input.env);
 
   return {
     auth: input.auth ?? "none",
     ...(input.aws ? { aws: { ...input.aws } } : {}),
     ...(input.description ? { description: input.description } : {}),
+    ...(env ? { env } : {}),
     execution,
     handler,
     method,

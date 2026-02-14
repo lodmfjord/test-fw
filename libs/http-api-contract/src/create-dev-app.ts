@@ -4,6 +4,7 @@ import {
   type DynamoDbClient,
 } from "@babbstack/dynamodb";
 import { createRuntimeSqs } from "@babbstack/sqs";
+import { initializeEndpointEnv } from "./initialize-endpoint-env";
 import type { CreateDevAppOptions } from "./types";
 import type { EndpointRuntimeDefinition } from "./types";
 import { toEndpointSqsContext } from "./to-endpoint-sqs-context";
@@ -161,6 +162,7 @@ export function createDevApp(
 ): (request: Request) => Promise<Response> {
   const db = options.db ?? createRuntimeDynamoDb();
   const sqs = options.sqs ?? createRuntimeSqs();
+  initializeEndpointEnv(endpoints);
 
   return async function fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
@@ -264,7 +266,7 @@ export function createDevApp(
     }
 
     try {
-      const handlerOutput = toEndpointHandlerOutput(output);
+      const handlerOutput = toEndpointHandlerOutput(output, endpoint.successStatusCode);
       if (typeof Buffer !== "undefined" && Buffer.isBuffer(handlerOutput.value)) {
         return toResponse(
           handlerOutput.statusCode ?? 200,

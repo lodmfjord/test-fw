@@ -135,4 +135,42 @@ describe("defineEndpoint", () => {
       }),
     ).toThrow("Lambda routes must define handlers");
   });
+
+  it("stores explicit successStatusCode metadata", () => {
+    const endpoint = defineEndpoint({
+      method: "POST",
+      path: "/users",
+      handler: ({ body }) => ({ value: { id: body.name } }),
+      request: {
+        body: schema.object({
+          name: schema.string(),
+        }),
+      },
+      response: schema.object({
+        id: schema.string(),
+      }),
+      successStatusCode: 201,
+    });
+
+    expect(endpoint.successStatusCode).toBe(201);
+  });
+
+  it("rejects non-2xx successStatusCode", () => {
+    expect(() =>
+      defineEndpoint({
+        method: "POST",
+        path: "/users",
+        handler: ({ body }) => ({ value: { id: body.name } }),
+        request: {
+          body: schema.object({
+            name: schema.string(),
+          }),
+        },
+        response: schema.object({
+          id: schema.string(),
+        }),
+        successStatusCode: 199,
+      }),
+    ).toThrow("successStatusCode must be an integer between 200 and 299");
+  });
 });

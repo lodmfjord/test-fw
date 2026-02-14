@@ -1,6 +1,8 @@
 export { buildContract } from "./build-contract";
 export { buildContractFromEndpoints } from "./build-contract-from-endpoints";
 export { createDevApp } from "./create-dev-app";
+export { createEnv } from "./create-env";
+export { createSecret } from "./create-secret";
 export { defineDelete } from "./define-delete";
 export { defineEndpoint } from "./define-endpoint";
 export { defineGet } from "./define-get";

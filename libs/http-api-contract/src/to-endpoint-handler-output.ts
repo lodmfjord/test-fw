@@ -21,7 +21,10 @@ function toOutputHeaders(headers: unknown): Record<string, string> | undefined {
   return normalized;
 }
 
-export function toEndpointHandlerOutput(output: unknown): EndpointHandlerOutput<unknown> {
+export function toEndpointHandlerOutput(
+  output: unknown,
+  defaultStatusCode = 200,
+): EndpointHandlerOutput<unknown> {
   if (!output || typeof output !== "object" || !("value" in output)) {
     throw new Error("Handler output must include value");
   }
@@ -32,7 +35,7 @@ export function toEndpointHandlerOutput(output: unknown): EndpointHandlerOutput<
     statusCode?: unknown;
     value: unknown;
   };
-  let statusCode = 200;
+  let statusCode = defaultStatusCode;
   if (typedOutput.statusCode !== undefined) {
     if (!Number.isInteger(typedOutput.statusCode)) {
       throw new Error("Handler output statusCode must be an integer");

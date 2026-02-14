@@ -42,7 +42,9 @@ describe("renderLambdaJsFiles", () => {
     expect(files["get_health.mjs"]?.includes("export async function handler")).toBe(true);
     expect(files["get_health.mjs"]?.includes("import ")).toBe(true);
     expect(
-      files["post_users.mjs"]?.includes("const handlerOutput = toHandlerOutput(output);"),
+      files["post_users.mjs"]?.includes(
+        "const handlerOutput = toHandlerOutput(output, endpointSuccessStatusCode);",
+      ),
     ).toBe(true);
   });
 });

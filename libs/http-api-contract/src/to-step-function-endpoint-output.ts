@@ -44,7 +44,7 @@ export async function toStepFunctionEndpointOutput(
 
   if (execution.invocationType === "async") {
     return {
-      statusCode: 202,
+      statusCode: endpoint.successStatusCode,
       value: {
         executionArn: toLocalExecutionArn(endpoint.routeId),
         status: "RUNNING",
