@@ -3,6 +3,7 @@ export type TerraformResourceSelection = {
   dynamodb: boolean;
   lambdas: boolean;
   sqs: boolean;
+  stepFunctions?: boolean;
 };
 
 type TerraformDisabledStateSettings = {

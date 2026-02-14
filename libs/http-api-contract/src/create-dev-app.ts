@@ -9,6 +9,7 @@ import type { EndpointRuntimeDefinition } from "./types";
 import { toEndpointSqsContext } from "./to-endpoint-sqs-context";
 import { toEndpointHandlerOutput } from "./to-endpoint-handler-output";
 import { toHttpResponseParts } from "./to-http-response-parts";
+import { toStepFunctionEndpointOutput } from "./to-step-function-endpoint-output";
 
 function toResponse(
   status: number,
@@ -210,30 +211,54 @@ export function createDevApp(
 
     let output: unknown;
     try {
-      const endpointDb = toDbForEndpoint(db, endpoint);
-      const endpointDatabase = toDatabaseForEndpoint(db, endpoint);
-      const endpointSqs = toEndpointSqsContext(sqs, endpoint);
-      const handler = endpoint.handler as (context: {
-        body: unknown;
-        database: unknown;
-        db: unknown;
-        headers: unknown;
-        params: unknown;
-        query: unknown;
-        request: Request;
-        sqs: unknown;
-      }) => Promise<unknown> | unknown;
+      if (endpoint.execution?.kind === "step-function") {
+        output = await toStepFunctionEndpointOutput(
+          endpoint,
+          {
+            body: validatedBody,
+            headers: validatedHeaders,
+            method,
+            params: validatedParams,
+            path: endpoint.path,
+            query: validatedQuery,
+            routeId: endpoint.routeId,
+          },
+          {
+            ...(options.stepFunctionTaskHandlers
+              ? { taskHandlers: options.stepFunctionTaskHandlers }
+              : {}),
+          },
+        );
+      } else {
+        if (!endpoint.handler) {
+          throw new Error("Missing handler for lambda endpoint");
+        }
 
-      output = await handler({
-        body: validatedBody,
-        database: endpointDatabase,
-        db: endpointDb,
-        headers: validatedHeaders,
-        params: validatedParams,
-        query: validatedQuery,
-        request,
-        sqs: endpointSqs,
-      });
+        const endpointDb = toDbForEndpoint(db, endpoint);
+        const endpointDatabase = toDatabaseForEndpoint(db, endpoint);
+        const endpointSqs = toEndpointSqsContext(sqs, endpoint);
+        const handler = endpoint.handler as (context: {
+          body: unknown;
+          database: unknown;
+          db: unknown;
+          headers: unknown;
+          params: unknown;
+          query: unknown;
+          request: Request;
+          sqs: unknown;
+        }) => Promise<unknown> | unknown;
+
+        output = await handler({
+          body: validatedBody,
+          database: endpointDatabase,
+          db: endpointDb,
+          headers: validatedHeaders,
+          params: validatedParams,
+          query: validatedQuery,
+          request,
+          sqs: endpointSqs,
+        });
+      }
     } catch {
       return toResponse(500, { error: "Handler execution failed" });
     }

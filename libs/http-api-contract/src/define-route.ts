@@ -1,4 +1,5 @@
 import type { HttpMethod, RouteDefinition, RouteInput } from "./types";
+import { toRouteExecution } from "./to-route-execution";
 
 const SUPPORTED_METHODS: HttpMethod[] = [
   "GET",
@@ -92,11 +93,13 @@ export function defineRoute(input: RouteInput): RouteDefinition {
   }
 
   const tags = input.tags ? [...input.tags] : [];
+  const execution = toRouteExecution(input.execution);
 
   return {
     auth: input.auth ?? "none",
     ...(input.aws ? { aws: { ...input.aws } } : {}),
     ...(input.description ? { description: input.description } : {}),
+    execution,
     handler,
     method,
     operationId: input.operationId ?? toOperationId(routeId),

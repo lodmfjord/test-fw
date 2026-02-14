@@ -171,15 +171,16 @@ export async function writeSqsListenerJsFiles(
   const endpointModulePath = resolveEndpointModulePath(options.endpointModulePath);
   const runtimeSqsImportSpecifier = resolveRuntimeSqsImportSpecifier(endpointModulePath);
   const externalModules = resolveExternalModules(options.externalModules, endpointModulePath);
+  const lambdaListeners = listeners.filter((listener) => listener.target?.kind !== "step-function");
   await mkdir(directory, { recursive: true });
 
-  const fileNames = listeners
+  const fileNames = lambdaListeners
     .map((listener) => `${listener.listenerId}.mjs`)
     .sort((left, right) => left.localeCompare(right));
   const tempDirectory = await mkdtemp(join(process.cwd(), ".babbstack-sqs-listener-entry-"));
 
   try {
-    for (const listener of listeners) {
+    for (const listener of lambdaListeners) {
       const fileName = `${listener.listenerId}.mjs`;
       const source = renderListenerLambdaSource(
         listener,

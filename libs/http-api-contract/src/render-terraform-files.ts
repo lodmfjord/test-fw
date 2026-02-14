@@ -4,6 +4,7 @@ import type {
 } from "./contract-generator-types";
 import { createApiGatewayTerraformJson } from "./create-api-gateway-terraform-json";
 import { createLambdasTerraformJson } from "./create-lambdas-terraform-json";
+import { createStepFunctionsTerraformJson } from "./create-step-functions-terraform-json";
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import { toDynamodbTables } from "./to-dynamodb-tables";
 import { toSqsQueues } from "./to-sqs-queues";
@@ -258,6 +259,17 @@ export function renderTerraformFiles(
 
   if (resources.sqs) {
     files["sqs.tf.json"] = toTerraformString(createSqsTerraformJson(endpoints, sqsListeners));
+  }
+
+  if (resources.stepFunctions) {
+    files["step-functions.tf.json"] = toTerraformString(
+      createStepFunctionsTerraformJson(
+        endpoints,
+        sqsListeners,
+        resources.apiGateway,
+        resources.sqs,
+      ),
+    );
   }
 
   return files;

@@ -18,6 +18,10 @@ export function toRouteSqsSendAccess(
   const accessByRoute = new Map<string, LambdaSqsSendAccess>();
 
   for (const endpoint of endpoints) {
+    if (endpoint.execution?.kind === "step-function") {
+      continue;
+    }
+
     const runtime = endpoint.context?.sqs?.runtime;
     if (!runtime) {
       continue;

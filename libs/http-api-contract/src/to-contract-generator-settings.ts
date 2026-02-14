@@ -50,6 +50,7 @@ function toTerraformResources(value: unknown): TerraformResourceSelection {
       dynamodb: true,
       lambdas: true,
       sqs: false,
+      stepFunctions: false,
     };
   }
 
@@ -72,6 +73,10 @@ function toTerraformResources(value: unknown): TerraformResourceSelection {
         ? false
         : toBooleanSetting(source.lambdas, "terraform.resources.lambdas"),
     sqs: source.sqs === undefined ? false : toBooleanSetting(source.sqs, "terraform.resources.sqs"),
+    stepFunctions:
+      source.stepFunctions === undefined
+        ? false
+        : toBooleanSetting(source.stepFunctions, "terraform.resources.stepFunctions"),
   };
 }
 
@@ -129,6 +134,7 @@ function toTerraformSettings(value: unknown): TerraformGeneratorSettings | undef
         dynamodb: false,
         lambdas: false,
         sqs: false,
+        stepFunctions: false,
       },
     };
   }

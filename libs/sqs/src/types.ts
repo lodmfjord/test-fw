@@ -1,3 +1,6 @@
+import type { StepFunctionTaskHandler } from "@babbstack/step-functions";
+import type { SqsListenerTarget, SqsListenerTargetInput } from "./listener-target-types";
+
 export type SqsMessage = Record<string, unknown>;
 
 export type SqsSendInput = {
@@ -68,8 +71,9 @@ export type SqsListenerHandler<TMessage extends SqsMessage> = {
 
 export type CreateSqsListenerInput<TMessage extends SqsMessage> = {
   aws?: SqsListenerAwsOptions;
-  handler: SqsListenerHandler<TMessage>;
+  handler?: SqsListenerHandler<TMessage>;
   listenerId?: string;
+  target?: SqsListenerTargetInput;
 };
 
 export type SqsQueueListenerRuntime = {
@@ -78,15 +82,16 @@ export type SqsQueueListenerRuntime = {
   queue: {
     runtime: SqsQueueRuntimeConfig;
   };
+  target: SqsListenerTarget;
 };
 
 export type SqsListenerRuntimeDefinition = SqsQueueListenerRuntime & {
-  handler(context: { message: unknown; request: SqsListenerRequest }): Promise<void> | void;
+  handler?(context: { message: unknown; request: SqsListenerRequest }): Promise<void> | void;
   parse(input: unknown): unknown;
 };
 
 export type SqsQueueListener<TMessage extends SqsMessage> = SqsQueueListenerRuntime & {
-  handler: SqsListenerHandler<TMessage>;
+  handler?: SqsListenerHandler<TMessage>;
   parse(input: unknown): TMessage;
 };
 
@@ -97,3 +102,17 @@ export type SqsQueue<TMessage extends SqsMessage> = {
   queueName: string;
   runtimeConfig: SqsQueueRuntimeConfig;
 };
+
+export type RunSqsQueueListenerOptions = {
+  stepFunctionTaskHandlers?: Record<string, StepFunctionTaskHandler>;
+};
+
+export type {
+  SqsListenerLambdaTargetInput,
+  SqsListenerStepFunctionTarget,
+  SqsListenerStepFunctionTargetInput,
+  SqsListenerTarget,
+  SqsListenerTargetInput,
+  SqsStepFunctionInvocationType,
+  SqsStepFunctionWorkflowType,
+} from "./listener-target-types";

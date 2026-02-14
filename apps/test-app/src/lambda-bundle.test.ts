@@ -59,6 +59,7 @@ describe("generated lambda bundle", () => {
       "get_s3_demo_files.mjs",
       "get_s3_demo_secure_link.mjs",
       "post_s3_demo_files.mjs",
+      "post_step_function_events.mjs",
     ]);
 
     const source = await readFile(join(outputDirectory, "get_last_update.mjs"), "utf8");

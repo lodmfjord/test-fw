@@ -43,6 +43,7 @@
         "@babbstack/dynamodb": "workspace:*",
         "@babbstack/schema": "workspace:*",
         "@babbstack/sqs": "workspace:*",
+        "@babbstack/step-functions": "workspace:*",
         "esbuild": "^0.27.3",
       },
     },
@@ -63,7 +64,11 @@
       "name": "@babbstack/sqs",
       "dependencies": {
         "@aws-sdk/client-sqs": "^3.0.0",
+        "@babbstack/step-functions": "workspace:*",
       },
+    },
+    "libs/step-functions": {
+      "name": "@babbstack/step-functions",
     },
   },
   "packages": {
@@ -176,6 +181,8 @@
     "@babbstack/schema": ["@babbstack/schema@workspace:libs/schema"],
 
     "@babbstack/sqs": ["@babbstack/sqs@workspace:libs/sqs"],
+
+    "@babbstack/step-functions": ["@babbstack/step-functions@workspace:libs/step-functions"],
 
     "@babbstack/test-app": ["@babbstack/test-app@workspace:apps/test-app"],
 

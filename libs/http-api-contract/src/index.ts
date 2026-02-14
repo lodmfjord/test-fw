@@ -16,6 +16,8 @@ export { renderLambdaJsFiles } from "./render-lambda-js-files";
 export { resetDefinedEndpoints } from "./reset-defined-endpoints";
 export { runDevAppFromSettings } from "./run-dev-app-from-settings";
 export { runContractGeneratorFromSettings } from "./run-contract-generator-from-settings";
+export { defineStepFunction } from "@babbstack/step-functions";
+export { registerStepFunctionTaskHandler } from "@babbstack/step-functions";
 export { schema } from "@babbstack/schema";
 export { writeContractFiles } from "./write-contract-files-export";
 export { writeLambdaJsFiles } from "./write-lambda-js-files-export";
@@ -40,7 +42,33 @@ export type {
   RouteDefinition,
   RouteInput,
 } from "./types";
+export type {
+  RouteExecution,
+  RouteExecutionInput,
+  RouteStepFunctionExecution,
+  RouteStepFunctionExecutionInput,
+  StepFunctionInvocationType,
+  StepFunctionWorkflowType,
+} from "./route-execution-types";
 export type { GlobalCors } from "./cors-types";
+export type {
+  ExecuteStepFunctionDefinitionOptions,
+  StepFunctionChoiceRule,
+  StepFunctionChoiceState,
+  StepFunctionDefinition,
+  StepFunctionDefinitionInput,
+  StepFunctionDefinitionShape,
+  StepFunctionExecutionResult,
+  StepFunctionJsonPath,
+  StepFunctionJsonPathOrNull,
+  StepFunctionPassState,
+  StepFunctionResultPath,
+  StepFunctionState,
+  StepFunctionStateInput,
+  StepFunctionSucceedState,
+  StepFunctionTaskHandler,
+  StepFunctionTaskState,
+} from "@babbstack/step-functions";
 export type {
   ContractGeneratorOutput,
   ContractGeneratorSettings,

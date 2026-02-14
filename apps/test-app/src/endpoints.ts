@@ -4,6 +4,12 @@ import { defineGet, definePost } from "@babbstack/http-api-contract";
 import { schema } from "@babbstack/schema";
 import { z } from "zod";
 import { lastUpdateStore } from "./last-update-store";
+import {
+  postStepFunctionDemoEndpoint,
+  postStepFunctionEventsEndpoint,
+  postStepFunctionRandomBranchEndpoint,
+  stepFunctionEventsListener,
+} from "./step-function-demo";
 
 const lastUpdateMessageSchema = z.object({
   time: z.string(),
@@ -233,4 +239,11 @@ export const endpoints = [
     listS3DemoFilesEndpoint,
     getS3DemoSecureLinkEndpoint,
   ],
+  [
+    postStepFunctionDemoEndpoint,
+    postStepFunctionEventsEndpoint,
+    postStepFunctionRandomBranchEndpoint,
+  ],
 ];
+
+export { stepFunctionEventsListener };

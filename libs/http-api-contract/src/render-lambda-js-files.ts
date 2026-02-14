@@ -265,11 +265,14 @@ export function renderLambdaJsFiles(
     throw new Error("endpointModulePath is required");
   }
 
-  assertUniqueRouteIds(endpoints);
+  const lambdaEndpoints = endpoints.filter(
+    (endpoint) => endpoint.execution?.kind !== "step-function",
+  );
+  assertUniqueRouteIds(lambdaEndpoints);
 
   const files: Record<string, string> = {};
 
-  for (const endpoint of endpoints) {
+  for (const endpoint of lambdaEndpoints) {
     files[`${endpoint.routeId}.mjs`] = renderFile(endpoint, {
       ...options,
       endpointModulePath,

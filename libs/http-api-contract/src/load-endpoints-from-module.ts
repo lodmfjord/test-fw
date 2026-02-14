@@ -21,11 +21,13 @@ function appendEndpoint(
   }
 
   const candidate = value as Partial<EndpointRuntimeDefinition>;
+  const isStepFunctionEndpoint = candidate.execution?.kind === "step-function";
+  const hasValidHandler = isStepFunctionEndpoint || typeof candidate.handler === "function";
   if (
     typeof candidate.routeId !== "string" ||
     typeof candidate.method !== "string" ||
     typeof candidate.path !== "string" ||
-    typeof candidate.handler !== "function" ||
+    !hasValidHandler ||
     !candidate.request ||
     !candidate.response
   ) {

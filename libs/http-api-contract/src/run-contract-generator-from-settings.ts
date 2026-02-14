@@ -64,6 +64,9 @@ export async function runContractGeneratorFromSettings(
   resetDefinedSqsListeners();
   const endpoints = await loadEndpointsFromModule(endpointModulePath, settings.endpointExportName);
   const sqsListeners = listDefinedSqsListeners();
+  const lambdaSqsListeners = sqsListeners.filter(
+    (listener) => listener.target?.kind !== "step-function",
+  );
   const contractModule = (await import(toImportPath(contractModulePath))) as Record<
     string,
     unknown
@@ -84,7 +87,7 @@ export async function runContractGeneratorFromSettings(
   );
   const sqsListenerLambdaFiles = await writeSqsListenerJsFiles(
     lambdaOutputDirectory,
-    sqsListeners,
+    lambdaSqsListeners,
     {
       endpointModulePath,
       ...(settings.externalModules ? { externalModules: settings.externalModules } : {}),
@@ -105,7 +108,7 @@ export async function runContractGeneratorFromSettings(
       resolvePathFromSettings("lambda-artifacts", terraformOutputDirectory),
       contract.lambdasManifest,
       lambdaOutputDirectory,
-      sqsListeners.map((listener) => listener.listenerId),
+      lambdaSqsListeners.map((listener) => listener.listenerId),
     );
     await writeLambdaLayerArtifacts(
       resolvePathFromSettings("layer-artifacts", terraformOutputDirectory),

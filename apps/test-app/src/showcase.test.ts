@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { runSqsQueueListener } from "@babbstack/sqs";
 import { testAppFetch, testAppSqs } from "./dev-app";
-import { lastUpdateListener } from "./endpoints";
+import { lastUpdateListener, stepFunctionEventsListener } from "./endpoints";
 import { testAppContract } from "./test-app-contract";
 
 describe("test-app showcase", () => {
@@ -47,7 +47,90 @@ describe("test-app showcase", () => {
       "get_s3_demo_files_raw",
       "get_s3_demo_files_list",
       "get_s3_demo_secure_link",
+      "post_step_function_events",
     ]);
+  });
+
+  it("runs step-function endpoint locally and keeps step-function routes out of lambda manifest", async () => {
+    const response = await testAppFetch(
+      new Request("http://local/step-function-demo", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          value: "demo",
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect((await response.json()) as unknown).toEqual({
+      ok: true,
+      source: "step-function",
+    });
+    expect(
+      testAppContract.lambdasManifest.functions.some(
+        (lambdaFunction) => lambdaFunction.routeId === "post_step_function_demo",
+      ),
+    ).toBe(false);
+    expect(
+      testAppContract.lambdasManifest.functions.some(
+        (lambdaFunction) => lambdaFunction.routeId === "post_step_function_random_branch",
+      ),
+    ).toBe(false);
+    expect(
+      testAppContract.openapi.paths["/step-function-demo"]?.post?.["x-babbstack"].execution.kind,
+    ).toBe("step-function");
+    expect(stepFunctionEventsListener.target.kind).toBe("step-function");
+  });
+
+  it("runs random branch step-function endpoint with task and choice states", async () => {
+    const response = await testAppFetch(
+      new Request("http://local/step-function-random-branch", {
+        method: "POST",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    const payload = (await response.json()) as {
+      branch?: string;
+      message?: string;
+      random?: number;
+    };
+    expect(typeof payload.random).toBe("number");
+    expect((payload.random ?? 0) >= 1).toBe(true);
+    expect((payload.random ?? 0) <= 100).toBe(true);
+    expect(typeof payload.message).toBe("string");
+
+    if ((payload.random ?? 0) < 51) {
+      expect(payload.branch).toBe("low");
+    } else {
+      expect(payload.branch).toBe("high");
+    }
+  });
+
+  it("runs /step-function-events and processes the step-function targeted listener locally", async () => {
+    const response = await testAppFetch(
+      new Request("http://local/step-function-events", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          eventId: "event-1",
+        }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect((await response.json()) as unknown).toEqual({
+      accepted: true,
+      eventId: "event-1",
+    });
+
+    const processed = await runSqsQueueListener(stepFunctionEventsListener, testAppSqs);
+    expect(processed).toBe(1);
+    expect(stepFunctionEventsListener.target.kind).toBe("step-function");
   });
 
   it("runs local s3 demo endpoints for put, get, list, and secure-link", async () => {

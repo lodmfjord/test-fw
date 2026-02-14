@@ -31,6 +31,10 @@ export function toRouteDynamodbAccess(
   const accessByRoute = new Map<string, LambdaDynamodbAccess>();
 
   for (const endpoint of endpoints) {
+    if (endpoint.execution?.kind === "step-function") {
+      continue;
+    }
+
     const runtime = endpoint.context?.database?.runtime;
     if (!runtime) {
       continue;

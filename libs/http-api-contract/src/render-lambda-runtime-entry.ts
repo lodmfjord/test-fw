@@ -151,7 +151,7 @@ function toSqsForContext(client, config) {
 ${runtimeSqsState}
 ${endpointDatabaseContextLine}
 ${endpointSqsContextLine}
-const endpointHandler = (${endpoint.handler.toString()});
+const endpointHandler = (${handlerSource});
 function isBufferValue(payload) {
   return typeof Buffer !== "undefined" && Buffer.isBuffer(payload);
 }
@@ -275,13 +275,13 @@ export async function handler(event) {
 }
 `;
 }
-
 export function renderLambdaRuntimeEntrySource(
   endpointModulePath: string,
   endpointModuleSource: string,
   endpoint: EndpointRuntimeDefinition,
 ): string {
-  const handlerSource = endpoint.handler.toString();
+  const handlerSource = endpoint.handler?.toString();
+  if (!handlerSource) throw new Error(`Endpoint ${endpoint.routeId} is missing a lambda handler`);
   const importLines = renderUsedImportLines(
     endpointModulePath,
     endpointModuleSource,

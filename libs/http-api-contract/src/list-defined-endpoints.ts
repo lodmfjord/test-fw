@@ -11,6 +11,6 @@ export function listDefinedEndpoints(): EndpointRuntimeDefinition[] {
       ...(endpoint.request.query ? { query: endpoint.request.query } : {}),
     },
     response: endpoint.response,
-    handler: endpoint.handler,
+    ...(endpoint.handler ? { handler: endpoint.handler } : {}),
   }));
 }

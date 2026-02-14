@@ -30,6 +30,7 @@ export function defineEndpoint<
 >(
   input: EndpointInput<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput>,
 ): EndpointDefinition<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput> {
+  const hasHandler = typeof input.handler === "function";
   let access: { db: EndpointDbAccess } | undefined;
   if (input.access) {
     if (input.access.db !== "read" && input.access.db !== "write") {
@@ -76,6 +77,7 @@ export function defineEndpoint<
     ...(input.auth ? { auth: input.auth } : {}),
     ...(input.aws ? { aws: input.aws } : {}),
     ...(input.description ? { description: input.description } : {}),
+    ...(input.execution ? { execution: input.execution } : {}),
     handler: "_placeholder_handler",
     method: input.method,
     ...(input.operationId ? { operationId: input.operationId } : {}),
@@ -83,6 +85,24 @@ export function defineEndpoint<
     ...(input.summary ? { summary: input.summary } : {}),
     ...(input.tags ? { tags: input.tags } : {}),
   });
+
+  if (baseRoute.execution.kind === "step-function") {
+    if (hasHandler) {
+      throw new Error("Step-function routes must not define handlers");
+    }
+
+    if (access) {
+      throw new Error("Step-function routes do not support endpoint db access overrides");
+    }
+
+    if (context) {
+      throw new Error("Step-function routes do not support endpoint runtime context");
+    }
+  }
+
+  if (baseRoute.execution.kind !== "step-function" && !hasHandler) {
+    throw new Error("Lambda routes must define handlers");
+  }
 
   const handlerId = toHandlerId(baseRoute.routeId, input.handlerId);
 
@@ -99,7 +119,8 @@ export function defineEndpoint<
     auth: baseRoute.auth,
     ...(baseRoute.aws ? { aws: baseRoute.aws } : {}),
     ...(baseRoute.description ? { description: baseRoute.description } : {}),
-    handler: input.handler,
+    execution: baseRoute.execution,
+    ...(hasHandler ? { handler: input.handler } : {}),
     handlerId,
     method: baseRoute.method,
     operationId: baseRoute.operationId,

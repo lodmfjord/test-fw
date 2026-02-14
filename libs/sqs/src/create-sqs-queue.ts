@@ -1,4 +1,5 @@
 import { registerDefinedSqsListener } from "./register-defined-sqs-listener";
+import { toListenerTarget } from "./to-listener-target";
 import type {
   BoundSqsQueue,
   CreateSqsListenerInput,
@@ -67,22 +68,35 @@ function addQueueListener<TMessage extends SqsMessage>(
   input: CreateSqsListenerInput<TMessage>,
 ): SqsQueueListener<TMessage> {
   const listenerId = toListenerId(queueName, input.listenerId);
+  const target = toListenerTarget(input.target);
+  const hasHandler = typeof input.handler === "function";
+
+  if (target.kind === "step-function" && hasHandler) {
+    throw new Error("Step-function listeners must not define handlers");
+  }
+
+  if (target.kind !== "step-function" && !hasHandler) {
+    throw new Error("Lambda listeners must define handlers");
+  }
+
   const listener: SqsQueueListener<TMessage> = {
     ...(input.aws ? { aws: { ...input.aws } } : {}),
-    handler: input.handler,
+    ...(hasHandler ? { handler: input.handler } : {}),
     listenerId,
     parse,
     queue: {
       runtime: runtimeConfig,
     },
+    target,
   };
 
   registerDefinedSqsListener({
     ...(listener.aws ? { aws: { ...listener.aws } } : {}),
-    handler: listener.handler,
+    ...(listener.handler ? { handler: listener.handler } : {}),
     listenerId: listener.listenerId,
     parse: listener.parse,
     queue: listener.queue,
+    target: listener.target,
   });
 
   return listener;

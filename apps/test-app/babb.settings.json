@@ -19,7 +19,8 @@
       "apiGateway": true,
       "dynamodb": false,
       "lambdas": true,
-      "sqs": true
+      "sqs": true,
+      "stepFunctions": true
     }
   }
 }

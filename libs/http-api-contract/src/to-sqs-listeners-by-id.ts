@@ -15,9 +15,9 @@ function toQueueKey(queueName: string): string {
 export function toSqsListenersById(
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
 ): Record<string, LambdaSqsListenerConfig> {
-  const sortedListeners = [...listeners].sort((left, right) =>
-    left.listenerId.localeCompare(right.listenerId),
-  );
+  const sortedListeners = listeners
+    .filter((listener) => listener.target?.kind !== "step-function")
+    .sort((left, right) => left.listenerId.localeCompare(right.listenerId));
 
   return Object.fromEntries(
     sortedListeners.map((listener) => [

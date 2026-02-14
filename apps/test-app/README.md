@@ -8,6 +8,10 @@ The same endpoint declarations are used for:
 
 Endpoints are defined in `/Users/lommi/Projects/simple-api/apps/test-app/src/endpoints.ts`.
 The endpoint entrypoint exports `endpoints` (arrays and nested arrays are supported).
+Step Function demos are defined in `/Users/lommi/Projects/simple-api/apps/test-app/src/step-function-demo.ts`:
+- `POST /step-function-demo` (endpoint target is Step Functions)
+- `POST /step-function-random-branch` (Task + Choice flow with random 1-100 branch)
+- `POST /step-function-events` (sends to an SQS queue whose listener target is Step Functions)
 
 ## Commands
 

@@ -1,11 +1,11 @@
 import { assertUniqueRouteIds } from "./assert-unique-route-ids";
 import { toRoutesWithGlobalCorsOptions } from "./to-routes-with-global-cors-options";
 import type { GlobalCors } from "./cors-types";
+import type { EnvSchema } from "./env-schema-types";
 import type {
   BuildContractInput,
   Contract,
   DeployContract,
-  EnvSchema,
   LambdasManifest,
   OpenApiDocument,
   OpenApiOperation,
@@ -89,6 +89,7 @@ function toOpenApiDocument(input: BuildContractInput): OpenApiDocument {
       "x-babbstack": {
         auth: route.auth,
         ...(route.aws ? { aws: { ...route.aws } } : {}),
+        execution: route.execution ?? { kind: "lambda" },
         handler: route.handler,
         routeId: route.routeId,
       },
@@ -128,9 +129,11 @@ function toRoutesManifest(input: BuildContractInput): RoutesManifest {
 }
 
 function toLambdasManifest(input: BuildContractInput): LambdasManifest {
+  const lambdaRoutes = input.routes.filter((route) => route.execution?.kind !== "step-function");
+
   return {
     apiName: input.apiName,
-    functions: input.routes.map((route) => ({
+    functions: lambdaRoutes.map((route) => ({
       architecture: "arm64",
       artifactPath: `lambda-artifacts/${route.routeId}.zip`,
       functionId: route.routeId,

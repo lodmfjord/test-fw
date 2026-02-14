@@ -69,6 +69,7 @@ export function toRuntimeEndpointsWithGlobalCorsOptions(
       auth: route.auth,
       ...(route.aws ? { aws: { ...route.aws } } : {}),
       ...(route.description ? { description: route.description } : {}),
+      execution: route.execution,
       handler: () => ({
         headers: toCorsHeaders(cors, methods),
         statusCode: 204,

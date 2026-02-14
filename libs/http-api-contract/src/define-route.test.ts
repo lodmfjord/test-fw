@@ -14,6 +14,7 @@ describe("defineRoute", () => {
     expect(route.routeId).toBe("get_users_param_userid");
     expect(route.operationId).toBe("getUsersParamUserid");
     expect(route.auth).toBe("none");
+    expect(route.execution.kind).toBe("lambda");
     expect(route.tags).toEqual([]);
   });
 

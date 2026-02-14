@@ -1,6 +1,8 @@
 import type { DynamoDbClient } from "@babbstack/dynamodb";
+import type { StepFunctionTaskHandler } from "@babbstack/step-functions";
 import type { SqsClient } from "@babbstack/sqs";
 import type { GlobalCors } from "./cors-types";
+import type { EnvSchema } from "./env-schema-types";
 import type {
   EndpointAccess,
   EndpointContext,
@@ -8,6 +10,7 @@ import type {
   EndpointDbAccess,
   EndpointRuntimeContext,
 } from "./endpoint-context-types";
+import type { RouteExecution, RouteExecutionInput } from "./route-execution-types";
 import type { JsonSchema, Schema } from "@babbstack/schema";
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | "HEAD";
 
@@ -23,6 +26,7 @@ export type RouteInput = {
   auth?: RouteAuth;
   aws?: AwsRouteOptions;
   description?: string;
+  execution?: RouteExecutionInput;
   handler: string;
   method: string;
   operationId?: string;
@@ -35,6 +39,7 @@ export type RouteDefinition = {
   auth: RouteAuth;
   aws?: AwsRouteOptions;
   description?: string;
+  execution: RouteExecution;
   handler: string;
   method: HttpMethod;
   operationId: string;
@@ -54,6 +59,7 @@ export type EndpointRequest<TParams, TQuery, THeaders, TBody> = {
 export type CreateDevAppOptions = {
   db?: DynamoDbClient;
   sqs?: SqsClient;
+  stepFunctionTaskHandlers?: Record<string, StepFunctionTaskHandler>;
 };
 
 export type EndpointHandler<
@@ -91,7 +97,8 @@ export type EndpointInput<
   aws?: AwsRouteOptions;
   context?: TContextInput;
   description?: string;
-  handler: EndpointHandler<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput>;
+  execution?: RouteExecutionInput;
+  handler?: EndpointHandler<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput>;
   handlerId?: string;
   method: string;
   operationId?: string;
@@ -117,7 +124,7 @@ export type EndpointDefinition<
   TDbAccess extends EndpointDbAccess = "write",
   TContextInput extends EndpointContextInput | undefined = undefined,
 > = EndpointMetadata & {
-  handler: EndpointHandler<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput>;
+  handler?: EndpointHandler<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput>;
   request: EndpointRequest<TParams, TQuery, THeaders, TBody>;
   response: Schema<TResponse>;
 };
@@ -132,7 +139,7 @@ export type EndpointRuntimeHandler = {
 }["bivarianceHack"];
 
 export type EndpointRuntimeDefinition = EndpointContractDefinition & {
-  handler: EndpointRuntimeHandler;
+  handler?: EndpointRuntimeHandler;
 };
 
 export type EnvVarDefinition = {
@@ -168,6 +175,7 @@ export type OpenApiExtension = {
   access?: EndpointAccess<EndpointDbAccess>;
   auth: RouteAuth;
   aws?: AwsRouteOptions;
+  execution: RouteExecution;
   handler: string;
   routeId: string;
 };
@@ -272,20 +280,6 @@ export type DeployContract = {
   };
   schemaVersion: "1.0.0";
   version: string;
-};
-
-export type JsonSchemaProperty = {
-  default?: string;
-  description?: string;
-  type: "string";
-};
-
-export type EnvSchema = {
-  $schema: "https://json-schema.org/draft/2020-12/schema";
-  additionalProperties: false;
-  properties: Record<string, JsonSchemaProperty>;
-  required: string[];
-  type: "object";
 };
 
 export type Contract = {

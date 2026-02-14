@@ -81,20 +81,23 @@ export async function writeLambdaJsFiles(
     throw new Error("outputDirectory is required");
   }
 
-  assertUniqueRouteIds(endpoints);
+  const lambdaEndpoints = endpoints.filter(
+    (endpoint) => endpoint.execution?.kind !== "step-function",
+  );
+  assertUniqueRouteIds(lambdaEndpoints);
 
   const endpointModulePath = resolveEndpointModulePath(options.endpointModulePath);
   const externalModules = resolveExternalModules(options.externalModules, endpointModulePath);
   const endpointModuleSource = await readFile(endpointModulePath, "utf8");
   await mkdir(directory, { recursive: true });
 
-  const fileNames = endpoints
+  const fileNames = lambdaEndpoints
     .map((endpoint) => `${endpoint.routeId}.mjs`)
     .sort((left, right) => left.localeCompare(right));
   const tempDirectory = await mkdtemp(join(process.cwd(), ".babbstack-lambda-entry-"));
 
   try {
-    for (const endpoint of endpoints) {
+    for (const endpoint of lambdaEndpoints) {
       const fileName = `${endpoint.routeId}.mjs`;
       const source = renderLambdaRuntimeEntrySource(
         endpointModulePath,

@@ -1,4 +1,5 @@
-import type { SqsClient, SqsMessage, SqsQueueListener } from "./types";
+import { executeStepFunctionDefinition } from "./execute-step-function-definition";
+import type { RunSqsQueueListenerOptions, SqsClient, SqsMessage, SqsQueueListener } from "./types";
 
 function toBatchSize(listener: SqsQueueListener<SqsMessage>): number {
   const value = listener.aws?.batchSize ?? 10;
@@ -12,6 +13,7 @@ function toBatchSize(listener: SqsQueueListener<SqsMessage>): number {
 export async function runSqsQueueListener<TMessage extends SqsMessage>(
   listener: SqsQueueListener<TMessage>,
   sqs: SqsClient,
+  options: RunSqsQueueListenerOptions = {},
 ): Promise<number> {
   const queueName = listener.queue.runtime.queueName;
   const maxMessages = toBatchSize(listener as SqsQueueListener<SqsMessage>);
@@ -24,12 +26,26 @@ export async function runSqsQueueListener<TMessage extends SqsMessage>(
 
   for (const item of batch) {
     const message = listener.parse(item.message);
-    await listener.handler({
-      message,
-      request: {
-        rawRecord: item,
-      },
-    });
+    if (listener.target?.kind === "step-function") {
+      if (listener.target.invocationType === "sync") {
+        await executeStepFunctionDefinition(listener.target.definition, message, {
+          ...(options.stepFunctionTaskHandlers
+            ? { taskHandlers: options.stepFunctionTaskHandlers }
+            : {}),
+        });
+      }
+    } else {
+      if (!listener.handler) {
+        throw new Error("Missing handler for lambda listener");
+      }
+
+      await listener.handler({
+        message,
+        request: {
+          rawRecord: item,
+        },
+      });
+    }
     await sqs.remove({
       queueName,
       receiptHandle: item.receiptHandle,

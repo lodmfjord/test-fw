@@ -30,5 +30,6 @@ describe("sqs listener registry", () => {
     expect(listeners).toHaveLength(1);
     expect(listeners[0]?.listenerId).toBe("ble_listener");
     expect(listeners[0]?.queue.runtime.queueName).toBe("ble-events");
+    expect(listeners[0]?.target.kind).toBe("lambda");
   });
 });

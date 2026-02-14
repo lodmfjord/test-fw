@@ -100,4 +100,39 @@ describe("defineEndpoint", () => {
       },
     });
   });
+
+  it("rejects handlers for step-function endpoints", () => {
+    expect(() =>
+      defineEndpoint({
+        execution: {
+          definition:
+            '{"StartAt":"Done","States":{"Done":{"Type":"Pass","Result":{"ok":true},"End":true}}}',
+          kind: "step-function",
+          stateMachineName: "demo",
+        },
+        method: "POST",
+        path: "/step-function",
+        handler: () => ({
+          value: {
+            ok: true,
+          },
+        }),
+        response: schema.object({
+          ok: schema.boolean(),
+        }),
+      }),
+    ).toThrow("Step-function routes must not define handlers");
+  });
+
+  it("rejects lambda endpoints without handlers", () => {
+    expect(() =>
+      defineEndpoint({
+        method: "GET",
+        path: "/health",
+        response: schema.object({
+          ok: schema.boolean(),
+        }),
+      }),
+    ).toThrow("Lambda routes must define handlers");
+  });
 });

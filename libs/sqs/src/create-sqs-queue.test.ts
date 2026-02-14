@@ -64,4 +64,66 @@ describe("createSqsQueue", () => {
       },
     ]);
   });
+
+  it("rejects handlers for step-function listeners", () => {
+    const ble = createSqsQueue(
+      {
+        parse(input: unknown): BleMessage {
+          const source = input as { kind?: unknown; userId?: unknown };
+          if (source.kind !== "ble" || typeof source.userId !== "string") {
+            throw new Error("invalid ble message");
+          }
+
+          return {
+            kind: "ble",
+            userId: source.userId,
+          };
+        },
+      },
+      {
+        queueName: "ble-events",
+      },
+    );
+
+    expect(() =>
+      ble.addListener({
+        handler: () => undefined,
+        target: {
+          definition:
+            '{"StartAt":"Done","States":{"Done":{"Type":"Pass","Result":{"ok":true},"End":true}}}',
+          kind: "step-function",
+          stateMachineName: "demo",
+        },
+      }),
+    ).toThrow("Step-function listeners must not define handlers");
+  });
+
+  it("rejects lambda listeners without handlers", () => {
+    const ble = createSqsQueue(
+      {
+        parse(input: unknown): BleMessage {
+          const source = input as { kind?: unknown; userId?: unknown };
+          if (source.kind !== "ble" || typeof source.userId !== "string") {
+            throw new Error("invalid ble message");
+          }
+
+          return {
+            kind: "ble",
+            userId: source.userId,
+          };
+        },
+      },
+      {
+        queueName: "ble-events",
+      },
+    );
+
+    expect(() =>
+      ble.addListener({
+        target: {
+          kind: "lambda",
+        },
+      }),
+    ).toThrow("Lambda listeners must define handlers");
+  });
 });

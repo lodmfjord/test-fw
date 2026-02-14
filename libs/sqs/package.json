@@ -13,6 +13,7 @@
     }
   },
   "dependencies": {
+    "@babbstack/step-functions": "workspace:*",
     "@aws-sdk/client-sqs": "^3.0.0"
   }
 }
