@@ -34,11 +34,26 @@ export async function writeLambdaFunctionArtifacts(
   outputDirectory: string,
   lambdasManifest: LambdasManifest,
   lambdaOutputDirectory: string,
+  additionalFunctionIds: ReadonlyArray<string> = [],
 ): Promise<string[]> {
   const lambdaFunctions = [...lambdasManifest.functions].sort((left, right) =>
     left.routeId.localeCompare(right.routeId),
   );
-  if (lambdaFunctions.length === 0) {
+  const existingRouteIds = new Set(lambdaFunctions.map((item) => item.routeId));
+  const additionalRouteIds = [...new Set(additionalFunctionIds)]
+    .filter((routeId) => !existingRouteIds.has(routeId))
+    .sort((left, right) => left.localeCompare(right));
+  const functionDescriptors = [
+    ...lambdaFunctions.map((item) => ({
+      artifactFileName: basename(item.artifactPath),
+      routeId: item.routeId,
+    })),
+    ...additionalRouteIds.map((routeId) => ({
+      artifactFileName: `${routeId}.zip`,
+      routeId,
+    })),
+  ];
+  if (functionDescriptors.length === 0) {
     return [];
   }
 
@@ -46,11 +61,12 @@ export async function writeLambdaFunctionArtifacts(
   const artifactFileNames: string[] = [];
   const sourceCodeHashByRoute: Record<string, string> = {};
 
-  for (const lambdaFunction of lambdaFunctions) {
-    const artifactFileName = basename(lambdaFunction.artifactPath);
-    const sourceFilePath = join(lambdaOutputDirectory, `${lambdaFunction.routeId}.mjs`);
+  for (const functionDescriptor of functionDescriptors) {
+    const artifactFileName = functionDescriptor.artifactFileName;
+    const sourceFilePath = join(lambdaOutputDirectory, `${functionDescriptor.routeId}.mjs`);
     await writeLambdaArtifact(join(outputDirectory, artifactFileName), sourceFilePath);
-    sourceCodeHashByRoute[lambdaFunction.routeId] = await toLambdaSourceCodeHash(sourceFilePath);
+    sourceCodeHashByRoute[functionDescriptor.routeId] =
+      await toLambdaSourceCodeHash(sourceFilePath);
     artifactFileNames.push(artifactFileName);
   }
   await writeFile(

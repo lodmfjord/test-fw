@@ -63,4 +63,24 @@ describe("endpoint registry", () => {
     expect(endpoints).toHaveLength(1);
     expect(endpoints[0]?.handlerId).toBe("health_handler_v2");
   });
+
+  it("rejects endpoints with colliding route ids across different paths", () => {
+    defineGet({
+      path: "/users-roles",
+      handler: () => ({ value: { status: "ok" } }),
+      response: schema.object({
+        status: schema.string(),
+      }),
+    });
+
+    expect(() =>
+      defineGet({
+        path: "/users_roles",
+        handler: () => ({ value: { status: "ok" } }),
+        response: schema.object({
+          status: schema.string(),
+        }),
+      }),
+    ).toThrow('Route ID collision: "get_users_roles"');
+  });
 });

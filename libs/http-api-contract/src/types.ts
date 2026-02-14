@@ -1,4 +1,5 @@
 import type { DynamoDbClient } from "@babbstack/dynamodb";
+import type { SqsClient } from "@babbstack/sqs";
 import type {
   EndpointAccess,
   EndpointContext,
@@ -7,7 +8,6 @@ import type {
   EndpointRuntimeContext,
 } from "./endpoint-context-types";
 import type { JsonSchema, Schema } from "@babbstack/schema";
-
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | "HEAD";
 
 export type RouteAuth = "none" | "jwt" | "iam";
@@ -52,6 +52,7 @@ export type EndpointRequest<TParams, TQuery, THeaders, TBody> = {
 
 export type CreateDevAppOptions = {
   db?: DynamoDbClient;
+  sqs?: SqsClient;
 };
 
 export type EndpointHandler<
@@ -290,10 +291,4 @@ export type Contract = {
   routesManifest: RoutesManifest;
 };
 
-export type {
-  EndpointAccess,
-  EndpointContext,
-  EndpointContextInput,
-  EndpointDbAccess,
-  EndpointRuntimeContext,
-};
+export type { EndpointAccess, EndpointContext, EndpointContextInput, EndpointDbAccess };

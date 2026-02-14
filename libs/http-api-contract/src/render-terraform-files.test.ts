@@ -60,7 +60,7 @@ describe("renderTerraformFiles", () => {
       version: "1.0.0",
     });
 
-    const files = renderTerraformFiles(contract, endpoints, {
+    const files = renderTerraformFiles(contract, endpoints, [], {
       appName: "test-app",
       prefix: "babbstack",
       region: "eu-west-1",
@@ -68,6 +68,7 @@ describe("renderTerraformFiles", () => {
         apiGateway: false,
         dynamodb: true,
         lambdas: false,
+        sqs: false,
       },
     });
     const dynamodbSource = files["dynamodb.tf.json"] ?? "";
@@ -112,7 +113,7 @@ describe("renderTerraformFiles", () => {
     const lambdaExternalModulesByRoute = {
       get_health: ["@aws-sdk/client-dynamodb", "@aws-sdk/util-dynamodb"],
     };
-    const files = renderTerraformFiles(contract, endpoints, {
+    const files = renderTerraformFiles(contract, endpoints, [], {
       appName: "test-app",
       lambdaExternalModulesByRoute,
       prefix: "babbstack",
@@ -121,6 +122,7 @@ describe("renderTerraformFiles", () => {
         apiGateway: false,
         dynamodb: false,
         lambdas: true,
+        sqs: false,
       },
     });
     const lambdaSource = files["lambdas.tf.json"] ?? "";
@@ -220,7 +222,7 @@ describe("renderTerraformFiles", () => {
       version: "1.0.0",
     });
 
-    const files = renderTerraformFiles(contract, endpoints, {
+    const files = renderTerraformFiles(contract, endpoints, [], {
       appName: "test-app",
       prefix: "babbstack",
       region: "eu-west-1",
@@ -228,6 +230,7 @@ describe("renderTerraformFiles", () => {
         apiGateway: false,
         dynamodb: false,
         lambdas: true,
+        sqs: false,
       },
     });
     const lambdaSource = files["lambdas.tf.json"] ?? "";

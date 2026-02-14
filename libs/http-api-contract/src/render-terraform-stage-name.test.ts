@@ -30,7 +30,7 @@ describe("renderTerraformFiles stage naming", () => {
       endpoints,
       version: "1.0.0",
     });
-    const files = renderTerraformFiles(contract, endpoints, {
+    const files = renderTerraformFiles(contract, endpoints, [], {
       appName: "test-app",
       prefix: "babbstack",
       region: "eu-west-1",
@@ -38,6 +38,7 @@ describe("renderTerraformFiles stage naming", () => {
         apiGateway: true,
         dynamodb: false,
         lambdas: false,
+        sqs: false,
       },
     });
     const apiGatewayJson = JSON.parse(files["api-gateway.tf.json"] ?? "") as {

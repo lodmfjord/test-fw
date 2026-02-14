@@ -1,251 +1,58 @@
-import { defineGet, definePatch, definePost } from "@babbstack/http-api-contract";
+import { createSqsQueue } from "@babbstack/sqs";
+import { defineGet } from "@babbstack/http-api-contract";
 import { schema } from "@babbstack/schema";
-import slugify from "slugify";
-import { pointDatabase, titleDatabase } from "./db";
+import { z } from "zod";
+import { lastUpdateStore } from "./last-update-store";
 
-const getHealthEndpoint = defineGet({
-  access: {
-    db: "read",
-  },
-  path: "/health",
-  handler: () => {
-    return {
-      value: {
-        status: "ok",
-      },
-    };
-  },
-  response: schema.object({
-    status: schema.string(),
-  }),
-  summary: "Health check",
-  tags: ["system"],
+const lastUpdateMessageSchema = z.object({
+  time: z.string(),
 });
 
-const getHelloWorldEndpoint = defineGet({
-  access: {
-    db: "read",
-  },
-  path: "/hello_world",
-  handler: async () => {
-    return {
-      value: {
-        hello: slugify("Hello World From Package", {
-          lower: true,
-          strict: true,
-        }),
-      },
-    };
-  },
-  response: schema.object({
-    hello: schema.string(),
-  }),
-  summary: "Health check",
-  tags: ["system"],
-});
-
-const postUsersEndpoint = definePost({
-  access: {
-    db: "write",
-  },
-  path: "/users",
-  handler: ({ body }) => {
-    return {
-      value: {
-        id: `user-${body.name}`,
-      },
-    };
-  },
-  request: {
-    body: schema.object({
-      name: schema.string(),
-    }),
-  },
-  response: schema.object({
-    id: schema.string(),
-  }),
-  tags: ["users"],
-});
-
-const getTestDbOneEndpoint = defineGet({
-  context: {
-    database: {
-      access: ["read"],
-      handler: pointDatabase,
+export const lastUpdateQueue = createSqsQueue(
+  {
+    parse(input) {
+      return lastUpdateMessageSchema.parse(input);
     },
   },
-  path: "/test-db-one/{id}",
-  handler: async ({ database, params }) => {
-    const existing = await database.read({
-      id: params.id,
-    });
+  {
+    queueName: "last-update-events",
+  },
+);
 
-    if (existing) {
-      return {
-        value: existing,
-      };
+export const lastUpdateListener = lastUpdateQueue.addListener({
+  listenerId: "last_update",
+  handler: ({ message }) => {
+    console.log("last_update listener received message", message);
+    lastUpdateStore.update(message.time);
+  },
+});
+
+const getLastUpdateEndpoint = defineGet({
+  path: "/last-update",
+  context: {
+    sqs: {
+      handler: lastUpdateQueue,
+    },
+  },
+  handler: async ({ sqs }) => {
+    if (!sqs) {
+      throw new Error("missing sqs context");
     }
 
-    return {
-      value: {
-        id: params.id,
-        name: `test-db-one-${params.id}`,
-        points: 0,
-      },
-    };
-  },
-  request: {
-    params: schema.object({
-      id: schema.string(),
-    }),
-  },
-  response: schema.object({
-    id: schema.string(),
-    name: schema.string(),
-    points: schema.number(),
-  }),
-  tags: ["test-db-one"],
-});
-
-const patchTestDbOneEndpoint = definePatch({
-  context: {
-    database: {
-      access: ["write"],
-      handler: pointDatabase,
-    },
-  },
-  path: "/test-db-one/{id}",
-  handler: async ({ body, database, params }) => {
-    const existing = await database.read({
-      id: params.id,
+    await sqs.send({
+      time: new Date().toISOString(),
     });
-
-    const seeded =
-      existing ??
-      (await database.write({
-        id: params.id,
-        name: `test-db-one-${params.id}`,
-        points: 0,
-      }));
-    const updated = await database.update(
-      {
-        id: params.id,
-      },
-      body,
-    );
-
-    return {
-      value: updated ?? seeded,
-    };
-  },
-  request: {
-    body: schema.object({
-      name: schema.optional(schema.string()),
-      points: schema.optional(schema.number()),
-    }),
-    params: schema.object({
-      id: schema.string(),
-    }),
-  },
-  response: schema.object({
-    id: schema.string(),
-    name: schema.string(),
-    points: schema.number(),
-  }),
-  tags: ["test-db-one"],
-});
-
-const getTestDbTwoEndpoint = defineGet({
-  context: {
-    database: {
-      access: ["read"],
-      handler: titleDatabase,
-    },
-  },
-  path: "/test-db-two/{id}",
-  handler: async ({ database, params }) => {
-    const existing = await database.read({
-      id: params.id,
-    });
-
-    if (existing) {
-      return {
-        value: existing,
-      };
-    }
 
     return {
       value: {
-        enabled: false,
-        id: params.id,
-        title: `test-db-two-${params.id}`,
+        time: lastUpdateStore.read(),
       },
     };
   },
-  request: {
-    params: schema.object({
-      id: schema.string(),
-    }),
-  },
   response: schema.object({
-    enabled: schema.boolean(),
-    id: schema.string(),
-    title: schema.string(),
+    time: schema.string(),
   }),
-  tags: ["test-db-two"],
+  tags: ["last-update"],
 });
 
-const patchTestDbTwoEndpoint = definePatch({
-  context: {
-    database: {
-      access: ["write"],
-      handler: titleDatabase,
-    },
-  },
-  path: "/test-db-two/{id}",
-  handler: async ({ body, database, params }) => {
-    const existing = await database.read({
-      id: params.id,
-    });
-
-    const seeded =
-      existing ??
-      (await database.write({
-        enabled: false,
-        id: params.id,
-        title: `test-db-two-${params.id}`,
-      }));
-    const updated = await database.update(
-      {
-        id: params.id,
-      },
-      body,
-    );
-
-    return {
-      value: updated ?? seeded,
-    };
-  },
-  request: {
-    body: schema.object({
-      enabled: schema.optional(schema.boolean()),
-      title: schema.optional(schema.string()),
-    }),
-    params: schema.object({
-      id: schema.string(),
-    }),
-  },
-  response: schema.object({
-    enabled: schema.boolean(),
-    id: schema.string(),
-    title: schema.string(),
-  }),
-  tags: ["test-db-two"],
-});
-
-export const endpoints = [
-  [getHealthEndpoint, getHelloWorldEndpoint],
-  [postUsersEndpoint],
-  [getTestDbOneEndpoint, patchTestDbOneEndpoint],
-  [getTestDbTwoEndpoint, patchTestDbTwoEndpoint],
-];
+export const endpoints = [[getLastUpdateEndpoint]];

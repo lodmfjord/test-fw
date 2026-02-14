@@ -3,9 +3,11 @@ import {
   createRuntimeDynamoDb,
   type DynamoDbClient,
 } from "@babbstack/dynamodb";
+import { createRuntimeSqs } from "@babbstack/sqs";
 import type { EndpointHandlerOutput } from "./types";
 import type { EndpointRuntimeDefinition } from "./types";
 import type { CreateDevAppOptions } from "./types";
+import { toEndpointSqsContext } from "./to-endpoint-sqs-context";
 import { toHttpResponseParts } from "./to-http-response-parts";
 
 function toResponse(status: number, payload: unknown, contentType?: string): Response {
@@ -193,6 +195,7 @@ export function createDevApp(
   options: CreateDevAppOptions = {},
 ): (request: Request) => Promise<Response> {
   const db = options.db ?? createRuntimeDynamoDb();
+  const sqs = options.sqs ?? createRuntimeSqs();
 
   return async function fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
@@ -245,6 +248,7 @@ export function createDevApp(
     try {
       const endpointDb = toDbForEndpoint(db, endpoint);
       const endpointDatabase = toDatabaseForEndpoint(db, endpoint);
+      const endpointSqs = toEndpointSqsContext(sqs, endpoint);
       const handler = endpoint.handler as (context: {
         body: unknown;
         database: unknown;
@@ -253,6 +257,7 @@ export function createDevApp(
         params: unknown;
         query: unknown;
         request: Request;
+        sqs: unknown;
       }) => Promise<unknown> | unknown;
 
       output = await handler({
@@ -263,6 +268,7 @@ export function createDevApp(
         params: validatedParams,
         query: validatedQuery,
         request,
+        sqs: endpointSqs,
       });
     } catch {
       return toResponse(500, { error: "Handler execution failed" });

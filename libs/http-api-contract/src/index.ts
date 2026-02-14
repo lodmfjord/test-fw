@@ -19,6 +19,7 @@ export { runContractGeneratorFromSettings } from "./run-contract-generator-from-
 export { schema } from "@babbstack/schema";
 export { writeContractFiles } from "./write-contract-files-export";
 export { writeLambdaJsFiles } from "./write-lambda-js-files-export";
+export { writeSqsListenerJsFiles } from "./write-sqs-listener-js-files";
 export type {
   BuildContractFromEndpointsInput,
   BuildContractInput,

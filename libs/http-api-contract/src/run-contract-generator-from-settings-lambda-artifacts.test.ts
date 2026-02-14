@@ -76,6 +76,7 @@ export const contract = buildContractFromEndpoints({
               apiGateway: false,
               dynamodb: false,
               lambdas: true,
+              sqs: false,
             },
           },
         },

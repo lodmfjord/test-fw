@@ -1,11 +1,11 @@
 import { defineRoute } from "./define-route";
+import type { EndpointRuntimeContext } from "./endpoint-context-types";
 import { registerDefinedEndpoint } from "./register-defined-endpoint";
 import type {
   EndpointContextInput,
   EndpointDbAccess,
   EndpointDefinition,
   EndpointInput,
-  EndpointRuntimeContext,
 } from "./types";
 
 function toHandlerId(routeId: string, providedHandlerId: string | undefined): string {
@@ -59,6 +59,15 @@ export function defineEndpoint<
       database: {
         access: normalizedAccess,
         runtime: input.context.database.handler.runtimeConfig,
+      },
+    };
+  }
+
+  if (input.context?.sqs) {
+    context = {
+      ...(context ? { ...context } : {}),
+      sqs: {
+        runtime: input.context.sqs.handler.runtimeConfig,
       },
     };
   }

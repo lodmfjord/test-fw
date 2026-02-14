@@ -5,7 +5,7 @@
   "contractsOutputDirectory": "./dist/contracts",
   "endpointExportName": "endpoints",
   "endpointModulePath": "./src/endpoints.ts",
-  "externalModules": ["@aws-sdk/client-dynamodb", "@aws-sdk/util-dynamodb"],
+  "externalModules": ["@aws-sdk/client-sqs"],
   "lambdaOutputDirectory": "./dist/lambda-js",
   "prefix": "babbstack",
   "terraform": {
@@ -17,8 +17,9 @@
     },
     "resources": {
       "apiGateway": true,
-      "dynamodb": true,
-      "lambdas": true
+      "dynamodb": false,
+      "lambdas": true,
+      "sqs": true
     }
   }
 }

@@ -1,3 +1,4 @@
+import { assertUniqueRouteIds } from "./assert-unique-route-ids";
 import type {
   BuildContractInput,
   Contract,
@@ -26,6 +27,8 @@ function validateDuplicateRoutes(routes: RouteDefinition[]): void {
 
     seen.add(key);
   }
+
+  assertUniqueRouteIds(routes);
 }
 
 function toOpenApiDocument(input: BuildContractInput): OpenApiDocument {

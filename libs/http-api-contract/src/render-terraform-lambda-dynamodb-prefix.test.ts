@@ -56,7 +56,7 @@ describe("renderTerraformFiles lambda dynamodb prefix", () => {
       endpoints,
       version: "1.0.0",
     });
-    const files = renderTerraformFiles(contract, endpoints, {
+    const files = renderTerraformFiles(contract, endpoints, [], {
       appName: "test-app",
       prefix: "babbstack",
       region: "eu-west-1",
@@ -64,6 +64,7 @@ describe("renderTerraformFiles lambda dynamodb prefix", () => {
         apiGateway: false,
         dynamodb: true,
         lambdas: true,
+        sqs: false,
       },
     });
     const lambdaSource = files["lambdas.tf.json"] ?? "";

@@ -3,7 +3,9 @@ import type {
   TerraformResourceSelection,
 } from "./contract-generator-types";
 import { createLambdasTerraformJson } from "./create-lambdas-terraform-json";
+import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import { toDynamodbTables } from "./to-dynamodb-tables";
+import { toSqsQueues } from "./to-sqs-queues";
 import { toStateKey } from "./to-state-key";
 import type { EndpointRuntimeDefinition } from "./types";
 import type { Contract } from "./types";
@@ -221,9 +223,32 @@ function createDynamodbTerraformJson(
   };
 }
 
+function createSqsTerraformJson(
+  endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
+  listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
+): TerraformJson {
+  return {
+    locals: {
+      sqs_queues: toSqsQueues(endpoints, listeners),
+    },
+    resource: {
+      aws_sqs_queue: {
+        queue: {
+          for_each: toTerraformReference("local.sqs_queues"),
+          name: `${toTerraformReference("local.resource_name_prefix")}${toTerraformReference("var.sqs_queue_name_prefix")}${toTerraformReference("each.value.name")}`,
+        },
+      },
+    },
+    variable: {
+      sqs_queue_name_prefix: { default: "", type: "string" },
+    },
+  };
+}
+
 export function renderTerraformFiles(
   contract: Contract,
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
+  sqsListeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
   settings: TerraformRenderSettings,
 ): Record<string, string> {
   const appName = settings.appName.length > 0 ? settings.appName : contract.deployContract.apiName;
@@ -241,8 +266,10 @@ export function renderTerraformFiles(
       createLambdasTerraformJson(
         contract,
         endpoints,
+        sqsListeners,
         settings.lambdaExternalModulesByRoute,
         resources.dynamodb,
+        resources.sqs,
       ),
     );
   }
@@ -255,6 +282,10 @@ export function renderTerraformFiles(
 
   if (resources.dynamodb) {
     files["dynamodb.tf.json"] = toTerraformString(createDynamodbTerraformJson(endpoints));
+  }
+
+  if (resources.sqs) {
+    files["sqs.tf.json"] = toTerraformString(createSqsTerraformJson(endpoints, sqsListeners));
   }
 
   return files;

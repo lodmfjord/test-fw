@@ -20,6 +20,9 @@ The goal is to define typed HTTP endpoints once and generate deployable contract
 - `@babbstack/dynamodb` (`libs/dynamodb`)
   - Runtime DB adapters (in-memory and AWS-backed)
   - Typed table helpers and runtime-aware DB client selection
+- `@babbstack/sqs` (`libs/sqs`)
+  - Runtime SQS adapters (in-memory and AWS-backed)
+  - Typed queue helpers and listener registration/runtime metadata
 - `@babbstack/schema` (`libs/schema`)
   - Schema builder + JSON Schema output + runtime parsing wrappers
 - `@babbstack/test-app` (`apps/test-app`)

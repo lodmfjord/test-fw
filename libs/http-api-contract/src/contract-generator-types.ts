@@ -2,6 +2,7 @@ export type TerraformResourceSelection = {
   apiGateway: boolean;
   dynamodb: boolean;
   lambdas: boolean;
+  sqs: boolean;
 };
 
 type TerraformDisabledStateSettings = {

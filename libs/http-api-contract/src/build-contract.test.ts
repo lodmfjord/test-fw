@@ -66,4 +66,25 @@ describe("buildContract", () => {
       }),
     ).toThrow("Duplicate route");
   });
+
+  it("rejects route id collisions across different routes", () => {
+    const usersRolesDashRoute = defineRoute({
+      method: "GET",
+      path: "/users-roles",
+      handler: "src/users/get-roles-dash.ts#handler",
+    });
+    const usersRolesUnderscoreRoute = defineRoute({
+      method: "GET",
+      path: "/users_roles",
+      handler: "src/users/get-roles-underscore.ts#handler",
+    });
+
+    expect(() =>
+      buildContract({
+        apiName: "example-api",
+        version: "1.0.0",
+        routes: [usersRolesDashRoute, usersRolesUnderscoreRoute],
+      }),
+    ).toThrow('Route ID collision: "get_users_roles"');
+  });
 });

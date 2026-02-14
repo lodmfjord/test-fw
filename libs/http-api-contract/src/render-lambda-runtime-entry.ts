@@ -19,24 +19,48 @@ function resolveRuntimeDbImportSpecifier(endpointModulePath: string): string {
   }
 }
 
+function resolveRuntimeSqsImportSpecifier(endpointModulePath: string): string {
+  const moduleSpecifier = "@babbstack/sqs";
+
+  try {
+    const requireFromEndpoint = createRequire(endpointModulePath);
+    return requireFromEndpoint.resolve(moduleSpecifier);
+  } catch {}
+
+  try {
+    const requireFromFramework = createRequire(import.meta.url);
+    return requireFromFramework.resolve(moduleSpecifier);
+  } catch {
+    return fileURLToPath(new URL("../../sqs/src/index.ts", import.meta.url));
+  }
+}
+
 function renderLambdaRuntimeSource(
   endpoint: EndpointRuntimeDefinition,
   importLines: string[],
   runtimeDbImportSpecifier: string,
+  runtimeSqsImportSpecifier: string,
   handlerSource: string,
 ): string {
   const usesHandlerDbContext = /\bdb\b/.test(handlerSource) || /\bdatabase\b/.test(handlerSource);
   const hasContextDatabase = Boolean(endpoint.context?.database);
   const hasRuntimeDb = hasContextDatabase || usesHandlerDbContext;
+  const usesHandlerSqsContext = /\bsqs\b/.test(handlerSource);
+  const hasContextSqs = Boolean(endpoint.context?.sqs);
+  const hasRuntimeSqs = hasContextSqs || usesHandlerSqsContext;
   const runtimeDbImport = hasRuntimeDb
     ? hasContextDatabase
       ? `import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from ${JSON.stringify(runtimeDbImportSpecifier)};`
       : `import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from ${JSON.stringify(runtimeDbImportSpecifier)};`
     : "";
+  const runtimeSqsImport = hasRuntimeSqs
+    ? `import { createRuntimeSqs as createSimpleApiRuntimeSqs } from ${JSON.stringify(runtimeSqsImportSpecifier)};`
+    : "";
   const runtimeDbState = hasRuntimeDb
     ? `const db = createSimpleApiRuntimeDynamoDb();
 const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};`
     : "";
+  const runtimeSqsState = hasRuntimeSqs ? "const sqs = createSimpleApiRuntimeSqs();" : "";
   const dbAccessSupport = hasRuntimeDb
     ? `
 function toDbForAccess(client, access) {
@@ -57,10 +81,21 @@ function toDbForAccess(client, access) {
     ? "const endpointDatabase = toDatabaseForContext(db, endpointDatabaseContext);"
     : "";
   const endpointDatabaseValue = hasContextDatabase ? "endpointDatabase" : "undefined";
-  const preludeLines = runtimeDbImport.length > 0 ? [...importLines, runtimeDbImport] : importLines;
+  const endpointSqsBinding = hasContextSqs
+    ? "const endpointSqs = toSqsForContext(sqs, endpointSqsContext);"
+    : "";
+  const endpointSqsValue = hasContextSqs ? "endpointSqs" : "undefined";
+  const preludeLines = [
+    ...importLines,
+    ...(runtimeDbImport.length > 0 ? [runtimeDbImport] : []),
+    ...(runtimeSqsImport.length > 0 ? [runtimeSqsImport] : []),
+  ];
   const prelude = preludeLines.length > 0 ? `${preludeLines.join("\n")}\n\n` : "";
   const endpointDatabaseContextLine = hasContextDatabase
     ? `const endpointDatabaseContext = ${JSON.stringify(endpoint.context?.database ?? null)};\n`
+    : "";
+  const endpointSqsContextLine = hasContextSqs
+    ? `const endpointSqsContext = ${JSON.stringify(endpoint.context?.sqs ?? null)};\n`
     : "";
   const contextDatabaseHelper = hasContextDatabase
     ? `
@@ -89,8 +124,33 @@ function toDatabaseForContext(client, config) {
 }
 `
     : "";
+  const contextSqsHelper = hasContextSqs
+    ? `
+function toSqsForContext(client, config) {
+  if (!config) {
+    return undefined;
+  }
+
+  const queueNamePrefix = typeof process === "undefined" || !process.env
+    ? ""
+    : process.env.SIMPLE_API_SQS_QUEUE_NAME_PREFIX ?? "";
+  const queueName = queueNamePrefix + config.runtime.queueName;
+  return {
+    async send(message) {
+      await client.send({
+        message,
+        queueName
+      });
+      return message;
+    }
+  };
+}
+`
+    : "";
   return `${prelude}${runtimeDbState}
+${runtimeSqsState}
 ${endpointDatabaseContextLine}
+${endpointSqsContextLine}
 
 const endpointHandler = (${endpoint.handler.toString()});
 
@@ -168,6 +228,7 @@ function toHandlerOutput(output) {
   };
 }
 ${contextDatabaseHelper}
+${contextSqsHelper}
 
 export async function handler(event) {
   const bodyResult = parseJsonBody(event);
@@ -180,6 +241,7 @@ export async function handler(event) {
   const headers = event?.headers ?? {};
   ${endpointDbLine}
   ${endpointDatabaseBinding}
+  ${endpointSqsBinding}
 
   try {
     const output = await endpointHandler({
@@ -191,7 +253,8 @@ export async function handler(event) {
       query,
       request: {
         rawEvent: event
-      }
+      },
+      sqs: ${endpointSqsValue}
     });
     const handlerOutput = toHandlerOutput(output);
     return toResponse(handlerOutput.statusCode, handlerOutput.value, handlerOutput.contentType);
@@ -215,5 +278,12 @@ export function renderLambdaRuntimeEntrySource(
     handlerSource,
   );
   const runtimeDbImportSpecifier = resolveRuntimeDbImportSpecifier(endpointModulePath);
-  return renderLambdaRuntimeSource(endpoint, importLines, runtimeDbImportSpecifier, handlerSource);
+  const runtimeSqsImportSpecifier = resolveRuntimeSqsImportSpecifier(endpointModulePath);
+  return renderLambdaRuntimeSource(
+    endpoint,
+    importLines,
+    runtimeDbImportSpecifier,
+    runtimeSqsImportSpecifier,
+    handlerSource,
+  );
 }

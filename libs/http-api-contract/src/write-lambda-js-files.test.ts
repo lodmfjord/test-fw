@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "bun:test";
 import { listDefinedEndpoints } from "./list-defined-endpoints";
 import { resetDefinedEndpoints } from "./reset-defined-endpoints";
+import type { EndpointRuntimeDefinition } from "./types";
 import { writeLambdaJsFiles } from "./write-lambda-js-files";
 
 describe("writeLambdaJsFiles", () => {
@@ -108,5 +109,57 @@ defineGet({
     expect(source.includes("@aws-sdk/util-dynamodb")).toBe(true);
     expect(source.includes("@smithy/")).toBe(false);
     expect(source.includes("node_modules/.bun/@aws-sdk+client-dynamodb")).toBe(false);
+  });
+
+  it("rejects endpoints with colliding route ids", async () => {
+    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-endpoint-module-"));
+    const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
+    await writeFile(endpointModulePath, "export const noop = true;\n", "utf8");
+
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
+    const collidingEndpoints = [
+      {
+        auth: "none",
+        handler: () => ({ value: { status: "ok" } }),
+        handlerId: "get_users_roles_handler_a",
+        method: "GET",
+        operationId: "getUsersRolesA",
+        path: "/users-roles",
+        request: {},
+        response: {
+          jsonSchema: { type: "object" },
+          optional: false,
+          parse(input: unknown) {
+            return input as { status: string };
+          },
+        },
+        routeId: "get_users_roles",
+        tags: [],
+      },
+      {
+        auth: "none",
+        handler: () => ({ value: { status: "ok" } }),
+        handlerId: "get_users_roles_handler_b",
+        method: "GET",
+        operationId: "getUsersRolesB",
+        path: "/users_roles",
+        request: {},
+        response: {
+          jsonSchema: { type: "object" },
+          optional: false,
+          parse(input: unknown) {
+            return input as { status: string };
+          },
+        },
+        routeId: "get_users_roles",
+        tags: [],
+      },
+    ] as unknown as EndpointRuntimeDefinition[];
+
+    await expect(
+      writeLambdaJsFiles(outputDirectory, collidingEndpoints, {
+        endpointModulePath,
+      }),
+    ).rejects.toThrow('Route ID collision: "get_users_roles"');
   });
 });

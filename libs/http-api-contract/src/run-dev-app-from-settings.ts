@@ -1,5 +1,17 @@
 import { readFile } from "node:fs/promises";
 import { dirname } from "node:path";
+import {
+  createRuntimeSqs,
+  listDefinedSqsListeners,
+  resetDefinedSqsListeners,
+  runSqsQueueListener,
+} from "@babbstack/sqs";
+import type {
+  SqsClient,
+  SqsListenerRuntimeDefinition,
+  SqsMessage,
+  SqsQueueListener,
+} from "@babbstack/sqs";
 import { createDevApp } from "./create-dev-app";
 import { loadEndpointsFromModule } from "./load-endpoints-from-module";
 import { parseJsonc } from "./parse-jsonc";
@@ -12,6 +24,7 @@ type DevServeInput = {
 
 type RunDevAppFromSettingsOptions = {
   env?: Record<string, string | undefined>;
+  listenerPollMs?: number;
   log?: (message: string) => void;
   serve?: (input: DevServeInput) => unknown;
 };
@@ -76,6 +89,56 @@ function toEndpointSettings(value: unknown): {
   };
 }
 
+function toListenerPollMs(value: number | undefined): number {
+  const resolved = value ?? 250;
+  if (!Number.isInteger(resolved) || resolved <= 0) {
+    throw new Error(`listenerPollMs must be a positive integer: ${String(value)}`);
+  }
+
+  return resolved;
+}
+
+function startSqsListeners(
+  listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
+  sqs: SqsClient,
+  pollMs: number,
+  log: (message: string) => void,
+): void {
+  if (listeners.length === 0) {
+    return;
+  }
+
+  let isPolling = false;
+  const poll = async (): Promise<void> => {
+    if (isPolling) {
+      return;
+    }
+
+    isPolling = true;
+    try {
+      for (const listener of listeners) {
+        const typedListener = listener as unknown as SqsQueueListener<SqsMessage>;
+        const processed = await runSqsQueueListener(typedListener, sqs);
+        if (processed > 0) {
+          log(`babbstack sqs listener ${listener.listenerId} processed ${processed} message(s)`);
+        }
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown SQS listener error";
+      log(`babbstack sqs listener polling error: ${message}`);
+    } finally {
+      isPolling = false;
+    }
+  };
+
+  const timer = setInterval(() => {
+    void poll();
+  }, pollMs);
+  timer.unref?.();
+  void poll();
+  log(`babbstack sqs listener polling started for ${listeners.length} listener(s) at ${pollMs}ms`);
+}
+
 export async function runDevAppFromSettings(
   settingsFilePath: string,
   options: RunDevAppFromSettingsOptions = {},
@@ -102,9 +165,15 @@ export async function runDevAppFromSettings(
     settings.endpointModulePath,
     settingsDirectory,
   );
+  const listenerPollMs = toListenerPollMs(options.listenerPollMs);
+  resetDefinedSqsListeners();
   const endpoints = await loadEndpointsFromModule(endpointModulePath, settings.endpointExportName);
+  const sqsListeners = listDefinedSqsListeners();
 
-  const fetch = createDevApp(endpoints);
+  const sqs = createRuntimeSqs();
+  const fetch = createDevApp(endpoints, {
+    sqs,
+  });
   const port = toPort((options.env ?? process.env).PORT);
   const serve = options.serve ?? ((input: DevServeInput) => Bun.serve(input));
   const log = options.log ?? console.log;
@@ -113,6 +182,7 @@ export async function runDevAppFromSettings(
     fetch,
     port,
   });
+  startSqsListeners(sqsListeners, sqs, listenerPollMs, log);
   log(`babbstack dev server listening on http://localhost:${port}`);
 
   return port;

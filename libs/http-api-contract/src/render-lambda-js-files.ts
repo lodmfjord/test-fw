@@ -1,3 +1,4 @@
+import { assertUniqueRouteIds } from "./assert-unique-route-ids";
 import type { EndpointRuntimeDefinition, LambdaJsGenerationOptions } from "./types";
 
 function renderEndpointLookup(routeId: string, method: string, variableName: string): string {
@@ -13,11 +14,20 @@ function renderFile(
 ): string {
   const frameworkImportPath = options.frameworkImportPath ?? "@babbstack/http-api-contract";
   const hasContextDatabase = Boolean(endpoint.context?.database);
-  const runtimeDbImportLine = hasContextDatabase
-    ? 'import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@babbstack/dynamodb";'
-    : 'import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@babbstack/dynamodb";';
+  const hasContextSqs = Boolean(endpoint.context?.sqs);
+  const runtimeImportLines = [
+    hasContextDatabase
+      ? 'import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@babbstack/dynamodb";'
+      : 'import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@babbstack/dynamodb";',
+    ...(hasContextSqs
+      ? ['import { createRuntimeSqs as createSimpleApiRuntimeSqs } from "@babbstack/sqs";']
+      : []),
+  ].join("\n");
   const endpointDatabaseContextLine = hasContextDatabase
     ? `const endpointDatabaseContext = ${JSON.stringify(endpoint.context?.database ?? null)};\n`
+    : "";
+  const endpointSqsContextLine = hasContextSqs
+    ? `const endpointSqsContext = ${JSON.stringify(endpoint.context?.sqs ?? null)};\n`
     : "";
   const contextDatabaseSupport = hasContextDatabase
     ? `
@@ -46,18 +56,48 @@ function toDatabaseForContext(client, config) {
 }
 `
     : "";
+  const contextSqsSupport = hasContextSqs
+    ? `
+function toSqsForContext(client, config) {
+  if (!config) {
+    return undefined;
+  }
+
+  const queueNamePrefix = typeof process === "undefined" || !process.env
+    ? ""
+    : process.env.SIMPLE_API_SQS_QUEUE_NAME_PREFIX ?? "";
+  const queueName = queueNamePrefix + config.runtime.queueName;
+  return {
+    async send(message) {
+      await client.send({
+        message,
+        queueName
+      });
+      return message;
+    }
+  };
+}
+`
+    : "";
   const endpointDatabaseBinding = hasContextDatabase
     ? "const endpointDatabase = toDatabaseForContext(db, endpointDatabaseContext);"
     : "";
   const endpointDatabaseValue = hasContextDatabase ? "endpointDatabase" : "undefined";
+  const endpointSqsStateLine = hasContextSqs ? "const sqs = createSimpleApiRuntimeSqs();" : "";
+  const endpointSqsBinding = hasContextSqs
+    ? "const endpointSqs = toSqsForContext(sqs, endpointSqsContext);"
+    : "";
+  const endpointSqsValue = hasContextSqs ? "endpointSqs" : "undefined";
 
-  return `${runtimeDbImportLine}
+  return `${runtimeImportLines}
 import { listDefinedEndpoints } from "${frameworkImportPath}";
 
 let endpointPromise;
 const db = createSimpleApiRuntimeDynamoDb();
+${endpointSqsStateLine}
 const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};
 ${endpointDatabaseContextLine}
+${endpointSqsContextLine}
 
 async function loadEndpoint() {
   if (!endpointPromise) {
@@ -164,6 +204,7 @@ function toHandlerOutput(output) {
   };
 }
 ${contextDatabaseSupport}
+${contextSqsSupport}
 
 export async function handler(event) {
   const bodyResult = parseJsonBody(event);
@@ -176,6 +217,7 @@ export async function handler(event) {
   const headers = event?.headers ?? {};
   const endpointDb = toDbForAccess(db, endpointDbAccess);
   ${endpointDatabaseBinding}
+  ${endpointSqsBinding}
 
   try {
     const endpoint = await loadEndpoint();
@@ -188,7 +230,8 @@ export async function handler(event) {
       query,
       request: {
         rawEvent: event
-      }
+      },
+      sqs: ${endpointSqsValue}
     });
     const handlerOutput = toHandlerOutput(output);
     return toResponse(handlerOutput.statusCode, handlerOutput.value, handlerOutput.contentType);
@@ -208,6 +251,8 @@ export function renderLambdaJsFiles(
   if (endpointModulePath.length === 0) {
     throw new Error("endpointModulePath is required");
   }
+
+  assertUniqueRouteIds(endpoints);
 
   const files: Record<string, string> = {};
 

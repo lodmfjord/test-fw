@@ -6,6 +6,7 @@ import type {
   ReadBoundDynamoDatabase,
   WriteBoundDynamoDatabase,
 } from "@babbstack/dynamodb";
+import type { BoundSqsQueue, SqsMessage, SqsQueue, SqsQueueRuntimeConfig } from "@babbstack/sqs";
 
 export type EndpointDbAccess = "read" | "write";
 
@@ -40,8 +41,13 @@ export type EndpointContextDatabaseInput = {
   handler: DynamoDatabase<DynamoDbItem, keyof DynamoDbItem & string>;
 };
 
+export type EndpointContextSqsInput = {
+  handler: SqsQueue<SqsMessage>;
+};
+
 export type EndpointContextInput = {
   database?: EndpointContextDatabaseInput;
+  sqs?: EndpointContextSqsInput;
 };
 
 type ResolvedEndpointContextDatabase<TContextInput extends EndpointContextInput | undefined> =
@@ -55,13 +61,29 @@ type ResolvedEndpointContextDatabase<TContextInput extends EndpointContextInput 
       : undefined
     : undefined;
 
+type ResolvedEndpointContextSqs<TContextInput extends EndpointContextInput | undefined> =
+  TContextInput extends {
+    sqs: EndpointContextSqsInput;
+  }
+    ? TContextInput["sqs"] extends EndpointContextSqsInput
+      ? TContextInput["sqs"]["handler"] extends SqsQueue<infer TMessage>
+        ? BoundSqsQueue<TMessage>
+        : undefined
+      : undefined
+    : undefined;
+
 export type EndpointRuntimeContextDatabase = {
   access: EndpointDbAccess[];
   runtime: DynamoDatabaseRuntimeConfig<string>;
 };
 
+export type EndpointRuntimeContextSqs = {
+  runtime: SqsQueueRuntimeConfig;
+};
+
 export type EndpointRuntimeContext = {
   database?: EndpointRuntimeContextDatabase;
+  sqs?: EndpointRuntimeContextSqs;
 };
 
 export type EndpointContext<
@@ -79,4 +101,5 @@ export type EndpointContext<
   params: TParams;
   query: TQuery;
   request: Request;
+  sqs: ResolvedEndpointContextSqs<TContextInput>;
 };

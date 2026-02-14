@@ -2,6 +2,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { isAbsolute, join, resolve } from "node:path";
 import { build } from "esbuild";
+import { assertUniqueRouteIds } from "./assert-unique-route-ids";
 import { renderLambdaRuntimeEntrySource } from "./render-lambda-runtime-entry";
 import type { EndpointRuntimeDefinition, LambdaJsGenerationOptions } from "./types";
 
@@ -79,6 +80,8 @@ export async function writeLambdaJsFiles(
   if (directory.length === 0) {
     throw new Error("outputDirectory is required");
   }
+
+  assertUniqueRouteIds(endpoints);
 
   const endpointModulePath = resolveEndpointModulePath(options.endpointModulePath);
   const externalModules = resolveExternalModules(options.externalModules, endpointModulePath);

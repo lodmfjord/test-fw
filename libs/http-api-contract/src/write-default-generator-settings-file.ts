@@ -10,7 +10,7 @@ const DEFAULT_SETTINGS_TEMPLATE = `{
   "endpointExportName": "endpoints",
   "endpointModulePath": "./src/endpoints.ts",
   // packages must be installed in this app and are layered only for lambdas that need them
-  "externalModules": ["@aws-sdk/client-dynamodb", "@aws-sdk/util-dynamodb"],
+  "externalModules": ["@aws-sdk/client-dynamodb", "@aws-sdk/util-dynamodb", "@aws-sdk/client-sqs"],
   "lambdaOutputDirectory": "./dist/lambda-js",
   "prefix": "babb",
   "terraform": {
@@ -20,7 +20,8 @@ const DEFAULT_SETTINGS_TEMPLATE = `{
     "resources": {
       "apiGateway": true,
       "dynamodb": true,
-      "lambdas": true
+      "lambdas": true,
+      "sqs": true
     }
   }
 }
