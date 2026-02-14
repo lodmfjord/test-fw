@@ -52,7 +52,13 @@ describe("generated lambda bundle", () => {
       endpointModulePath,
     });
 
-    expect(fileNames).toEqual(["get_last_update.mjs"]);
+    expect(fileNames).toEqual([
+      "get_last_update.mjs",
+      "get_s3_demo_files_list.mjs",
+      "get_s3_demo_files.mjs",
+      "get_s3_demo_secure_link.mjs",
+      "post_s3_demo_files.mjs",
+    ]);
 
     const source = await readFile(join(outputDirectory, "get_last_update.mjs"), "utf8");
     const handler = getHandlerFromSource(source);

@@ -14,6 +14,7 @@
     "@babbstack/dynamodb": "workspace:*",
     "@babbstack/http-api-contract": "workspace:*",
     "@babbstack/schema": "workspace:*",
+    "@babbstack/s3": "workspace:*",
     "@babbstack/sqs": "workspace:*",
     "slugify": "^1.6.6",
     "zod": "^4.3.6"

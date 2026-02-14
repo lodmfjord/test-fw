@@ -38,6 +38,104 @@ describe("test-app showcase", () => {
       (lambdaFunction) => lambdaFunction.functionId,
     );
 
-    expect(functionIds).toEqual(["get_last_update"]);
+    expect(functionIds).toEqual([
+      "get_last_update",
+      "post_s3_demo_files",
+      "get_s3_demo_files",
+      "get_s3_demo_files_list",
+      "get_s3_demo_secure_link",
+    ]);
+  });
+
+  it("runs local s3 demo endpoints for put, get, list, and secure-link", async () => {
+    const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+    const bucketName = "local-demo-bucket";
+    const key = `demo/${uniqueId}.txt`;
+    const content = `local-file-${uniqueId}`;
+    const contentType = "text/plain";
+
+    const putResponse = await testAppFetch(
+      new Request("http://local/s3-demo/files", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          bucketName,
+          content,
+          contentType,
+          key,
+        }),
+      }),
+    );
+    expect(putResponse.status).toBe(200);
+    expect((await putResponse.json()) as unknown).toEqual({
+      bucketName,
+      contentType,
+      key,
+      size: content.length,
+    });
+
+    const getResponse = await testAppFetch(
+      new Request(
+        `http://local/s3-demo/files?bucketName=${encodeURIComponent(bucketName)}&key=${encodeURIComponent(key)}`,
+        {
+          method: "GET",
+        },
+      ),
+    );
+    expect(getResponse.status).toBe(200);
+    expect((await getResponse.json()) as unknown).toEqual({
+      bucketName,
+      content,
+      contentType,
+      key,
+      size: content.length,
+    });
+
+    const listResponse = await testAppFetch(
+      new Request(
+        `http://local/s3-demo/files/list?bucketName=${encodeURIComponent(bucketName)}&prefix=${encodeURIComponent("demo/")}`,
+        {
+          method: "GET",
+        },
+      ),
+    );
+    expect(listResponse.status).toBe(200);
+    const listPayload = (await listResponse.json()) as {
+      items?: Array<{
+        bucketName?: string;
+        contentType?: string;
+        key?: string;
+        size?: number;
+      }>;
+    };
+    expect(Array.isArray(listPayload.items)).toBe(true);
+    expect(listPayload.items).toEqual(
+      expect.arrayContaining([
+        {
+          bucketName,
+          contentType,
+          key,
+          size: content.length,
+        },
+      ]),
+    );
+    expect((listPayload.items?.length ?? 0) >= 1).toBe(true);
+
+    const secureLinkResponse = await testAppFetch(
+      new Request(
+        `http://local/s3-demo/secure-link?bucketName=${encodeURIComponent(bucketName)}&key=${encodeURIComponent(key)}&operation=get`,
+        {
+          method: "GET",
+        },
+      ),
+    );
+    expect(secureLinkResponse.status).toBe(200);
+    const secureLinkPayload = (await secureLinkResponse.json()) as { url?: unknown };
+    expect(typeof secureLinkPayload.url).toBe("string");
+    expect(String(secureLinkPayload.url).startsWith("http://localhost:4569/local-s3/secure?")).toBe(
+      true,
+    );
   });
 });
