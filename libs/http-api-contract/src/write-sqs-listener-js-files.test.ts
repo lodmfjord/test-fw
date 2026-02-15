@@ -1,15 +1,15 @@
 /**
- * @fileoverview Smoke tests for write-sqs-listener-js-files.
+ * @fileoverview Tests writeSqsListenerJsFiles behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./write-sqs-listener-js-files";
+import { writeSqsListenerJsFiles } from "./write-sqs-listener-js-files";
 
-describe("write-sqs-listener-js-files", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
-
-    expect(functionExports.length).toBeGreaterThan(0);
+describe("writeSqsListenerJsFiles", () => {
+  it("fails fast when output directory is missing", async () => {
+    await expect(
+      writeSqsListenerJsFiles(" ", [], {
+        endpointModulePath: import.meta.url,
+      }),
+    ).rejects.toThrow("outputDirectory is required");
   });
 });

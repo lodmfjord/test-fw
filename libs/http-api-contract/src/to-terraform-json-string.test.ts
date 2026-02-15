@@ -1,15 +1,16 @@
 /**
- * @fileoverview Smoke tests for to-terraform-json-string.
+ * @fileoverview Tests toTerraformJsonString behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-terraform-json-string";
+import { toTerraformJsonString } from "./to-terraform-json-string";
 
-describe("to-terraform-json-string", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("toTerraformJsonString", () => {
+  it("renders pretty JSON with trailing newline", () => {
+    const result = toTerraformJsonString({ a: 1 });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(result).toBe(`{
+  "a": 1
+}
+`);
   });
 });

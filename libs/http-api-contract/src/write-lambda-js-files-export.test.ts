@@ -1,15 +1,15 @@
 /**
- * @fileoverview Smoke tests for write-lambda-js-files-export.
+ * @fileoverview Tests writeLambdaJsFiles export behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./write-lambda-js-files-export";
+import { writeLambdaJsFiles } from "./write-lambda-js-files-export";
 
-describe("write-lambda-js-files-export", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
-
-    expect(functionExports.length).toBeGreaterThan(0);
+describe("writeLambdaJsFiles export", () => {
+  it("fails fast when output directory is missing", async () => {
+    await expect(
+      writeLambdaJsFiles(" ", [], {
+        endpointModulePath: import.meta.url,
+      }),
+    ).rejects.toThrow("outputDirectory is required");
   });
 });

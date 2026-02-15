@@ -1,15 +1,29 @@
 /**
- * @fileoverview Smoke tests for reset-defined-endpoints.
+ * @fileoverview Tests resetDefinedEndpoints behavior.
  */
-import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./reset-defined-endpoints";
+import { beforeEach, describe, expect, it } from "bun:test";
+import { schema } from "@babbstack/schema";
+import { defineGet } from "./define-get";
+import { listDefinedEndpoints } from "./list-defined-endpoints";
+import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 
-describe("reset-defined-endpoints", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("resetDefinedEndpoints", () => {
+  beforeEach(() => {
+    resetDefinedEndpoints();
+  });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+  it("clears the endpoint registry", () => {
+    defineGet({
+      handler: ({ params }) => ({ value: { id: params.id } }),
+      path: "/users/:id",
+      request: {
+        params: schema.object({ id: schema.string() }),
+      },
+      response: schema.object({ id: schema.string() }),
+    });
+
+    expect(listDefinedEndpoints()).toHaveLength(1);
+    resetDefinedEndpoints();
+    expect(listDefinedEndpoints()).toEqual([]);
   });
 });

@@ -1,15 +1,22 @@
 /**
- * @fileoverview Smoke tests for to-external-modules-setting.
+ * @fileoverview Tests toExternalModulesSetting behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-external-modules-setting";
+import { toExternalModulesSetting } from "./to-external-modules-setting";
 
-describe("to-external-modules-setting", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
+describe("toExternalModulesSetting", () => {
+  it("trims module names and omits empty arrays", () => {
+    expect(toExternalModulesSetting([" aws-sdk ", "zod"])).toEqual(["aws-sdk", "zod"]);
+    expect(toExternalModulesSetting([])).toBeUndefined();
+    expect(toExternalModulesSetting(undefined)).toBeUndefined();
+  });
+
+  it("throws for invalid values", () => {
+    expect(() => toExternalModulesSetting("not-array")).toThrow(
+      'Setting "externalModules" must be an array of strings',
     );
-
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(() => toExternalModulesSetting([""])).toThrow(
+      'Setting "externalModules[0]" must not be empty',
+    );
   });
 });

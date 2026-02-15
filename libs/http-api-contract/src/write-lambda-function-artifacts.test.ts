@@ -1,15 +1,19 @@
 /**
- * @fileoverview Smoke tests for write-lambda-function-artifacts.
+ * @fileoverview Tests writeLambdaFunctionArtifacts behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./write-lambda-function-artifacts";
+import { writeLambdaFunctionArtifacts } from "./write-lambda-function-artifacts";
 
-describe("write-lambda-function-artifacts", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
+describe("writeLambdaFunctionArtifacts", () => {
+  it("returns no artifacts when no lambda functions are present", async () => {
+    const fileNames = await writeLambdaFunctionArtifacts(
+      "/tmp/simple-api-empty-artifacts",
+      {
+        functions: [],
+      } as never,
+      "/tmp/simple-api-empty-lambda",
     );
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(fileNames).toEqual([]);
   });
 });

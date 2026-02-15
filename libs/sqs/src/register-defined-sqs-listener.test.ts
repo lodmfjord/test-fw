@@ -1,15 +1,50 @@
 /**
- * @fileoverview Smoke tests for register-defined-sqs-listener.
+ * @fileoverview Tests registerDefinedSqsListener behavior.
  */
-import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./register-defined-sqs-listener";
+import { beforeEach, describe, expect, it } from "bun:test";
+import { listDefinedSqsListeners } from "./list-defined-sqs-listeners";
+import { registerDefinedSqsListener } from "./register-defined-sqs-listener";
+import { resetDefinedSqsListeners } from "./reset-defined-sqs-listeners";
 
-describe("register-defined-sqs-listener", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("registerDefinedSqsListener", () => {
+  beforeEach(() => {
+    resetDefinedSqsListeners();
+  });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+  it("upserts listeners by listenerId", () => {
+    registerDefinedSqsListener({
+      listenerId: "listener-1",
+      parse(input: unknown) {
+        return input;
+      },
+      queue: {
+        runtime: {
+          kind: "sqs-queue",
+          queueName: "queue-1",
+        },
+      },
+      target: {
+        kind: "lambda",
+      },
+    } as never);
+
+    registerDefinedSqsListener({
+      listenerId: "listener-1",
+      parse(input: unknown) {
+        return input;
+      },
+      queue: {
+        runtime: {
+          kind: "sqs-queue",
+          queueName: "queue-2",
+        },
+      },
+      target: {
+        kind: "lambda",
+      },
+    } as never);
+
+    expect(listDefinedSqsListeners()).toHaveLength(1);
+    expect(listDefinedSqsListeners()[0]?.queue.runtime.queueName).toBe("queue-2");
   });
 });

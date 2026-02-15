@@ -1,15 +1,15 @@
 /**
- * @fileoverview Smoke tests for create-env.
+ * @fileoverview Tests createEnv behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./create-env";
+import { createEnv } from "./create-env";
 
-describe("create-env", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("createEnv", () => {
+  it("returns a shallow copy of input env", () => {
+    const input = { A: "1" };
+    const output = createEnv(input);
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(output).toEqual({ A: "1" });
+    expect(output).not.toBe(input);
   });
 });

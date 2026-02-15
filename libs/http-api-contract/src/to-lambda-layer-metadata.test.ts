@@ -1,15 +1,19 @@
 /**
- * @fileoverview Smoke tests for to-lambda-layer-metadata.
+ * @fileoverview Tests toLambdaLayerMetadata behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-lambda-layer-metadata";
+import { toLambdaLayerMetadata } from "./to-lambda-layer-metadata";
 
-describe("to-lambda-layer-metadata", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("toLambdaLayerMetadata", () => {
+  it("deduplicates layers by module signature", () => {
+    const metadata = toLambdaLayerMetadata({
+      routeA: ["zod", "aws-sdk"],
+      routeB: ["aws-sdk", "zod"],
+      routeC: ["zod", "uuid"],
+    });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(Object.keys(metadata.layersByKey)).toHaveLength(2);
+    expect(metadata.routeLayerKeyByRoute.routeA).toBe(metadata.routeLayerKeyByRoute.routeB);
+    expect(metadata.routeLayerKeyByRoute.routeA).not.toBe(metadata.routeLayerKeyByRoute.routeC);
   });
 });

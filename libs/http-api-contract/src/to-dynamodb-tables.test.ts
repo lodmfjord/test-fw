@@ -1,15 +1,56 @@
 /**
- * @fileoverview Smoke tests for to-dynamodb-tables.
+ * @fileoverview Tests toDynamodbTables behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-dynamodb-tables";
+import { toDynamodbTables } from "./to-dynamodb-tables";
 
-describe("to-dynamodb-tables", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("toDynamodbTables", () => {
+  it("maps table runtime metadata with sanitized keys", () => {
+    const tables = toDynamodbTables([
+      {
+        context: {
+          database: {
+            runtime: {
+              keyField: "id",
+              tableName: "users-table",
+            },
+          },
+        },
+      } as never,
+    ]);
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(tables).toEqual({
+      users_table: {
+        hash_key: "id",
+        name: "users-table",
+      },
+    });
+  });
+
+  it("throws when key fields conflict for the same table", () => {
+    expect(() =>
+      toDynamodbTables([
+        {
+          context: {
+            database: {
+              runtime: {
+                keyField: "id",
+                tableName: "users",
+              },
+            },
+          },
+        } as never,
+        {
+          context: {
+            database: {
+              runtime: {
+                keyField: "userId",
+                tableName: "users",
+              },
+            },
+          },
+        } as never,
+      ]),
+    ).toThrow('Conflicting keyField for DynamoDB table "users": "id" vs "userId"');
   });
 });

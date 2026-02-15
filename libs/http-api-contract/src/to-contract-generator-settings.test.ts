@@ -1,15 +1,27 @@
 /**
- * @fileoverview Smoke tests for to-contract-generator-settings.
+ * @fileoverview Tests toContractGeneratorSettings behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-contract-generator-settings";
+import { toContractGeneratorSettings } from "./to-contract-generator-settings";
 
-describe("to-contract-generator-settings", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
+describe("toContractGeneratorSettings", () => {
+  it("parses required fields and applies defaults", () => {
+    const settings = toContractGeneratorSettings({
+      contractModulePath: "./contract.ts",
+      contractsOutputDirectory: "./dist/contracts",
+      endpointModulePath: "./endpoints.ts",
+      externalModules: [" zod "],
+      lambdaOutputDirectory: "./dist/lambda",
+    });
+
+    expect(settings.contractExportName).toBe("contract");
+    expect(settings.endpointExportName).toBe("endpoints");
+    expect(settings.externalModules).toEqual(["zod"]);
+  });
+
+  it("throws for missing required fields", () => {
+    expect(() => toContractGeneratorSettings({})).toThrow(
+      "Missing required setting: contractModulePath",
     );
-
-    expect(functionExports.length).toBeGreaterThan(0);
   });
 });

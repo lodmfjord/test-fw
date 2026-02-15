@@ -1,15 +1,19 @@
 /**
- * @fileoverview Smoke tests for create-api-gateway-lambda-bindings-terraform-json.
+ * @fileoverview Tests createApiGatewayLambdaBindingsTerraformJson behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./create-api-gateway-lambda-bindings-terraform-json";
+import { createApiGatewayLambdaBindingsTerraformJson } from "./create-api-gateway-lambda-bindings-terraform-json";
 
-describe("create-api-gateway-lambda-bindings-terraform-json", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
+describe("createApiGatewayLambdaBindingsTerraformJson", () => {
+  it("renders api gateway route, integration, and invoke permission resources", () => {
+    const terraformJson = createApiGatewayLambdaBindingsTerraformJson() as {
+      resource: Record<string, Record<string, Record<string, unknown>>>;
+    };
+
+    expect(terraformJson.resource.aws_apigatewayv2_integration?.route).toBeDefined();
+    expect(terraformJson.resource.aws_apigatewayv2_route?.route?.route_key).toContain(
+      "each.value.method",
     );
-
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(terraformJson.resource.aws_lambda_permission?.apigw_invoke).toBeDefined();
   });
 });

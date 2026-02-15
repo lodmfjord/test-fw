@@ -1,15 +1,29 @@
 /**
- * @fileoverview Smoke tests for define-put.
+ * @fileoverview Tests definePut behavior.
  */
-import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./define-put";
+import { beforeEach, describe, expect, it } from "bun:test";
+import { schema } from "@babbstack/schema";
+import { definePut } from "./define-put";
+import { listDefinedEndpoints } from "./list-defined-endpoints";
+import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 
-describe("define-put", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("definePut", () => {
+  beforeEach(() => {
+    resetDefinedEndpoints();
+  });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+  it("defines and registers a PUT endpoint", () => {
+    const endpoint = definePut({
+      handler: ({ body, params }) => ({ value: { id: params.id, name: body.name } }),
+      path: "/users/:id",
+      request: {
+        body: schema.object({ name: schema.string() }),
+        params: schema.object({ id: schema.string() }),
+      },
+      response: schema.object({ id: schema.string(), name: schema.string() }),
+    });
+
+    expect(endpoint.method).toBe("PUT");
+    expect(listDefinedEndpoints().at(0)?.method).toBe("PUT");
   });
 });

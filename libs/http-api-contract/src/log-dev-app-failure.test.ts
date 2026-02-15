@@ -1,15 +1,39 @@
 /**
- * @fileoverview Smoke tests for log-dev-app-failure.
+ * @fileoverview Tests logDevAppFailure behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./log-dev-app-failure";
+import { logDevAppFailure } from "./log-dev-app-failure";
 
-describe("log-dev-app-failure", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
+describe("logDevAppFailure", () => {
+  it("logs normalized error metadata", () => {
+    const messages: unknown[] = [];
+    const originalConsoleError = console.error;
+    console.error = (value?: unknown) => {
+      messages.push(value);
+    };
+
+    logDevAppFailure({
+      error: new Error("boom"),
+      event: "dev_app.handler_execution_failed",
+      method: "GET",
+      path: "/users",
+      requestId: "req-1",
+      routeId: "get_users",
+    });
+
+    console.error = originalConsoleError;
+
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toEqual(
+      expect.objectContaining({
+        errorMessage: "boom",
+        errorName: "Error",
+        event: "dev_app.handler_execution_failed",
+        method: "GET",
+        path: "/users",
+        requestId: "req-1",
+        routeId: "get_users",
+      }),
     );
-
-    expect(functionExports.length).toBeGreaterThan(0);
   });
 });

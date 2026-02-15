@@ -1,15 +1,19 @@
 /**
- * @fileoverview Smoke tests for assert-unique-listener-ids.
+ * @fileoverview Tests assertUniqueListenerIds behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./assert-unique-listener-ids";
+import { assertUniqueListenerIds } from "./assert-unique-listener-ids";
 
-describe("assert-unique-listener-ids", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("assertUniqueListenerIds", () => {
+  it("accepts unique listener ids", () => {
+    expect(() =>
+      assertUniqueListenerIds([{ listenerId: "a" }, { listenerId: "b" }] as never),
+    ).not.toThrow();
+  });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+  it("throws for duplicate listener ids", () => {
+    expect(() =>
+      assertUniqueListenerIds([{ listenerId: "dup" }, { listenerId: "dup" }] as never),
+    ).toThrow('SQS listener ID collision: "dup"');
   });
 });

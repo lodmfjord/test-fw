@@ -1,15 +1,27 @@
 /**
- * @fileoverview Smoke tests for parse-jsonc.
+ * @fileoverview Tests parseJsonc behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./parse-jsonc";
+import { parseJsonc } from "./parse-jsonc";
 
-describe("parse-jsonc", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("parseJsonc", () => {
+  it("parses JSONC with comments and trailing commas", () => {
+    const parsed = parseJsonc(`
+{
+  // comment
+  "name": "demo",
+  "list": [1, 2,],
+}
+`);
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(parsed).toEqual({
+      list: [1, 2],
+      name: "demo",
+    });
+  });
+
+  it("keeps comment-looking text inside strings", () => {
+    const parsed = parseJsonc('{"text":"// not a comment"}');
+    expect(parsed).toEqual({ text: "// not a comment" });
   });
 });

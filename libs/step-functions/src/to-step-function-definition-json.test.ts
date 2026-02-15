@@ -1,15 +1,27 @@
 /**
- * @fileoverview Smoke tests for to-step-function-definition-json.
+ * @fileoverview Tests toStepFunctionDefinitionJson behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-step-function-definition-json";
+import { toStepFunctionDefinitionJson } from "./to-step-function-definition-json";
 
-describe("to-step-function-definition-json", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("toStepFunctionDefinitionJson", () => {
+  it("serializes step function definitions to JSON", () => {
+    const json = toStepFunctionDefinitionJson({
+      StartAt: "Done",
+      States: {
+        Done: {
+          Type: "Succeed",
+        },
+      },
+    });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(JSON.parse(json)).toEqual({
+      StartAt: "Done",
+      States: {
+        Done: {
+          Type: "Succeed",
+        },
+      },
+    });
   });
 });

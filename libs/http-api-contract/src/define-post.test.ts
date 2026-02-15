@@ -1,15 +1,28 @@
 /**
- * @fileoverview Smoke tests for define-post.
+ * @fileoverview Tests definePost behavior.
  */
-import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./define-post";
+import { beforeEach, describe, expect, it } from "bun:test";
+import { schema } from "@babbstack/schema";
+import { definePost } from "./define-post";
+import { listDefinedEndpoints } from "./list-defined-endpoints";
+import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 
-describe("define-post", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("definePost", () => {
+  beforeEach(() => {
+    resetDefinedEndpoints();
+  });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+  it("defines and registers a POST endpoint", () => {
+    const endpoint = definePost({
+      handler: ({ body }) => ({ value: { id: body.name } }),
+      path: "/users",
+      request: {
+        body: schema.object({ name: schema.string() }),
+      },
+      response: schema.object({ id: schema.string() }),
+    });
+
+    expect(endpoint.method).toBe("POST");
+    expect(listDefinedEndpoints().at(0)?.method).toBe("POST");
   });
 });

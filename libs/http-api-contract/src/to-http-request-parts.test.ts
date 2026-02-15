@@ -1,15 +1,24 @@
 /**
- * @fileoverview Smoke tests for to-http-request-parts.
+ * @fileoverview Tests toHttpRequestParts behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-http-request-parts";
+import { toHttpRequestParts } from "./to-http-request-parts";
 
-describe("to-http-request-parts", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
+describe("toHttpRequestParts", () => {
+  it("normalizes query params and lower-cases headers", () => {
+    const requestParts = toHttpRequestParts(
+      new URL("http://localhost/users?id=1&search=sam"),
+      new Headers({ "X-Request-ID": "req-1" }),
     );
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(requestParts).toEqual({
+      headers: {
+        "x-request-id": "req-1",
+      },
+      query: {
+        id: "1",
+        search: "sam",
+      },
+    });
   });
 });

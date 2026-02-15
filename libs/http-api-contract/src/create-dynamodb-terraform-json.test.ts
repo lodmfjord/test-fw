@@ -1,15 +1,33 @@
 /**
- * @fileoverview Smoke tests for create-dynamodb-terraform-json.
+ * @fileoverview Tests createDynamodbTerraformJson behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./create-dynamodb-terraform-json";
+import { createDynamodbTerraformJson } from "./create-dynamodb-terraform-json";
 
-describe("create-dynamodb-terraform-json", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("createDynamodbTerraformJson", () => {
+  it("renders dynamodb table locals and resources", () => {
+    const terraformJson = createDynamodbTerraformJson([
+      {
+        context: {
+          database: {
+            runtime: {
+              keyField: "id",
+              tableName: "users-table",
+            },
+          },
+        },
+      } as never,
+    ]) as {
+      locals: {
+        dynamodb_tables: Record<string, { hash_key: string; name: string }>;
+      };
+    };
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(terraformJson.locals.dynamodb_tables).toEqual({
+      users_table: {
+        hash_key: "id",
+        name: "users-table",
+      },
+    });
   });
 });

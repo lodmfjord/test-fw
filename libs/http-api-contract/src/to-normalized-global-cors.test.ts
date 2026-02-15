@@ -1,15 +1,32 @@
 /**
- * @fileoverview Smoke tests for to-normalized-global-cors.
+ * @fileoverview Tests toNormalizedGlobalCors behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-normalized-global-cors";
+import { toNormalizedGlobalCors } from "./to-normalized-global-cors";
 
-describe("to-normalized-global-cors", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("toNormalizedGlobalCors", () => {
+  it("normalizes cors lists and trims allowOrigin", () => {
+    const cors = toNormalizedGlobalCors({
+      allowHeaders: [" X-Test ", "X-Test", ""],
+      allowOrigin: " https://example.com ",
+      exposeHeaders: [" X-Trace "],
+      maxAgeSeconds: 300,
+    });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(cors).toEqual({
+      allowHeaders: ["X-Test"],
+      allowOrigin: "https://example.com",
+      exposeHeaders: ["X-Trace"],
+      maxAgeSeconds: 300,
+    });
+  });
+
+  it("throws for invalid maxAgeSeconds", () => {
+    expect(() =>
+      toNormalizedGlobalCors({
+        allowOrigin: "*",
+        maxAgeSeconds: -1,
+      }),
+    ).toThrow("cors.maxAgeSeconds must be a non-negative integer");
   });
 });

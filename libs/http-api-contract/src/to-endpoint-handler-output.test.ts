@@ -1,15 +1,29 @@
 /**
- * @fileoverview Smoke tests for to-endpoint-handler-output.
+ * @fileoverview Tests toEndpointHandlerOutput behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-endpoint-handler-output";
+import { toEndpointHandlerOutput } from "./to-endpoint-handler-output";
 
-describe("to-endpoint-handler-output", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("toEndpointHandlerOutput", () => {
+  it("uses default statusCode and preserves value", () => {
+    const output = toEndpointHandlerOutput({ value: { ok: true } }, 201);
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(output).toEqual({
+      statusCode: 201,
+      value: { ok: true },
+    });
+  });
+
+  it("throws when output is missing value", () => {
+    expect(() => toEndpointHandlerOutput({})).toThrow("Handler output must include value");
+  });
+
+  it("throws for invalid statusCode", () => {
+    expect(() =>
+      toEndpointHandlerOutput({
+        statusCode: 99,
+        value: {},
+      }),
+    ).toThrow("Handler output statusCode must be between 100 and 599");
   });
 });

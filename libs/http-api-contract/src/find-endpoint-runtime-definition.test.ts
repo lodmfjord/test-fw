@@ -1,15 +1,46 @@
 /**
- * @fileoverview Smoke tests for find-endpoint-runtime-definition.
+ * @fileoverview Tests findEndpointRuntimeDefinition behavior.
  */
-import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./find-endpoint-runtime-definition";
+import { beforeEach, describe, expect, it } from "bun:test";
+import { schema } from "@babbstack/schema";
+import { defineGet } from "./define-get";
+import { findEndpointRuntimeDefinition } from "./find-endpoint-runtime-definition";
+import { listDefinedEndpoints } from "./list-defined-endpoints";
+import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 
-describe("find-endpoint-runtime-definition", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("findEndpointRuntimeDefinition", () => {
+  beforeEach(() => {
+    resetDefinedEndpoints();
+  });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+  it("matches path params and decodes values", () => {
+    defineGet({
+      handler: ({ params }) => ({ value: { id: params.id } }),
+      path: "/users/:id",
+      request: {
+        params: schema.object({ id: schema.string() }),
+      },
+      response: schema.object({ id: schema.string() }),
+    });
+
+    const matched = findEndpointRuntimeDefinition(listDefinedEndpoints(), "GET", "/users/a%20b");
+
+    expect(matched?.params).toEqual({ id: "a b" });
+    expect(matched?.endpoint.path).toBe("/users/{id}");
+  });
+
+  it("returns undefined for non-matching method", () => {
+    defineGet({
+      handler: ({ params }) => ({ value: { id: params.id } }),
+      path: "/users/:id",
+      request: {
+        params: schema.object({ id: schema.string() }),
+      },
+      response: schema.object({ id: schema.string() }),
+    });
+
+    const matched = findEndpointRuntimeDefinition(listDefinedEndpoints(), "POST", "/users/a");
+
+    expect(matched).toBeUndefined();
   });
 });

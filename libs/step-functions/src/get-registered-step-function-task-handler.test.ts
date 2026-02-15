@@ -1,15 +1,21 @@
 /**
- * @fileoverview Smoke tests for get-registered-step-function-task-handler.
+ * @fileoverview Tests getRegisteredStepFunctionTaskHandler behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./get-registered-step-function-task-handler";
+import { getRegisteredStepFunctionTaskHandler } from "./get-registered-step-function-task-handler";
+import { registerStepFunctionTaskHandler } from "./register-step-function-task-handler";
+import { stepFunctionTaskHandlerMap } from "./step-function-task-handler-map";
 
-describe("get-registered-step-function-task-handler", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("getRegisteredStepFunctionTaskHandler", () => {
+  it("returns undefined when no handler is registered", () => {
+    stepFunctionTaskHandlerMap.clear();
+    expect(getRegisteredStepFunctionTaskHandler("missing")).toBeUndefined();
+  });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+  it("returns a previously registered handler", () => {
+    stepFunctionTaskHandlerMap.clear();
+    registerStepFunctionTaskHandler("task:demo", async () => ({ output: { ok: true } }));
+
+    expect(typeof getRegisteredStepFunctionTaskHandler("task:demo")).toBe("function");
   });
 });

@@ -1,15 +1,28 @@
 /**
- * @fileoverview Smoke tests for define-get.
+ * @fileoverview Tests defineGet behavior.
  */
-import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./define-get";
+import { beforeEach, describe, expect, it } from "bun:test";
+import { schema } from "@babbstack/schema";
+import { defineGet } from "./define-get";
+import { listDefinedEndpoints } from "./list-defined-endpoints";
+import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 
-describe("define-get", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("defineGet", () => {
+  beforeEach(() => {
+    resetDefinedEndpoints();
+  });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+  it("defines and registers a GET endpoint", () => {
+    const endpoint = defineGet({
+      handler: ({ params }) => ({ value: { id: params.id } }),
+      path: "/users/:id",
+      request: {
+        params: schema.object({ id: schema.string() }),
+      },
+      response: schema.object({ id: schema.string() }),
+    });
+
+    expect(endpoint.method).toBe("GET");
+    expect(listDefinedEndpoints().at(0)?.method).toBe("GET");
   });
 });

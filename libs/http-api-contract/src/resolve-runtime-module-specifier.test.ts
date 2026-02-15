@@ -1,15 +1,23 @@
 /**
- * @fileoverview Smoke tests for resolve-runtime-module-specifier.
+ * @fileoverview Tests resolveRuntimeModuleSpecifier behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./resolve-runtime-module-specifier";
+import { resolveRuntimeModuleSpecifier } from "./resolve-runtime-module-specifier";
 
-describe("resolve-runtime-module-specifier", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
+describe("resolveRuntimeModuleSpecifier", () => {
+  it("resolves known modules relative to the endpoint module", () => {
+    const resolved = resolveRuntimeModuleSpecifier(import.meta.url, "node:path", "./fallback.js");
+
+    expect(resolved.includes("path")).toBe(true);
+  });
+
+  it("falls back to framework-relative path when module cannot be resolved", () => {
+    const resolved = resolveRuntimeModuleSpecifier(
+      import.meta.url,
+      "@not-a-real/module-name",
+      "./fallback.js",
     );
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(resolved.endsWith("fallback.js")).toBe(true);
   });
 });

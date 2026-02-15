@@ -1,15 +1,33 @@
 /**
- * @fileoverview Smoke tests for define-step-function.
+ * @fileoverview Tests defineStepFunction behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./define-step-function";
+import { defineStepFunction } from "./define-step-function";
 
-describe("define-step-function", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("defineStepFunction", () => {
+  it("returns normalized step function definitions", () => {
+    const definition = defineStepFunction({
+      Comment: "Demo flow",
+      StartAt: "Done",
+      States: {
+        Done: {
+          End: true,
+          Result: { ok: true },
+          Type: "Pass",
+        },
+      },
+    });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(definition).toEqual({
+      Comment: "Demo flow",
+      StartAt: "Done",
+      States: {
+        Done: {
+          End: true,
+          Result: { ok: true },
+          Type: "Pass",
+        },
+      },
+    });
   });
 });

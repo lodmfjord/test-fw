@@ -1,15 +1,14 @@
 /**
- * @fileoverview Smoke tests for to-import-path.
+ * @fileoverview Tests toImportPath behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-import-path";
+import { toImportPath } from "./to-import-path";
 
-describe("to-import-path", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("toImportPath", () => {
+  it("returns a file URL with a cache buster query", () => {
+    const importPath = toImportPath("/tmp/file.ts");
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(importPath.startsWith("file:///tmp/file.ts")).toBe(true);
+    expect(importPath.includes("?cache=")).toBe(true);
   });
 });

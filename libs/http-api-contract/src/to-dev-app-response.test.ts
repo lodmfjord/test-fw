@@ -1,15 +1,17 @@
 /**
- * @fileoverview Smoke tests for to-dev-app-response.
+ * @fileoverview Tests toDevAppResponse behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-dev-app-response";
+import { toDevAppResponse } from "./to-dev-app-response";
 
-describe("to-dev-app-response", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("toDevAppResponse", () => {
+  it("builds a response with request id and content type", async () => {
+    const response = toDevAppResponse(200, { ok: true }, undefined, { "x-extra": "1" }, "req-1");
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toContain("application/json");
+    expect(response.headers.get("x-request-id")).toBe("req-1");
+    expect(response.headers.get("x-extra")).toBe("1");
+    expect(await response.text()).toBe('{"ok":true}');
   });
 });

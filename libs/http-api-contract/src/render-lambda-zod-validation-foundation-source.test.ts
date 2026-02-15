@@ -1,15 +1,17 @@
 /**
- * @fileoverview Smoke tests for render-lambda-zod-validation-foundation-source.
+ * @fileoverview Tests toZodValidationFoundationSource behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./render-lambda-zod-validation-foundation-source";
+import { toZodValidationFoundationSource } from "./render-lambda-zod-validation-foundation-source";
 
-describe("render-lambda-zod-validation-foundation-source", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("toZodValidationFoundationSource", () => {
+  it("returns foundation helpers used by runtime validation", () => {
+    const source = toZodValidationFoundationSource();
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(source).toContain("const SUPPORTED_SCHEMA_KEYS");
+    expect(source).toContain("function resolveRef");
+    expect(source).toContain("function assertSupportedSchemaKeywords");
+    expect(source).toContain("function withCommonModifiers");
+    expect(source).toContain("const rootValidatorCache = new WeakMap()");
   });
 });

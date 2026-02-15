@@ -1,15 +1,17 @@
 /**
- * @fileoverview Smoke tests for resolve-path-from-settings.
+ * @fileoverview Tests resolvePathFromSettings behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./resolve-path-from-settings";
+import { resolvePathFromSettings } from "./resolve-path-from-settings";
 
-describe("resolve-path-from-settings", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("resolvePathFromSettings", () => {
+  it("resolves relative paths from settings directory", () => {
+    const resolved = resolvePathFromSettings("./config.json", "/tmp/demo");
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(resolved).toContain("/tmp/demo/config.json");
+  });
+
+  it("keeps absolute paths unchanged", () => {
+    expect(resolvePathFromSettings("/tmp/absolute.json", "/tmp/demo")).toBe("/tmp/absolute.json");
   });
 });

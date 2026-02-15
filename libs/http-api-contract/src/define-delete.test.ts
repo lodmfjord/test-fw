@@ -1,15 +1,28 @@
 /**
- * @fileoverview Smoke tests for define-delete.
+ * @fileoverview Tests defineDelete behavior.
  */
-import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./define-delete";
+import { beforeEach, describe, expect, it } from "bun:test";
+import { schema } from "@babbstack/schema";
+import { defineDelete } from "./define-delete";
+import { listDefinedEndpoints } from "./list-defined-endpoints";
+import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 
-describe("define-delete", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("defineDelete", () => {
+  beforeEach(() => {
+    resetDefinedEndpoints();
+  });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+  it("defines and registers a DELETE endpoint", () => {
+    const endpoint = defineDelete({
+      handler: ({ params }) => ({ value: { deleted: params.id } }),
+      path: "/users/:id",
+      request: {
+        params: schema.object({ id: schema.string() }),
+      },
+      response: schema.object({ deleted: schema.string() }),
+    });
+
+    expect(endpoint.method).toBe("DELETE");
+    expect(listDefinedEndpoints().at(0)?.method).toBe("DELETE");
   });
 });

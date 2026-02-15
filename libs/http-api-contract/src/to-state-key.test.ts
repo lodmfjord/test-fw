@@ -1,15 +1,11 @@
 /**
- * @fileoverview Smoke tests for to-state-key.
+ * @fileoverview Tests toStateKey behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-state-key";
+import { toStateKey } from "./to-state-key";
 
-describe("to-state-key", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
-
-    expect(functionExports.length).toBeGreaterThan(0);
+describe("toStateKey", () => {
+  it("returns the default terraform state file name", () => {
+    expect(toStateKey({ enabled: false })).toBe("terraform.tfstate");
   });
 });

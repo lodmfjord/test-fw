@@ -1,15 +1,25 @@
 /**
- * @fileoverview Smoke tests for assert-unique-route-ids.
+ * @fileoverview Tests assertUniqueRouteIds behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./assert-unique-route-ids";
+import { assertUniqueRouteIds } from "./assert-unique-route-ids";
 
-describe("assert-unique-route-ids", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("assertUniqueRouteIds", () => {
+  it("allows duplicate route ids for the same method and path", () => {
+    expect(() =>
+      assertUniqueRouteIds([
+        { method: "GET", path: "/users", routeId: "get_users" },
+        { method: "GET", path: "/users", routeId: "get_users" },
+      ]),
+    ).not.toThrow();
+  });
 
-    expect(functionExports.length).toBeGreaterThan(0);
+  it("throws when different routes share the same route id", () => {
+    expect(() =>
+      assertUniqueRouteIds([
+        { method: "GET", path: "/users", routeId: "route" },
+        { method: "POST", path: "/users", routeId: "route" },
+      ]),
+    ).toThrow('Route ID collision: "route" is shared by GET /users and POST /users');
   });
 });

@@ -1,15 +1,38 @@
 /**
- * @fileoverview Smoke tests for create-api-gateway-terraform-json.
+ * @fileoverview Tests createApiGatewayTerraformJson behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./create-api-gateway-terraform-json";
+import { createApiGatewayTerraformJson } from "./create-api-gateway-terraform-json";
 
-describe("create-api-gateway-terraform-json", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
-    );
+describe("createApiGatewayTerraformJson", () => {
+  it("renders cors configuration and default stage resources", () => {
+    const terraformJson = createApiGatewayTerraformJson({
+      deployContract: {
+        apiGateway: {
+          cors: {
+            allowOrigin: "*",
+          },
+          stageName: "$default",
+        },
+        apiName: "demo",
+      },
+      routesManifest: {
+        routes: [{ method: "POST" }, { method: "GET" }],
+      },
+    } as never) as {
+      resource: {
+        aws_apigatewayv2_api: {
+          http_api: {
+            cors_configuration?: {
+              allow_methods: string[];
+            };
+          };
+        };
+      };
+    };
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(
+      terraformJson.resource.aws_apigatewayv2_api.http_api.cors_configuration?.allow_methods,
+    ).toEqual(["GET", "POST"]);
   });
 });

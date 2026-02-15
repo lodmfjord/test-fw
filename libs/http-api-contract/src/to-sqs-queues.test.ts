@@ -1,15 +1,37 @@
 /**
- * @fileoverview Smoke tests for to-sqs-queues.
+ * @fileoverview Tests toSqsQueues behavior.
  */
 import { describe, expect, it } from "bun:test";
-import * as moduleUnderTest from "./to-sqs-queues";
+import { toSqsQueues } from "./to-sqs-queues";
 
-describe("to-sqs-queues", () => {
-  it("exports at least one callable function", () => {
-    const functionExports = Object.values(moduleUnderTest).filter(
-      (value) => typeof value === "function",
+describe("toSqsQueues", () => {
+  it("collects queue names from endpoints and listeners", () => {
+    const queues = toSqsQueues(
+      [
+        {
+          context: {
+            sqs: {
+              runtime: {
+                queueName: "orders-queue",
+              },
+            },
+          },
+        } as never,
+      ],
+      [
+        {
+          queue: {
+            runtime: {
+              queueName: "audit-queue",
+            },
+          },
+        } as never,
+      ],
     );
 
-    expect(functionExports.length).toBeGreaterThan(0);
+    expect(queues).toEqual({
+      audit_queue: { name: "audit-queue" },
+      orders_queue: { name: "orders-queue" },
+    });
   });
 });
