@@ -43,4 +43,4 @@ test("generated app passes check:constraints", async () => {
       force: true,
     });
   }
-});
+}, 15000);

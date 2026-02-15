@@ -39,6 +39,7 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
 - Generated Lambda runtime responses always include `x-request-id` (reusing inbound `x-request-id` when provided).
 - Contract builders (`buildContract`, `buildContractFromEndpoints`) support optional `lambdaDefaults` for `memoryMb`, `timeoutSeconds`, `ephemeralStorageMb`, and `reservedConcurrency`; endpoint-level `aws` options override those defaults per route. When no timeout is provided, `timeoutSeconds` defaults to `15`.
 - Generated Terraform lambda resources always default architecture to `arm64`; `memory_size`, `ephemeral_storage`, and `reserved_concurrent_executions` are only set when configured, and `timeout` is set whenever present in the lambda manifest (including the default `15`).
+- Generated Terraform provider config now applies AWS `default_tags` to tagged resources with `maintained-by=babbstack` and `name=<appName>`.
 - Endpoint resource contexts include scoped runtime bindings for DynamoDB (`context.database`), SQS (`context.sqs`), and S3 buckets (`context.s3` via `createBucket(...)`) with access-aware IAM generation for lambda routes.
 - Lambda Terraform generation now creates managed S3 buckets for `context.s3` usage and injects `SIMPLE_API_S3_BUCKET_NAME_PREFIX` into lambda environments so runtime bucket resolution matches deployed resource names.
 - Lambda Terraform route SQS send permissions include both `sqs:GetQueueUrl` and `sqs:SendMessage`.

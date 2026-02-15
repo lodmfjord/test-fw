@@ -17,7 +17,7 @@
     },
     "resources": {
       "apiGateway": true,
-      "dynamodb": false,
+      "dynamodb": true,
       "lambdas": true,
       "sqs": true,
       "stepFunctions": true

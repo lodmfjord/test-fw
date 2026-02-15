@@ -21,6 +21,13 @@ describe("createProviderTerraformJson", () => {
       },
       "demo",
     ) as {
+      provider: {
+        aws: {
+          default_tags?: {
+            tags?: Record<string, string>;
+          };
+        };
+      };
       terraform: {
         backend?: {
           s3: {
@@ -35,5 +42,9 @@ describe("createProviderTerraformJson", () => {
 
     expect(terraformJson.variable.app_name.default).toBe("demo");
     expect(terraformJson.terraform.backend?.s3.key).toBe("terraform.tfstate");
+    expect(terraformJson.provider.aws.default_tags?.tags).toEqual({
+      "maintained-by": "babbstack",
+      name: "demo",
+    });
   });
 });

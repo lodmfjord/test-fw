@@ -55,3 +55,4 @@ and `context.s3` access declarations, so deployed smoke tests no longer require 
   - `apps/test-app/dist/layer-artifacts/*.zip`
 
 Generation settings live in `apps/test-app/babb.settings.json`.
+The default settings enable Terraform DynamoDB resource generation (`terraform.resources.dynamodb: true`).

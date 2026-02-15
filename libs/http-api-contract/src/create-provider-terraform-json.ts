@@ -101,6 +101,12 @@ export function createProviderTerraformJson(
     },
     provider: {
       aws: {
+        default_tags: {
+          tags: {
+            "maintained-by": "babbstack",
+            name: appName,
+          },
+        },
         region: toTerraformReference("var.aws_region"),
       },
     },
