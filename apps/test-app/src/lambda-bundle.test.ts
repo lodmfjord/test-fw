@@ -86,7 +86,9 @@ describe("generated lambda bundle", () => {
       "options_order.mjs",
       "patch_order_param_id.mjs",
       "post_s3_demo_files.mjs",
+      "post_step_function_demo.mjs",
       "post_step_function_events.mjs",
+      "post_step_function_random_branch.mjs",
       "put_order_param_id.mjs",
     ]);
 

@@ -79,4 +79,58 @@ describe("renderLambdaRuntimeEntrySource", () => {
       } as never),
     ).toThrow("Endpoint get_health is missing a lambda handler");
   });
+
+  it("renders step-function runtime wrapper without requiring endpoint.handler", () => {
+    const responseSchema = schema.object({ ok: schema.boolean() });
+
+    const source = renderLambdaRuntimeEntrySource("/tmp/endpoints.ts", "", {
+      execution: {
+        definition: {
+          StartAt: "Done",
+          States: {
+            Done: {
+              End: true,
+              Result: {
+                ok: true,
+              },
+              Type: "Pass",
+            },
+          },
+        },
+        definitionJson: JSON.stringify({
+          StartAt: "Done",
+          States: {
+            Done: {
+              End: true,
+              Result: {
+                ok: true,
+              },
+              Type: "Pass",
+            },
+          },
+        }),
+        invocationType: "sync",
+        kind: "step-function",
+        stateMachineName: "demo-state-machine",
+        workflowType: "STANDARD",
+      },
+      method: "POST",
+      path: "/step-function-demo",
+      request: {
+        body: schema.object({
+          value: schema.string(),
+        }),
+      },
+      response: responseSchema,
+      responseByStatusCode: {
+        "200": responseSchema,
+      },
+      routeId: "post_step_function_demo",
+      successStatusCode: 200,
+    } as never);
+
+    expect(source).toContain("runStepFunctionEndpoint");
+    expect(source).toContain("simpleApiExecuteStepFunctionDefinition");
+    expect(source).toContain("stepFunctionResult.output");
+  });
 });

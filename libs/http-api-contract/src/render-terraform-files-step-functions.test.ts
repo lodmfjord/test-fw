@@ -104,11 +104,12 @@ describe("renderTerraformFiles step functions", () => {
     expect(files["step-functions.tf.json"]).toBeDefined();
     expect(stepFunctionSource.includes('"aws_sfn_state_machine"')).toBe(true);
     expect(stepFunctionSource.includes('"aws_pipes_pipe"')).toBe(true);
-    expect(stepFunctionSource.includes("StepFunctions-StartSyncExecution")).toBe(true);
+    expect(stepFunctionSource.includes('"aws_apigatewayv2_integration"')).toBe(false);
+    expect(stepFunctionSource.includes('"aws_apigatewayv2_route"')).toBe(false);
     expect(stepFunctionSource.includes('"FIRE_AND_FORGET"')).toBe(true);
     expect(stepFunctionSource.includes('"get_step_health"')).toBe(true);
     expect(stepFunctionSource.includes('"step_function_events_listener"')).toBe(true);
     expect(lambdaSource.includes('"get_health"')).toBe(true);
-    expect(lambdaSource.includes('"get_step_health"')).toBe(false);
+    expect(lambdaSource.includes('"get_step_health"')).toBe(true);
   });
 });

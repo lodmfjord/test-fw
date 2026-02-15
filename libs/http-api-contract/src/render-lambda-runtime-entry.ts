@@ -5,6 +5,7 @@ import { renderLambdaRuntimeSourceBlocks } from "./render-lambda-runtime-source-
 import { toLambdaRuntimeSourceContext } from "./render-lambda-runtime-source-context";
 import { renderUsedImportLines } from "./render-used-import-lines";
 import { resolveRuntimeModuleSpecifier } from "./resolve-runtime-module-specifier";
+import { toStepFunctionRuntimeRendering } from "./to-step-function-runtime-rendering";
 import type { EndpointRuntimeDefinition } from "./types";
 
 /** Runs render lambda runtime source. */
@@ -15,6 +16,7 @@ function renderLambdaRuntimeSource(
   runtimeS3ImportSpecifier: string,
   runtimeSqsImportSpecifier: string,
   handlerSource: string,
+  stepFunctionSupportSource: string,
 ): string {
   const context = toLambdaRuntimeSourceContext(
     endpoint,
@@ -47,7 +49,7 @@ ${context.contextDatabaseHelper}
 ${context.contextS3Helper}
 ${context.contextSqsHelper}
 ${context.envBootstrapSource}
-
+${stepFunctionSupportSource}
 export async function handler(event) {
   const invocationLogContext = createInvocationLogContext(
     event,
@@ -169,13 +171,15 @@ export function renderLambdaRuntimeEntrySource(
   endpointModuleSource: string,
   endpoint: EndpointRuntimeDefinition,
 ): string {
-  const handlerSource = endpoint.handler?.toString();
+  const stepFunctionRuntimeRendering = toStepFunctionRuntimeRendering(endpoint);
+  const handlerSource = stepFunctionRuntimeRendering?.handlerSource ?? endpoint.handler?.toString();
   if (!handlerSource) throw new Error(`Endpoint ${endpoint.routeId} is missing a lambda handler`);
+  const importUsageSource = stepFunctionRuntimeRendering?.importUsageSource ?? handlerSource;
 
   const importLines = renderUsedImportLines(
     endpointModulePath,
     endpointModuleSource,
-    handlerSource,
+    importUsageSource,
   );
   const runtimeDbImportSpecifier = resolveRuntimeModuleSpecifier(
     endpointModulePath,
@@ -192,6 +196,16 @@ export function renderLambdaRuntimeEntrySource(
     "@babbstack/sqs",
     "../../sqs/src/index.ts",
   );
+  if (stepFunctionRuntimeRendering) {
+    const stepFunctionImportSpecifier = resolveRuntimeModuleSpecifier(
+      endpointModulePath,
+      "@babbstack/step-functions",
+      "../../step-functions/src/index.ts",
+    );
+    importLines.push(
+      `import { executeStepFunctionDefinition as simpleApiExecuteStepFunctionDefinition } from ${JSON.stringify(stepFunctionImportSpecifier)};`,
+    );
+  }
 
   return renderLambdaRuntimeSource(
     endpoint,
@@ -200,5 +214,6 @@ export function renderLambdaRuntimeEntrySource(
     runtimeS3ImportSpecifier,
     runtimeSqsImportSpecifier,
     handlerSource,
+    stepFunctionRuntimeRendering?.supportSource ?? "",
   );
 }

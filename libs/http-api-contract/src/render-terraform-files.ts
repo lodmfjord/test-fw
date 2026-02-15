@@ -75,7 +75,7 @@ export function renderTerraformFiles(
       createStepFunctionsTerraformJson(
         endpoints,
         sqsListeners,
-        resources.apiGateway,
+        resources.apiGateway && !resources.lambdas,
         resources.sqs,
       ),
     );

@@ -44,6 +44,8 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
 - Lambda Terraform route SQS send permissions include both `sqs:GetQueueUrl` and `sqs:SendMessage`.
 - Lambda Terraform generation now validates secret env markers (`createSecret(...)`) via `data.aws_ssm_parameter` so missing SSM parameters fail at plan/apply time instead of timing out at runtime.
 - Step Functions Terraform generation now grants `lambda:InvokeFunction` for lambda task resources referenced in deployed state machine definitions.
+- Step-function HTTP endpoints are generated as lambda routes (included in `lambdas.manifest.json`) and use a generated wrapper that validates HTTP input/output while returning sync workflow `output` payloads.
+- Direct API Gateway-to-StepFunctions service integrations are generated only when lambda resource generation is disabled.
 - `schema.fromZod(...)` is parity-safe for JSON-schema-representable behavior; custom refinements and transform/preprocess pipelines are rejected.
 
 ## Generated Artifacts

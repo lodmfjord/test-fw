@@ -90,11 +90,13 @@ describe("test-app showcase", () => {
       "delete_order_param_id",
       "options_order",
       "head_order_param_id",
+      "post_step_function_demo",
       "post_step_function_events",
+      "post_step_function_random_branch",
     ]);
   });
 
-  it("runs step-function endpoint locally and keeps step-function routes out of lambda manifest", async () => {
+  it("runs step-function endpoint locally and includes step-function routes in lambda manifest", async () => {
     const response = await testAppFetch(
       new Request("http://local/step-function-demo", {
         method: "POST",
@@ -116,12 +118,12 @@ describe("test-app showcase", () => {
       testAppContract.lambdasManifest.functions.some(
         (lambdaFunction) => lambdaFunction.routeId === "post_step_function_demo",
       ),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       testAppContract.lambdasManifest.functions.some(
         (lambdaFunction) => lambdaFunction.routeId === "post_step_function_random_branch",
       ),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       testAppContract.openapi.paths["/step-function-demo"]?.post?.["x-babbstack"].execution.kind,
     ).toBe("step-function");

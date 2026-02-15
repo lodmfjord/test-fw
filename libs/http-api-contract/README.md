@@ -50,6 +50,8 @@ This means async Step Function routes and multi-response routes keep runtime and
   - `output.api_gateway_url` mapped to `${aws_apigatewayv2_api.http_api.api_endpoint}`
   - `output.api_gateway_url_with_stage` mapped to `${aws_apigatewayv2_stage.default.invoke_url}`
   - stage resource naming uses `var.stage_name` directly (no resource-name prefixing)
+- Step-function HTTP endpoints are emitted in `lambdas.manifest.json` and executed through generated lambda wrappers, so request/response validation still applies and sync routes return the workflow `output` payload.
+- Step Functions Terraform keeps direct API Gateway service integrations only when lambda resource generation is disabled.
 
 ## Endpoint Context S3
 

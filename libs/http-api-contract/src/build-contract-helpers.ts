@@ -41,12 +41,11 @@ function toRoutesManifest(input: BuildContractInput): RoutesManifest {
 
 /** Converts to lambdas manifest. */
 function toLambdasManifest(input: BuildContractInput): LambdasManifest {
-  const lambdaRoutes = input.routes.filter((route) => route.execution?.kind !== "step-function");
   const lambdaDefaults = input.lambdaDefaults;
 
   return {
     apiName: input.apiName,
-    functions: lambdaRoutes.map((route) => {
+    functions: input.routes.map((route) => {
       const memoryMb = route.aws?.memoryMb ?? lambdaDefaults?.memoryMb;
       const timeoutSeconds =
         route.aws?.timeoutSeconds ??
