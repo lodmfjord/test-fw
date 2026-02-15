@@ -1,5 +1,6 @@
 /**
- * @fileoverview Implements check constraints.
+ * @fileoverview CLI entry point that validates repository-wide file constraints.
+ * Scans apps, libs, and tools for violations of naming, size, export, and documentation rules.
  */
 import { readFile } from "node:fs/promises";
 import { collectTargetFiles } from "./constraints/collect-target-files";

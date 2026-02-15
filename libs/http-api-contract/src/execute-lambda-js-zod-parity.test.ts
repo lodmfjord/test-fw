@@ -4,12 +4,15 @@
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { beforeEach, describe, expect, it } from "bun:test";
 import { listDefinedEndpoints } from "./list-defined-endpoints";
 import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 import { writeLambdaJsFiles } from "./write-lambda-js-files";
+
+const runtimeResolve = createRequire(import.meta.url);
+const zodImportPath = join(dirname(runtimeResolve.resolve("zod")), "index.js");
 
 type LambdaLikeEvent = {
   body?: string;
@@ -57,7 +60,6 @@ describe("generated lambda zod parity", () => {
     const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
-    const zodImportPath = fileURLToPath(new URL("../node_modules/zod/index.js", import.meta.url));
     await writeFile(
       endpointModulePath,
       `
@@ -116,7 +118,6 @@ definePost({
     const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
-    const zodImportPath = fileURLToPath(new URL("../node_modules/zod/index.js", import.meta.url));
     await writeFile(
       endpointModulePath,
       `
