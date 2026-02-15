@@ -6,7 +6,7 @@ import { toSqsQueues } from "./to-sqs-queues";
 import type { EndpointRuntimeDefinition } from "./types";
 import type { TerraformJson } from "./terraform-render-types";
 
-/** Converts values to terraform reference. */
+/** Converts to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
@@ -17,6 +17,7 @@ function toTerraformReference(expression: string): string {
  * @param listeners - Listeners parameter.
  * @example
  * createSqsTerraformJson(endpoints, listeners)
+ * @returns Output value.
  */
 export function createSqsTerraformJson(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

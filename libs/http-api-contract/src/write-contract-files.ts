@@ -7,11 +7,13 @@ import { renderContractFiles } from "./render-contract-files";
 import type { Contract } from "./types";
 
 /**
- * Handles write contract files.
+ * Runs write contract files.
  * @param outputDirectory - Output directory parameter.
  * @param contract - Contract parameter.
  * @example
  * await writeContractFiles(outputDirectory, contract)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export async function writeContractFiles(
   outputDirectory: string,

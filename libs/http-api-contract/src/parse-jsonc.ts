@@ -1,7 +1,7 @@
 /**
  * @fileoverview Implements parse jsonc.
  */
-/** Converts values to string-state transition. */
+/** Converts to string-state transition. */
 function toStringState(
   character: string | undefined,
   source: { inString: boolean; isEscaped: boolean },
@@ -34,7 +34,7 @@ function toStringState(
   return source;
 }
 
-/** Converts values to line-comment end index. */
+/** Converts to line-comment end index. */
 function toLineCommentEndIndex(source: string, index: number): number | undefined {
   if (source[index] !== "/" || source[index + 1] !== "/") {
     return undefined;
@@ -48,7 +48,7 @@ function toLineCommentEndIndex(source: string, index: number): number | undefine
   return commentIndex;
 }
 
-/** Converts values to block-comment end index. */
+/** Converts to block-comment end index. */
 function toBlockCommentEndIndex(source: string, index: number): number | undefined {
   if (source[index] !== "/" || source[index + 1] !== "*") {
     return undefined;
@@ -65,7 +65,7 @@ function toBlockCommentEndIndex(source: string, index: number): number | undefin
   return commentIndex;
 }
 
-/** Handles strip json comments. */
+/** Runs strip json comments. */
 function stripJsonComments(source: string): string {
   let output = "";
   let index = 0;
@@ -113,7 +113,7 @@ function stripJsonComments(source: string): string {
   return output;
 }
 
-/** Handles strip trailing commas. */
+/** Runs strip trailing commas. */
 function stripTrailingCommas(source: string): string {
   let output = "";
   let inString = false;
@@ -158,10 +158,11 @@ function stripTrailingCommas(source: string): string {
 }
 
 /**
- * Handles parse jsonc.
+ * Runs parse jsonc.
  * @param source - Source parameter.
  * @example
  * parseJsonc(source)
+ * @returns Output value.
  */
 export function parseJsonc(source: string): unknown {
   const withoutComments = stripJsonComments(source);

@@ -30,10 +30,21 @@ describe("createFakeLayerModulesForTest", () => {
         join(workspaceDirectory, "node_modules", "zod", "package.json"),
         "utf8",
       );
+      const loggerPackageText = await readFile(
+        join(
+          workspaceDirectory,
+          "node_modules",
+          "@aws-lambda-powertools",
+          "logger",
+          "package.json",
+        ),
+        "utf8",
+      );
 
       expect(onePackage.dependencies).toEqual({ "fake-layer-shared": "1.0.0" });
       expect(twoIndex).toContain('export const two = "two";');
       expect(zodPackageText).toContain('"name": "zod"');
+      expect(loggerPackageText).toContain('"name": "@aws-lambda-powertools/logger"');
     } finally {
       await rm(workspaceDirectory, { force: true, recursive: true });
     }

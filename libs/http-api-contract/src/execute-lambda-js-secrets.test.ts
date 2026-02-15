@@ -10,7 +10,6 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import { listDefinedEndpoints } from "./list-defined-endpoints";
 import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 import { writeLambdaJsFiles } from "./write-lambda-js-files";
-
 type LambdaLikeEvent = {
   body?: string;
   headers?: Record<string, string>;
@@ -23,20 +22,40 @@ type LambdaLikeResponse = {
   headers: Record<string, string>;
   statusCode: number;
 };
-
 /** Gets handler from source. */
 function getHandlerFromSource(
   source: string,
 ): (event: LambdaLikeEvent) => Promise<LambdaLikeResponse> {
+  (globalThis as { __simpleApiPowertoolsLogs?: unknown[] }).__simpleApiPowertoolsLogs = [];
   const sourceWithoutZodImport = source.replace(
     /import\s+\{\s*z\s+as\s+simpleApiZod\s*\}\s+from\s+["']zod["'];?\s*/g,
     'const { z: simpleApiZod } = require("zod");\n',
   );
-  if (/^\s*import\s/m.test(sourceWithoutZodImport)) {
+  const sourceWithoutLoggerImport = sourceWithoutZodImport.replace(
+    /import\s+\{\s*Logger\s+as\s+simpleApiPowertoolsLogger\s*\}\s+from\s+["']@aws-lambda-powertools\/logger["'];?\s*/g,
+    `const simpleApiPowertoolsLogSink = globalThis.__simpleApiPowertoolsLogs ?? (globalThis.__simpleApiPowertoolsLogs = []);
+class simpleApiPowertoolsLogger {
+  constructor() {}
+  debug(message, payload) {
+    simpleApiPowertoolsLogSink.push({ ...(payload ?? {}), level: "debug", message });
+  }
+  info(message, payload) {
+    simpleApiPowertoolsLogSink.push({ ...(payload ?? {}), level: "info", message });
+  }
+  warn(message, payload) {
+    simpleApiPowertoolsLogSink.push({ ...(payload ?? {}), level: "warn", message });
+  }
+  error(message, payload) {
+    simpleApiPowertoolsLogSink.push({ ...(payload ?? {}), level: "error", message });
+  }
+}
+`,
+  );
+  if (/^\s*import\s/m.test(sourceWithoutLoggerImport)) {
     throw new Error("Imports are forbidden in enclosed lambda runtime");
   }
 
-  const transformedSource = sourceWithoutZodImport
+  const transformedSource = sourceWithoutLoggerImport
     .replace(/export\s+async\s+function\s+handler\s*\(/, "async function handler(")
     .replace(/export\s*\{\s*handler\s*\};?/g, "");
   const runtimeRequire = createRequire(import.meta.url);
@@ -51,7 +70,6 @@ describe("generated lambda execution env secrets", () => {
   beforeEach(() => {
     resetDefinedEndpoints();
   });
-
   it("loads plain env values and logs secret loading outside lambda", async () => {
     const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
@@ -93,19 +111,12 @@ defineGet({
     const source = await readFile(join(outputDirectory, "get_env.mjs"), "utf8");
 
     const handler = getHandlerFromSource(source);
-    const logged: string[] = [];
     const previousAppName = process.env.APP_NAME;
     const previousToken = process.env.API_TOKEN;
     const previousLambdaName = process.env.AWS_LAMBDA_FUNCTION_NAME;
-    const originalConsoleLog = console.log;
-
     process.env.AWS_LAMBDA_FUNCTION_NAME = "";
     delete process.env.APP_NAME;
     delete process.env.API_TOKEN;
-    console.log = (...parts: unknown[]) => {
-      logged.push(parts.map((part) => String(part)).join(" "));
-    };
-
     const response = await handler({
       body: "",
       headers: {},
@@ -113,7 +124,6 @@ defineGet({
       queryStringParameters: {},
     });
 
-    console.log = originalConsoleLog;
     if (previousAppName === undefined) delete process.env.APP_NAME;
     else process.env.APP_NAME = previousAppName;
     if (previousToken === undefined) delete process.env.API_TOKEN;
@@ -126,9 +136,15 @@ defineGet({
       apiToken: "",
       appName: "dev-app-v2",
     });
+    const logs =
+      (globalThis as { __simpleApiPowertoolsLogs?: Array<Record<string, unknown>> })
+        .__simpleApiPowertoolsLogs ?? [];
     expect(
-      logged.some((entry) =>
-        entry.includes("Would load parameter /app/private/api-token into API_TOKEN"),
+      logs.some(
+        (entry) =>
+          entry.message === "[simple-api] Would load parameter for env" &&
+          entry.parameterName === "/app/private/api-token" &&
+          entry.envName === "API_TOKEN",
       ),
     ).toBe(true);
   });
@@ -176,6 +192,7 @@ defineGet({
     const previousToken = process.env.API_TOKEN;
     const previousSecretBle = process.env.SECRET_BLE;
     const previousLambdaName = process.env.AWS_LAMBDA_FUNCTION_NAME;
+
     process.env.AWS_LAMBDA_FUNCTION_NAME = "";
     delete process.env.API_TOKEN;
     process.env.SECRET_BLE = "mapped-local-value";

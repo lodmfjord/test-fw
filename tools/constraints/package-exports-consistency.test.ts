@@ -22,7 +22,7 @@ const EXPECTED_EXPORTS = {
   types: "./dist/index.d.ts",
 };
 
-/** Handles read library package paths. */ async function readLibraryPackagePaths(): Promise<
+/** Runs read library package paths. */ async function readLibraryPackagePaths(): Promise<
   string[]
 > {
   const librariesDirectory = join(import.meta.dir, "..", "..", "libs");

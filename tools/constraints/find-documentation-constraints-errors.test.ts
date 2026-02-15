@@ -69,7 +69,7 @@ describe("findDocumentationConstraintsErrors", () => {
        * @fileoverview File.
        */
       /**
-       * Handles run.
+       * Runs operation.
        * @param input - Input value.
        */
       export function run(input: string) {}
@@ -85,7 +85,8 @@ describe("findDocumentationConstraintsErrors", () => {
        * @fileoverview File.
        */
       /**
-       * Handles run.
+       * Runs operation.
+       * @returns Result value.
        * @example \`run(input)\`
        */
       export function run(input: string) {}
@@ -101,8 +102,9 @@ describe("findDocumentationConstraintsErrors", () => {
        * @fileoverview File.
        */
       /**
-       * Handles run.
+       * Runs operation.
        * @param input - Input value.
+       * @returns Result value.
        */
       export const run = (input: string) => input;
     `;
@@ -116,7 +118,7 @@ describe("findDocumentationConstraintsErrors", () => {
       /**
        * @fileoverview File.
        */
-      /** Handles run. @param input - Input value. @example \`run(input)\` */
+      /** Runs operation. @param input - Input value. @returns Result value. @example \`run(input)\` */
       export function run(input: string) {}
     `;
     const errors = findDocumentationConstraintsErrors("file.ts", source);
@@ -132,19 +134,20 @@ describe("findDocumentationConstraintsErrors", () => {
        * @fileoverview File.
        */
       /**
-       * Handles run.
+       * Runs operation.
        * @param input - Input value.
+       * @returns Result value.
        * @example
        * run(input)
-       */
+      */
       export function run(input: string) {}
       /**
-       * Handles helper.
-       */
+       * Calculates helper value.
+      */
       function helper() {}
       /**
-       * Handles mapper.
-       */
+       * Maps values.
+      */
       const mapper = () => {};
     `;
 

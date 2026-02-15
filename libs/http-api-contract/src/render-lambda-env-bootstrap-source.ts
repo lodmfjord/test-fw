@@ -10,7 +10,7 @@ type SecretVariableDefinition = {
   parameterName: string;
 };
 
-/** Converts values to env config. */
+/** Converts to env config. */
 function toEnvConfig(endpoint: EndpointRuntimeDefinition): {
   plain: Record<string, string>;
   secret: SecretVariableDefinition[];
@@ -36,10 +36,11 @@ function toEnvConfig(endpoint: EndpointRuntimeDefinition): {
 }
 
 /**
- * Handles render lambda env bootstrap source.
+ * Runs render lambda env bootstrap source.
  * @param endpoint - Endpoint parameter.
  * @example
  * renderLambdaEnvBootstrapSource(endpoint)
+ * @returns Output value.
  */
 export function renderLambdaEnvBootstrapSource(endpoint: EndpointRuntimeDefinition): string {
   const envConfig = toEnvConfig(endpoint);
@@ -112,7 +113,10 @@ async function initializeEndpointEnv() {
         continue;
       }
 
-      console.log("[simple-api] Would load parameter " + entry.parameterName + " into " + entry.envName);
+      simpleApiLogger.info("[simple-api] Would load parameter for env", {
+        envName: entry.envName,
+        parameterName: entry.parameterName
+      });
     }
     return;
   }

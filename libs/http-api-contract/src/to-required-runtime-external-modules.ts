@@ -1,9 +1,9 @@
 /**
  * @fileoverview Implements to required runtime external modules.
  */
-const REQUIRED_RUNTIME_EXTERNAL_MODULES = ["zod"] as const;
+const REQUIRED_RUNTIME_EXTERNAL_MODULES = ["@aws-lambda-powertools/logger", "zod"] as const;
 
-/** Converts values to normalized module names. */
+/** Converts to normalized module names. */
 function toNormalizedModuleNames(
   externalModules: ReadonlyArray<string> | undefined,
 ): ReadonlyArray<string> {
@@ -23,10 +23,11 @@ function toNormalizedModuleNames(
 }
 
 /**
- * Converts values to required runtime external modules.
+ * Converts to required runtime external modules.
  * @param externalModules - External modules parameter.
  * @example
  * toRequiredRuntimeExternalModules(externalModules)
+ * @returns Output value.
  */
 export function toRequiredRuntimeExternalModules(
   externalModules: ReadonlyArray<string> | undefined,

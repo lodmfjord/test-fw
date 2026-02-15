@@ -9,6 +9,7 @@ import type { CreateAwsS3Input, S3Client } from "./types";
  * @param input - Input parameter.
  * @example
  * createAwsS3(input)
+ * @returns Output value.
  */
 export function createAwsS3(input: CreateAwsS3Input = {}): S3Client {
   const operationsPromise = input.operations

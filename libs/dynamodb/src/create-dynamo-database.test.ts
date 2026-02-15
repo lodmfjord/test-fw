@@ -10,7 +10,7 @@ type PointItem = {
   points: number;
 };
 
-/** Handles point definition. */
+/** Runs point definition. */
 function pointDefinition() {
   return {
     parse(input: unknown): PointItem {

@@ -41,6 +41,7 @@ type PostEndpointDefinition<
  * @param input - Input parameter.
  * @example
  * definePost(input)
+ * @returns Output value.
  */ export function definePost<
   TParams,
   TQuery,

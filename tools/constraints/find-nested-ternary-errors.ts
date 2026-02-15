@@ -33,11 +33,12 @@ function hasNestedTernary(sourceFile: ts.SourceFile): boolean {
 }
 
 /**
- * Handles find nested ternary errors.
+ * Runs find nested ternary errors.
  * @param filePath - File path parameter.
  * @param source - Source parameter.
  * @example
  * findNestedTernaryErrors(filePath, source)
+ * @returns Output value.
  */
 export function findNestedTernaryErrors(filePath: string, source: string): string[] {
   const sourceFile = ts.createSourceFile(

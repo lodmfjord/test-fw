@@ -31,6 +31,7 @@ export function createClient<TEndpoints, TRouteEndpoints = unknown>(
  * @param endpoints - Endpoints parameter.
  * @example
  * createClient(baseUrl, endpoints)
+ * @returns Output value.
  */
 export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
   baseUrl: string,
@@ -43,7 +44,7 @@ export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
     endpointByRouteId.set(endpoint.routeId, endpoint);
   }
 
-  /** Handles request core. */
+  /** Runs request core. */
   async function requestCore<TEndpoint extends ClientEndpointUnion<TEndpoints>>(
     endpoint: TEndpoint,
     input: ClientRequestInput<TEndpoint>,

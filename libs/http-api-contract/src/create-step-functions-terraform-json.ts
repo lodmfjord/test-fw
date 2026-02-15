@@ -17,6 +17,7 @@ type TerraformJson = Record<string, unknown>;
  * @param usesManagedSqsQueues - Uses managed sqs queues parameter.
  * @example
  * createStepFunctionsTerraformJson(endpoints, sqsListeners, includeApiGatewayResources, usesManagedSqsQueues)
+ * @returns Output value.
  */
 export function createStepFunctionsTerraformJson(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

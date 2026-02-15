@@ -9,12 +9,12 @@ import type {
   RouteDefinition,
 } from "./types";
 
-/** Converts values to open api method. */
+/** Converts to open api method. */
 function toOpenApiMethod(method: RouteDefinition["method"]): keyof OpenApiPathItem {
   return method.toLowerCase() as keyof OpenApiPathItem;
 }
 
-/** Converts values to open api success status code. */
+/** Converts to open api success status code. */
 function toOpenApiSuccessStatusCode(route: RouteDefinition): "200" | "204" {
   if (route.method === "OPTIONS") {
     return "204";
@@ -24,10 +24,11 @@ function toOpenApiSuccessStatusCode(route: RouteDefinition): "200" | "204" {
 }
 
 /**
- * Converts values to open api document from routes.
+ * Converts to open api document from routes.
  * @param input - Input parameter.
  * @example
  * toOpenApiDocumentFromRoutes(input)
+ * @returns Output value.
  */
 export function toOpenApiDocumentFromRoutes(input: BuildContractInput): OpenApiDocument {
   const paths: Record<string, OpenApiPathItem> = {};

@@ -10,12 +10,12 @@ import type {
   StepFunctionTaskState,
 } from "./asl-types";
 
-/** Converts values to path type label. */
+/** Converts to path type label. */
 function toPathTypeLabel(pathType: "InputPath" | "OutputPath" | "ResultPath"): string {
   return pathType;
 }
 
-/** Handles validate json path. */
+/** Runs validate json path. */
 function validateJsonPath(
   stateName: string,
   pathType: "InputPath" | "OutputPath" | "ResultPath",
@@ -32,14 +32,14 @@ function validateJsonPath(
   }
 }
 
-/** Handles validate strict json path. */
+/** Runs validate strict json path. */
 function validateStrictJsonPath(stateName: string, pathType: "Variable", path: unknown): void {
   if (typeof path !== "string" || !path.startsWith("$")) {
     throw new Error(`Step-function state "${stateName}" has invalid ${pathType} "${String(path)}"`);
   }
 }
 
-/** Converts values to pass state. */
+/** Converts to pass state. */
 function toPassState(stateName: string, source: unknown): StepFunctionPassState {
   if (!source || typeof source !== "object" || Array.isArray(source)) {
     throw new Error(`Step-function state "${stateName}" is invalid`);
@@ -67,7 +67,7 @@ function toPassState(stateName: string, source: unknown): StepFunctionPassState 
   };
 }
 
-/** Converts values to task state. */
+/** Converts to task state. */
 function toTaskState(stateName: string, source: unknown): StepFunctionTaskState {
   if (!source || typeof source !== "object" || Array.isArray(source)) {
     throw new Error(`Step-function state "${stateName}" is invalid`);
@@ -104,7 +104,7 @@ function toTaskState(stateName: string, source: unknown): StepFunctionTaskState 
   };
 }
 
-/** Converts values to choice rule. */
+/** Converts to choice rule. */
 function toChoiceRule(stateName: string, source: unknown): StepFunctionChoiceRule {
   if (!source || typeof source !== "object" || Array.isArray(source)) {
     throw new Error(`Step-function state "${stateName}" has invalid Choice rule`);
@@ -152,7 +152,7 @@ function toChoiceRule(stateName: string, source: unknown): StepFunctionChoiceRul
   };
 }
 
-/** Converts values to choice state. */
+/** Converts to choice state. */
 function toChoiceState(stateName: string, source: unknown): StepFunctionChoiceState {
   if (!source || typeof source !== "object" || Array.isArray(source)) {
     throw new Error(`Step-function state "${stateName}" is invalid`);
@@ -176,7 +176,7 @@ function toChoiceState(stateName: string, source: unknown): StepFunctionChoiceSt
   };
 }
 
-/** Converts values to succeed state. */
+/** Converts to succeed state. */
 function toSucceedState(stateName: string, source: unknown): StepFunctionSucceedState {
   if (!source || typeof source !== "object" || Array.isArray(source)) {
     throw new Error(`Step-function state "${stateName}" is invalid`);
@@ -189,9 +189,11 @@ function toSucceedState(stateName: string, source: unknown): StepFunctionSucceed
   };
 }
 
-export const parseStepFunctionStateBuilders = {
+const parseStepFunctionStateBuilders = {
   toChoiceState,
   toPassState,
   toSucceedState,
   toTaskState,
 };
+
+export { parseStepFunctionStateBuilders };

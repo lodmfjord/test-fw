@@ -25,7 +25,7 @@ Declare typed HTTP endpoints once, then reuse that declaration for:
 - OpenAPI generation includes all declared response status codes from `responseByStatusCode`.
 - Generated Lambda runtime entries validate request schemas (`params`, `query`, `headers`, `body`) with Zod-backed validators derived from endpoint schemas and return `400` on input validation failures.
 - Generated Lambda runtime entries validate output schema by resolved status code with the same runtime validator flow and return `500` on output validation failures.
-- Generated Lambda runtime entries keep `zod` external (`import "zod"`), and terraform generation always plans a lambda layer dependency for `zod`.
+- Generated Lambda runtime entries keep `zod` and `@aws-lambda-powertools/logger` external runtime imports, and terraform generation plans lambda layer dependencies for both modules.
 - Lambda runtime validation supports JSON-schema refs/defaults and fails fast on unsupported schema keywords to avoid silent validation gaps.
 - Generated Lambda runtime entries emit structured logs for invocation lifecycle and failures (`lambda.invocation.start`, `lambda.invocation.complete`, `lambda.validation.input_failed`, `lambda.handler.failed`, `lambda.validation.output_failed`) and always return `x-request-id` response headers.
 
@@ -39,6 +39,7 @@ This means async Step Function routes and multi-response routes keep runtime and
 - handler execution failures emit structured logs with event `dev_app.handler_execution_failed`
 - output validation failures emit structured logs with event `dev_app.output_validation_failed`
 - structured logs include request correlation data (`requestId`, `method`, `path`, `routeId`) and error metadata
+- runtime logging uses injected `options.logger` (when provided) and defaults to no-op logging in library code; legacy `options.log` is still supported in `runDevAppFromSettings`
 
 ## Example: Multi-Response Endpoint
 

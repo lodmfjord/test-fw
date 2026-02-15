@@ -2,10 +2,12 @@
  * @fileoverview Implements to external modules setting.
  */
 /**
- * Converts values to external modules setting.
+ * Converts to external modules setting.
  * @param value - Value parameter.
  * @example
  * toExternalModulesSetting(value)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */ export function toExternalModulesSetting(value: unknown): string[] | undefined {
   if (value === undefined) {
     return undefined;

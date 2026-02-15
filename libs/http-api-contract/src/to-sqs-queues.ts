@@ -4,17 +4,18 @@
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import type { EndpointRuntimeDefinition } from "./types";
 
-/** Converts values to queue key. */
+/** Converts to queue key. */
 function toQueueKey(queueName: string): string {
   return queueName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
 /**
- * Converts values to sqs queues.
+ * Converts to sqs queues.
  * @param endpoints - Endpoints parameter.
  * @param listeners - Listeners parameter.
  * @example
  * toSqsQueues(endpoints, listeners)
+ * @returns Output value.
  */
 export function toSqsQueues(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

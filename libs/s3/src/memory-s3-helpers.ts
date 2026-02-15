@@ -13,7 +13,7 @@ export type StoredObjectMeta = {
 
 const DEFAULT_CONTENT_TYPE = "application/octet-stream";
 
-/** Converts values to non empty trimmed. */
+/** Converts to non empty trimmed. */
 function toNonEmptyTrimmed(value: string, fieldName: string): string {
   const normalized = value.trim();
   if (normalized.length === 0) {
@@ -23,7 +23,7 @@ function toNonEmptyTrimmed(value: string, fieldName: string): string {
   return normalized;
 }
 
-/** Converts values to content type. */
+/** Converts to content type. */
 function toContentType(contentType: string | undefined): string {
   if (contentType === undefined) {
     return DEFAULT_CONTENT_TYPE;
@@ -32,29 +32,29 @@ function toContentType(contentType: string | undefined): string {
   return toNonEmptyTrimmed(contentType, "contentType");
 }
 
-/** Handles encode storage id. */
+/** Runs encode storage id. */
 function encodeStorageId(value: string): string {
   return Buffer.from(value, "utf8").toString("base64url");
 }
 
-/** Converts values to bucket dir. */
+/** Converts to bucket dir. */
 function toBucketDir(rootDir: string, bucketName: string): string {
   return join(rootDir, encodeStorageId(bucketName));
 }
 
-/** Converts values to object body path. */
+/** Converts to object body path. */
 function toObjectBodyPath(rootDir: string, bucketName: string, key: string): string {
   const bucketDir = toBucketDir(rootDir, bucketName);
   return join(bucketDir, `${encodeStorageId(key)}.bin`);
 }
 
-/** Converts values to object meta path. */
+/** Converts to object meta path. */
 function toObjectMetaPath(rootDir: string, bucketName: string, key: string): string {
   const bucketDir = toBucketDir(rootDir, bucketName);
   return join(bucketDir, `${encodeStorageId(key)}.meta.json`);
 }
 
-/** Converts values to expires in seconds. */
+/** Converts to expires in seconds. */
 function toExpiresInSeconds(value: number | undefined): number {
   if (value === undefined) {
     return 900;
@@ -67,13 +67,13 @@ function toExpiresInSeconds(value: number | undefined): number {
   return value;
 }
 
-/** Converts values to base url. */
+/** Converts to base url. */
 function toBaseUrl(baseUrl: string | undefined): string {
   const source = baseUrl ?? "http://localhost:4569";
   return source.endsWith("/") ? source.slice(0, -1) : source;
 }
 
-/** Converts values to secure link. */
+/** Converts to secure link. */
 function toSecureLink(input: {
   baseUrl: string;
   bucketName: string;
@@ -102,7 +102,7 @@ function toSecureLink(input: {
   return url.toString();
 }
 
-/** Handles read object meta. */
+/** Runs read object meta. */
 async function readObjectMeta(metaPath: string): Promise<StoredObjectMeta | undefined> {
   try {
     const source = await readFile(metaPath, "utf8");
@@ -121,7 +121,7 @@ async function readObjectMeta(metaPath: string): Promise<StoredObjectMeta | unde
   }
 }
 
-/** Handles read object body. */
+/** Runs read object body. */
 async function readObjectBody(bodyPath: string): Promise<Uint8Array | undefined> {
   try {
     const body = await readFile(bodyPath);
@@ -139,7 +139,7 @@ async function readObjectBody(bodyPath: string): Promise<Uint8Array | undefined>
   }
 }
 
-export const memoryS3Helpers = {
+const memoryS3Helpers = {
   toBaseUrl,
   toBucketDir,
   toContentType,
@@ -151,3 +151,5 @@ export const memoryS3Helpers = {
   readObjectBody,
   readObjectMeta,
 };
+
+export { memoryS3Helpers };

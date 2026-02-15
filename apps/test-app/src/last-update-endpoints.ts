@@ -2,6 +2,7 @@
  * @fileoverview Implements last update endpoints.
  */
 import { createSqsQueue } from "@babbstack/sqs";
+import { createLogger } from "@babbstack/logger";
 import { createEnv, createSecret, defineGet } from "@babbstack/http-api-contract";
 import { schema } from "@babbstack/schema";
 import { z } from "zod";
@@ -10,8 +11,11 @@ import { lastUpdateStore } from "./last-update-store";
 const lastUpdateMessageSchema = z.object({
   time: z.string(),
 });
+const logger = createLogger({
+  serviceName: "test-app",
+});
 
-export const lastUpdateQueue = createSqsQueue(
+const lastUpdateQueue = createSqsQueue(
   {
     parse(input) {
       return lastUpdateMessageSchema.parse(input);
@@ -22,10 +26,12 @@ export const lastUpdateQueue = createSqsQueue(
   },
 );
 
-export const lastUpdateListener = lastUpdateQueue.addListener({
+lastUpdateQueue.addListener({
   listenerId: "last_update",
   handler: ({ message }) => {
-    console.log("last_update listener received message", message);
+    logger.info("last_update listener received message", {
+      message,
+    });
     lastUpdateStore.update(message.time);
   },
 });
@@ -91,4 +97,6 @@ const getLastUpdateEndpoint = defineGet({
   tags: ["last-update"],
 });
 
-export const lastUpdateEndpoints = [getLastUpdateEndpoint, getEnvDemoEndpoint];
+const lastUpdateEndpoints = [getLastUpdateEndpoint, getEnvDemoEndpoint];
+
+export { lastUpdateEndpoints };

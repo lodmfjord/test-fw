@@ -13,19 +13,19 @@ import type {
   StepFunctionWorkflowType,
 } from "./route-execution-types";
 
-/** Converts values to workflow type. */
+/** Converts to workflow type. */
 function toWorkflowType(value: StepFunctionWorkflowType | undefined): StepFunctionWorkflowType {
   return value ?? "EXPRESS";
 }
 
-/** Converts values to invocation type. */
+/** Converts to invocation type. */
 function toInvocationType(
   value: StepFunctionInvocationType | undefined,
 ): StepFunctionInvocationType {
   return value ?? "sync";
 }
 
-/** Converts values to step function execution. */
+/** Converts to step function execution. */
 function toStepFunctionExecution(
   input: RouteExecutionInput,
 ): RouteStepFunctionExecution | undefined {
@@ -58,10 +58,11 @@ function toStepFunctionExecution(
 }
 
 /**
- * Converts values to route execution.
+ * Converts to route execution.
  * @param input - Input parameter.
  * @example
  * toRouteExecution(input)
+ * @returns Output value.
  */
 export function toRouteExecution(input: RouteExecutionInput | undefined): RouteExecution {
   if (!input || input.kind === "lambda") {

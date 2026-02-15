@@ -7,11 +7,12 @@ const MAX_SRC_FUNCTION_LINES = 160;
 const MAX_SRC_FUNCTION_COGNITIVE_COMPLEXITY = 30;
 
 /**
- * Handles find src function density errors.
+ * Runs find src function density errors.
  * @param filePath - File path parameter.
  * @param source - Source parameter.
  * @example
  * findSrcFunctionDensityErrors(filePath, source)
+ * @returns Output value.
  */
 export function findSrcFunctionDensityErrors(filePath: string, source: string): string[] {
   if (!findSrcFunctionDensityErrorsHelpers.isSrcSourceFilePath(filePath)) {

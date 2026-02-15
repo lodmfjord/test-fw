@@ -13,7 +13,7 @@ export type LambdaLayerMetadata = {
   routeLayerKeyByRoute: Record<string, string>;
 };
 
-/** Converts values to layer key. */
+/** Converts to layer key. */
 function toLayerKey(moduleNames: ReadonlyArray<string>): string {
   const signature = moduleNames.join("|");
   const hash = createHash("sha256").update(signature).digest("hex").slice(0, 12);
@@ -21,10 +21,11 @@ function toLayerKey(moduleNames: ReadonlyArray<string>): string {
 }
 
 /**
- * Converts values to lambda layer metadata.
+ * Converts to lambda layer metadata.
  * @param lambdaExternalModulesByRoute - Lambda external modules by route parameter.
  * @example
  * toLambdaLayerMetadata(lambdaExternalModulesByRoute)
+ * @returns Output value.
  */
 export function toLambdaLayerMetadata(
   lambdaExternalModulesByRoute: Record<string, string[]>,

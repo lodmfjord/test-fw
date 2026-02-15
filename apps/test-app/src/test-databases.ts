@@ -30,6 +30,7 @@ const testDbTwoTable = defineDynamoDbTable<TestDbTwoItem, "id">({
  * @param db - Db parameter.
  * @example
  * createTestDatabases(db)
+ * @returns Output value.
  */ export function createTestDatabases(db: DynamoDbClient) {
   return createTypedDynamoDb(db, {
     testDbOne: testDbOneTable,

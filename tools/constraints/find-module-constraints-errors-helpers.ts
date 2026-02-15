@@ -19,12 +19,12 @@ type ModuleTarget = {
   scope: ModuleScope;
 };
 
-/** Converts values to posix path. */
+/** Converts to posix path. */
 function toPosixPath(filePath: string): string {
   return filePath.split(sep).join("/");
 }
 
-/** Converts values to scope. */
+/** Converts to scope. */
 function toScope(filePath: string): ModuleScope | undefined {
   const normalized = toPosixPath(filePath);
   const parts = normalized.split("/");
@@ -40,7 +40,7 @@ function toScope(filePath: string): ModuleScope | undefined {
   return { root, packageName };
 }
 
-/** Converts values to relative target path. */
+/** Converts to relative target path. */
 function toRelativeTargetPath(filePath: string, moduleSpecifier: string): string | undefined {
   if (!moduleSpecifier.startsWith(".")) {
     return undefined;
@@ -50,7 +50,7 @@ function toRelativeTargetPath(filePath: string, moduleSpecifier: string): string
   return toPosixPath(joined);
 }
 
-/** Converts values to package target scope. */
+/** Converts to package target scope. */
 function toPackageTargetScope(moduleSpecifier: string): ModuleScope | undefined {
   const match = /^@babbstack\/([^/]+)(?:\/(.*))?$/.exec(moduleSpecifier);
   if (!match) {
@@ -104,7 +104,7 @@ function isTypeOnlyExport(exportDeclaration: ts.ExportDeclaration): boolean {
   return exportDeclaration.exportClause.elements.every((element) => element.isTypeOnly);
 }
 
-/** Converts values to module links. */
+/** Converts to module links. */
 function toModuleLinks(sourceFile: ts.SourceFile): ModuleLink[] {
   const links: ModuleLink[] = [];
 
@@ -137,7 +137,7 @@ function toModuleLinks(sourceFile: ts.SourceFile): ModuleLink[] {
   return links;
 }
 
-/** Converts values to target scope. */
+/** Converts to target scope. */
 function toTargetScope(filePath: string, moduleSpecifier: string): ModuleTarget | undefined {
   const relativeTargetPath = toRelativeTargetPath(filePath, moduleSpecifier);
   if (relativeTargetPath) {
@@ -161,7 +161,7 @@ function toTargetScope(filePath: string, moduleSpecifier: string): ModuleTarget 
   return { hasDeepSrcPath: moduleSpecifier.includes("/src/"), scope: directScope };
 }
 
-/** Converts values to export star errors. */
+/** Converts to export star errors. */
 function toExportStarErrors(filePath: string, sourceFile: ts.SourceFile): string[] {
   const errors: string[] = [];
 
@@ -186,7 +186,7 @@ function toExportStarErrors(filePath: string, sourceFile: ts.SourceFile): string
   return errors;
 }
 
-/** Converts values to module constraint context. */
+/** Converts to module constraint context. */
 function toModuleConstraintContext(
   filePath: string,
   source: string,
@@ -210,8 +210,10 @@ function toModuleConstraintContext(
   };
 }
 
-export const findModuleConstraintsErrorsHelpers = {
+const findModuleConstraintsErrorsHelpers = {
   toExportStarErrors,
   toModuleConstraintContext,
   toTargetScope,
 };
+
+export { findModuleConstraintsErrorsHelpers };

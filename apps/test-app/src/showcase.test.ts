@@ -3,10 +3,21 @@
  */
 import { describe, expect, it } from "bun:test";
 import { createDevApp } from "@babbstack/http-api-contract";
-import { runSqsQueueListener } from "@babbstack/sqs";
-import { testAppFetch, testAppSqs } from "./dev-app";
-import { endpoints, lastUpdateListener, stepFunctionEventsListener } from "./endpoints";
+import { listDefinedSqsListeners, runSqsQueueListener } from "@babbstack/sqs";
+import { testAppFetch } from "./dev-app";
+import { endpoints } from "./endpoints";
+import { testAppSqs } from "./test-app-sqs";
 import { testAppContract } from "./test-app-contract";
+
+/** Converts to listener by id. */
+function toListenerById(listenerId: string): Parameters<typeof runSqsQueueListener>[0] {
+  const listener = listDefinedSqsListeners().find((item) => item.listenerId === listenerId);
+  if (!listener) {
+    throw new Error(`missing listener "${listenerId}"`);
+  }
+
+  return listener as Parameters<typeof runSqsQueueListener>[0];
+}
 
 describe("test-app showcase", () => {
   it("returns endpoint env values for /env-demo", async () => {
@@ -44,7 +55,7 @@ describe("test-app showcase", () => {
     }
     expect(new Date(firstPayload.time).toISOString()).toBe(firstPayload.time);
 
-    const processed = await runSqsQueueListener(lastUpdateListener, testAppSqs);
+    const processed = await runSqsQueueListener(toListenerById("last_update"), testAppSqs);
     expect(processed).toBe(1);
 
     const secondResponse = await testAppFetch(
@@ -114,7 +125,7 @@ describe("test-app showcase", () => {
     expect(
       testAppContract.openapi.paths["/step-function-demo"]?.post?.["x-babbstack"].execution.kind,
     ).toBe("step-function");
-    expect(stepFunctionEventsListener.target.kind).toBe("step-function");
+    expect(toListenerById("step_function_events").target.kind).toBe("step-function");
   });
 
   it("runs random branch step-function endpoint with task and choice states", async () => {

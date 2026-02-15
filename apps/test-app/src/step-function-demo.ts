@@ -75,7 +75,7 @@ const randomBranchStepFunctionDefinition = defineStepFunction({
   },
 });
 
-export const stepFunctionEventsQueue = createSqsQueue(
+const stepFunctionEventsQueue = createSqsQueue(
   {
     parse(input) {
       const source = input as { eventId?: unknown };
@@ -93,7 +93,7 @@ export const stepFunctionEventsQueue = createSqsQueue(
   },
 );
 
-export const stepFunctionEventsListener = stepFunctionEventsQueue.addListener({
+stepFunctionEventsQueue.addListener({
   listenerId: "step_function_events",
   target: {
     definition: demoStepFunctionDefinition,
@@ -103,7 +103,7 @@ export const stepFunctionEventsListener = stepFunctionEventsQueue.addListener({
   },
 });
 
-export const postStepFunctionDemoEndpoint = definePost({
+const postStepFunctionDemoEndpoint = definePost({
   execution: {
     definition: demoStepFunctionDefinition,
     kind: "step-function",
@@ -122,7 +122,7 @@ export const postStepFunctionDemoEndpoint = definePost({
   tags: ["step-function-demo"],
 });
 
-export const postStepFunctionRandomBranchEndpoint = definePost({
+const postStepFunctionRandomBranchEndpoint = definePost({
   execution: {
     definition: randomBranchStepFunctionDefinition,
     kind: "step-function",
@@ -137,7 +137,7 @@ export const postStepFunctionRandomBranchEndpoint = definePost({
   tags: ["step-function-demo"],
 });
 
-export const postStepFunctionEventsEndpoint = definePost({
+const postStepFunctionEventsEndpoint = definePost({
   path: "/step-function-events",
   context: {
     sqs: {
@@ -171,3 +171,11 @@ export const postStepFunctionEventsEndpoint = definePost({
   }),
   tags: ["step-function-demo"],
 });
+
+const stepFunctionDemoEndpoints = [
+  postStepFunctionDemoEndpoint,
+  postStepFunctionEventsEndpoint,
+  postStepFunctionRandomBranchEndpoint,
+];
+
+export { stepFunctionDemoEndpoints };

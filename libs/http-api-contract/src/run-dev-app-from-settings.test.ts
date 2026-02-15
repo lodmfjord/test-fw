@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "bun:test";
+import type { Logger } from "@babbstack/logger";
 import { runDevAppFromSettings } from "./run-dev-app-from-settings";
 
 describe("runDevAppFromSettings", () => {
@@ -101,5 +102,82 @@ export const endpoints = [[healthEndpoint], helloEndpoint];
     expect((await response.json()) as { hello?: string }).toEqual({
       hello: "world",
     });
+  });
+
+  it("prefers options.logger over options.log", async () => {
+    const workspaceDirectory = await mkdtemp(join(tmpdir(), "babbstack-dev-settings-"));
+    const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
+    const endpointsPath = join(workspaceDirectory, "endpoints.ts");
+    const settingsPath = join(workspaceDirectory, "settings.json");
+
+    await writeFile(
+      endpointsPath,
+      `
+import { defineGet, schema } from "${frameworkImportPath}";
+
+const helloEndpoint = defineGet({
+  path: "/hello",
+  handler: () => ({
+    value: {
+      hello: "world",
+    },
+  }),
+  response: schema.object({
+    hello: schema.string(),
+  }),
+});
+
+export const endpoints = [helloEndpoint];
+`,
+      "utf8",
+    );
+
+    await writeFile(
+      settingsPath,
+      JSON.stringify(
+        {
+          endpointModulePath: "./endpoints.ts",
+        },
+        null,
+        2,
+      ),
+      "utf8",
+    );
+
+    const logMessages: string[] = [];
+    const loggerMessages: string[] = [];
+    const logger: Logger = {
+      debug(message) {
+        loggerMessages.push(message);
+      },
+      error(message) {
+        loggerMessages.push(message);
+      },
+      getPersistentKeys() {
+        return {};
+      },
+      info(message) {
+        loggerMessages.push(message);
+      },
+      warn(message) {
+        loggerMessages.push(message);
+      },
+    };
+
+    await runDevAppFromSettings(settingsPath, {
+      env: {
+        PORT: "4323",
+      },
+      log(message) {
+        logMessages.push(message);
+      },
+      logger,
+      serve() {},
+    });
+
+    expect(logMessages).toEqual([]);
+    expect(loggerMessages.includes("babbstack dev server listening on http://localhost:4323")).toBe(
+      true,
+    );
   });
 });

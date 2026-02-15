@@ -2,29 +2,42 @@
  * @fileoverview Tests create dev app observability.
  */
 import { describe, expect, it } from "bun:test";
+import type { Logger } from "@babbstack/logger";
 import { createDevApp } from "./create-dev-app";
 import { defineEndpoint } from "./define-endpoint";
 import { schema } from "@babbstack/schema";
 
 describe("createDevApp observability", () => {
   it("logs structured handler failures with request correlation id", async () => {
-    const fetch = createDevApp([
-      defineEndpoint({
-        method: "GET",
-        path: "/boom",
-        handler: () => {
-          throw new Error("handler exploded");
-        },
-        response: schema.object({
-          ok: schema.boolean(),
-        }),
-      }),
-    ]);
-    const originalConsoleError = console.error;
     const loggedEntries: unknown[] = [];
-    console.error = (...args: unknown[]) => {
-      loggedEntries.push(args[0]);
+    const logger: Logger = {
+      debug() {},
+      error(_message, payload) {
+        loggedEntries.push(payload);
+      },
+      getPersistentKeys() {
+        return {};
+      },
+      info() {},
+      warn() {},
     };
+    const fetch = createDevApp(
+      [
+        defineEndpoint({
+          method: "GET",
+          path: "/boom",
+          handler: () => {
+            throw new Error("handler exploded");
+          },
+          response: schema.object({
+            ok: schema.boolean(),
+          }),
+        }),
+      ],
+      {
+        logger,
+      },
+    );
 
     const response = await fetch(
       new Request("http://local/boom", {
@@ -34,7 +47,6 @@ describe("createDevApp observability", () => {
         },
       }),
     );
-    console.error = originalConsoleError;
 
     expect(response.status).toBe(500);
     expect(response.headers.get("x-request-id")).toBe("req-123");
@@ -54,28 +66,39 @@ describe("createDevApp observability", () => {
   });
 
   it("logs structured output validation failures with generated request ids", async () => {
-    const fetch = createDevApp([
-      defineEndpoint({
-        method: "GET",
-        path: "/bad-output",
-        handler: () => ({
-          value: {
-            id: 123,
-          },
-        }),
-        response: schema.object({
-          id: schema.string(),
-        }),
-      }),
-    ]);
-    const originalConsoleError = console.error;
     const loggedEntries: unknown[] = [];
-    console.error = (...args: unknown[]) => {
-      loggedEntries.push(args[0]);
+    const logger: Logger = {
+      debug() {},
+      error(_message, payload) {
+        loggedEntries.push(payload);
+      },
+      getPersistentKeys() {
+        return {};
+      },
+      info() {},
+      warn() {},
     };
+    const fetch = createDevApp(
+      [
+        defineEndpoint({
+          method: "GET",
+          path: "/bad-output",
+          handler: () => ({
+            value: {
+              id: 123,
+            },
+          }),
+          response: schema.object({
+            id: schema.string(),
+          }),
+        }),
+      ],
+      {
+        logger,
+      },
+    );
 
     const response = await fetch(new Request("http://local/bad-output", { method: "GET" }));
-    console.error = originalConsoleError;
 
     expect(response.status).toBe(500);
     expect((await response.json()) as { error?: string }).toEqual({

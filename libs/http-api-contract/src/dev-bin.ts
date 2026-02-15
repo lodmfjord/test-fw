@@ -2,11 +2,12 @@
 /**
  * @fileoverview Implements dev bin.
  */
+import { createLogger } from "@babbstack/logger";
 import { runDevAppFromSettings } from "./run-dev-app-from-settings";
 
 const DEFAULT_SETTINGS_FILE_PATH = "babb.settings.json";
 
-/** Converts values to settings file path. */
+/** Converts to settings file path. */
 function toSettingsFilePath(argv: string[]): string {
   const settingsFlagIndex = argv.indexOf("--settings");
   if (settingsFlagIndex >= 0) {
@@ -27,11 +28,17 @@ function toSettingsFilePath(argv: string[]): string {
 }
 
 if (import.meta.main) {
+  const logger = createLogger({
+    serviceName: "http-api-contract-dev-bin",
+  });
+
   try {
-    await runDevAppFromSettings(toSettingsFilePath(process.argv.slice(2)));
+    await runDevAppFromSettings(toSettingsFilePath(process.argv.slice(2)), {
+      logger,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    console.error(message);
+    logger.error(message);
     process.exit(1);
   }
 }

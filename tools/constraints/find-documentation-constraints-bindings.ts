@@ -5,9 +5,11 @@ import * as ts from "typescript";
 
 type FunctionLikeBinding = {
   exported: boolean;
+  functionNode: ts.FunctionDeclaration | ts.ArrowFunction | ts.FunctionExpression;
   name: string;
   node: ts.FunctionDeclaration | ts.VariableStatement;
   parameters: ts.NodeArray<ts.ParameterDeclaration>;
+  variableDeclaration?: ts.VariableDeclaration;
 };
 
 /** Checks whether a node has a given modifier. */
@@ -29,6 +31,7 @@ function toFunctionBindings(sourceFile: ts.SourceFile): FunctionLikeBinding[] {
     if (ts.isFunctionDeclaration(node) && node.body) {
       bindings.push({
         exported: hasModifier(node, ts.SyntaxKind.ExportKeyword),
+        functionNode: node,
         name: node.name?.text ?? "<default>",
         node,
         parameters: node.parameters,
@@ -49,9 +52,11 @@ function toFunctionBindings(sourceFile: ts.SourceFile): FunctionLikeBinding[] {
 
         bindings.push({
           exported: hasModifier(node, ts.SyntaxKind.ExportKeyword),
+          functionNode: declaration.initializer,
           name: declaration.name.text,
           node,
           parameters: declaration.initializer.parameters,
+          variableDeclaration: declaration,
         });
       }
     }
@@ -64,6 +69,8 @@ function toFunctionBindings(sourceFile: ts.SourceFile): FunctionLikeBinding[] {
 }
 
 export type { FunctionLikeBinding };
-export const findDocumentationConstraintsBindings = {
+const findDocumentationConstraintsBindings = {
   toFunctionBindings,
 };
+
+export { findDocumentationConstraintsBindings };

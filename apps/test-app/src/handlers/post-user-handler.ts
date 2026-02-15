@@ -11,10 +11,11 @@ type InputContext = {
 };
 
 /**
- * Handles post user handler.
+ * Runs post user handler.
  * @param input - Input parameter.
  * @example
  * postUserHandler(input)
+ * @returns Output value.
  */ export function postUserHandler({ body }: InputContext) {
   const digest = createHash("sha256").update(body.name).digest("hex").slice(0, 8);
   return {

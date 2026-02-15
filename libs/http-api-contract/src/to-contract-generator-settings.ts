@@ -5,7 +5,7 @@ import type { ContractGeneratorSettings } from "./contract-generator-types";
 import { toExternalModulesSetting } from "./to-external-modules-setting";
 import { toTerraformSettings } from "./to-terraform-settings";
 
-/** Converts values to string setting. */
+/** Converts to string setting. */
 function toStringSetting(
   value: unknown,
   settingName: string,
@@ -36,10 +36,12 @@ function toStringSetting(
 }
 
 /**
- * Converts values to contract generator settings.
+ * Converts to contract generator settings.
  * @param value - Value parameter.
  * @example
  * toContractGeneratorSettings(value)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export function toContractGeneratorSettings(value: unknown): ContractGeneratorSettings {
   if (!value || typeof value !== "object" || Array.isArray(value)) {

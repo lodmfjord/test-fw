@@ -5,7 +5,7 @@ import type { S3ObjectSummary, S3PutInput } from "./types";
 
 const DEFAULT_CONTENT_TYPE = "application/octet-stream";
 
-/** Converts values to bucket name. */
+/** Converts to bucket name. */
 function toBucketName(bucketName: string): string {
   const normalized = bucketName.trim();
   if (normalized.length === 0) {
@@ -15,7 +15,7 @@ function toBucketName(bucketName: string): string {
   return normalized;
 }
 
-/** Converts values to object key. */
+/** Converts to object key. */
 function toObjectKey(key: string): string {
   const normalized = key.trim();
   if (normalized.length === 0) {
@@ -25,7 +25,7 @@ function toObjectKey(key: string): string {
   return normalized;
 }
 
-/** Converts values to content type. */
+/** Converts to content type. */
 function toContentType(contentType: string | undefined): string {
   if (contentType === undefined) {
     return DEFAULT_CONTENT_TYPE;
@@ -39,7 +39,7 @@ function toContentType(contentType: string | undefined): string {
   return normalized;
 }
 
-/** Converts values to expires in seconds. */
+/** Converts to expires in seconds. */
 function toExpiresInSeconds(expiresInSeconds: number | undefined): number {
   if (expiresInSeconds === undefined) {
     return 900;
@@ -52,12 +52,12 @@ function toExpiresInSeconds(expiresInSeconds: number | undefined): number {
   return expiresInSeconds;
 }
 
-/** Converts values to put body. */
+/** Converts to put body. */
 function toPutBody(body: S3PutInput["body"]): Uint8Array | string {
   return typeof body === "string" ? body : new Uint8Array(body);
 }
 
-/** Converts values to body bytes. */
+/** Converts to body bytes. */
 async function toBodyBytes(body: unknown): Promise<Uint8Array> {
   if (body === undefined || body === null) {
     return new Uint8Array();
@@ -106,7 +106,7 @@ async function toBodyBytes(body: unknown): Promise<Uint8Array> {
   throw new Error("Unsupported S3 object body type");
 }
 
-/** Converts values to summary. */
+/** Converts to summary. */
 function toSummary(input: {
   bucketName: string;
   contentType?: string;
@@ -121,7 +121,7 @@ function toSummary(input: {
   };
 }
 
-export const s3AwsNormalizers = {
+const s3AwsNormalizers = {
   DEFAULT_CONTENT_TYPE,
   toBodyBytes,
   toBucketName,
@@ -131,3 +131,5 @@ export const s3AwsNormalizers = {
   toPutBody,
   toSummary,
 };
+
+export { s3AwsNormalizers };

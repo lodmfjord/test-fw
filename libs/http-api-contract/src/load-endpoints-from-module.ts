@@ -4,7 +4,7 @@
 import { toImportPath } from "./to-import-path";
 import type { EndpointRuntimeDefinition } from "./types";
 
-/** Handles append endpoint. */
+/** Runs append endpoint. */
 function appendEndpoint(
   result: EndpointRuntimeDefinition[],
   value: unknown,
@@ -52,11 +52,13 @@ function appendEndpoint(
 }
 
 /**
- * Handles load endpoints from module.
+ * Runs load endpoints from module.
  * @param endpointModulePath - Endpoint module path parameter.
  * @param endpointExportName - Endpoint export name parameter.
  * @example
  * await loadEndpointsFromModule(endpointModulePath, endpointExportName)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export async function loadEndpointsFromModule(
   endpointModulePath: string,

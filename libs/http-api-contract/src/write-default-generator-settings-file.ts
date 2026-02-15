@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS_TEMPLATE = `{
   "endpointExportName": "endpoints",
   "endpointModulePath": "./src/endpoints.ts",
   // packages must be installed in this app and are layered only for lambdas that need them
-  // note: zod is always treated as an external runtime dependency for generated route lambdas
+  // note: zod and @aws-lambda-powertools/logger are always treated as external runtime dependencies for generated route lambdas
   "externalModules": ["@aws-sdk/client-dynamodb", "@aws-sdk/util-dynamodb", "@aws-sdk/client-sqs"],
   "lambdaOutputDirectory": "./dist/lambda-js",
   "prefix": "babb",
@@ -31,7 +31,7 @@ const DEFAULT_SETTINGS_TEMPLATE = `{
 }
 `;
 
-/** Handles assert file does not exist. */
+/** Runs assert file does not exist. */
 async function assertFileDoesNotExist(path: string): Promise<void> {
   try {
     await access(path);
@@ -45,7 +45,7 @@ async function assertFileDoesNotExist(path: string): Promise<void> {
 }
 
 /**
- * Handles write default generator settings file.
+ * Runs write default generator settings file.
  * @param path - Path parameter.
  * @example
  * await writeDefaultGeneratorSettingsFile(path)

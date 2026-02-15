@@ -22,6 +22,7 @@ type TerraformJson = Record<string, unknown>;
  * @param usesManagedSqsQueues - Uses managed sqs queues parameter.
  * @example
  * createLambdasTerraformJson(contract, endpoints, sqsListeners, lambdaExternalModulesByRoute, usesManagedDynamodbTables, usesManagedSqsQueues)
+ * @returns Output value.
  */
 export function createLambdasTerraformJson(
   contract: Contract,

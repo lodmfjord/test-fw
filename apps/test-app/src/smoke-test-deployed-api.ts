@@ -1,6 +1,9 @@
 /**
  * @fileoverview Implements smoke test deployed api.
  */
+import { createLogger, createNoopLogger } from "@babbstack/logger";
+import type { Logger } from "@babbstack/logger";
+
 type SmokeTestResult = {
   failed: number;
   passed: number;
@@ -14,6 +17,7 @@ type DeployedFetch = (
 
 type DeployedSmokeTestOptions = {
   fetchImpl?: DeployedFetch;
+  logger?: Logger;
   log?: (message: string) => void;
 };
 
@@ -26,7 +30,7 @@ type EndpointExpectation = {
   validate: (payload: unknown) => void;
 };
 
-/** Converts values to base url. */ function toBaseUrl(value: string): string {
+/** Converts to base url. */ function toBaseUrl(value: string): string {
   const source = value.trim();
   if (source.length === 0) {
     throw new Error("Base URL argument is required.");
@@ -35,7 +39,7 @@ type EndpointExpectation = {
   return source.replace(/\/+$/g, "");
 }
 
-/** Handles assert object. */ function assertObject(
+/** Runs assert object. */ function assertObject(
   value: unknown,
   message: string,
 ): Record<string, unknown> {
@@ -46,7 +50,7 @@ type EndpointExpectation = {
   return value as Record<string, unknown>;
 }
 
-/** Converts values to endpoint expectations. */ function toEndpointExpectations(): EndpointExpectation[] {
+/** Converts to endpoint expectations. */ function toEndpointExpectations(): EndpointExpectation[] {
   return [
     {
       expectedStatusCode: 200,
@@ -106,7 +110,7 @@ type EndpointExpectation = {
   ];
 }
 
-/** Handles execute endpoint. */ async function executeEndpoint(
+/** Runs execute endpoint. */ async function executeEndpoint(
   endpoint: EndpointExpectation,
   baseUrl: string,
   fetchImpl: DeployedFetch,
@@ -139,19 +143,49 @@ type EndpointExpectation = {
   endpoint.validate(await response.text());
 }
 
+/** Converts to logger. */
+function toLogger(options: DeployedSmokeTestOptions | undefined): Logger {
+  if (options?.logger) {
+    return options.logger;
+  }
+
+  if (options?.log) {
+    return {
+      debug(message) {
+        options.log?.(message);
+      },
+      error(message) {
+        options.log?.(message);
+      },
+      getPersistentKeys() {
+        return {};
+      },
+      info(message) {
+        options.log?.(message);
+      },
+      warn(message) {
+        options.log?.(message);
+      },
+    };
+  }
+
+  return createNoopLogger();
+}
+
 /**
  * Runs smoke test deployed api.
  * @param baseUrl - Base url parameter.
  * @param options - Options parameter.
  * @example
  * await runSmokeTestDeployedApi(baseUrl, options)
+ * @returns Output value.
  */ export async function runSmokeTestDeployedApi(
   baseUrl: string,
   options?: DeployedSmokeTestOptions,
 ): Promise<SmokeTestResult> {
   const normalizedBaseUrl = toBaseUrl(baseUrl);
   const fetchImpl = options?.fetchImpl ?? fetch;
-  const log = options?.log ?? console.log;
+  const logger = toLogger(options);
   const endpoints = toEndpointExpectations();
   let passed = 0;
 
@@ -159,10 +193,10 @@ type EndpointExpectation = {
     try {
       await executeEndpoint(endpoint, normalizedBaseUrl, fetchImpl);
       passed += 1;
-      log(`PASS ${endpoint.method} ${endpoint.path} (${endpoint.name})`);
+      logger.info(`PASS ${endpoint.method} ${endpoint.path} (${endpoint.name})`);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
-      log(`FAIL ${endpoint.method} ${endpoint.path} (${endpoint.name}): ${message}`);
+      logger.error(`FAIL ${endpoint.method} ${endpoint.path} (${endpoint.name}): ${message}`);
     }
   }
 
@@ -175,8 +209,9 @@ type EndpointExpectation = {
 
 if (import.meta.main) {
   const baseUrl = process.argv[2] ?? "";
-  const result = await runSmokeTestDeployedApi(baseUrl);
-  console.log(`Smoke test complete: ${result.passed}/${result.total} passed`);
+  const logger = createLogger({ serviceName: "test-app-smoke" });
+  const result = await runSmokeTestDeployedApi(baseUrl, { logger });
+  logger.info(`Smoke test complete: ${result.passed}/${result.total} passed`);
   if (result.failed > 0) {
     process.exit(1);
   }

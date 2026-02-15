@@ -36,13 +36,18 @@ const titleParser = {
   },
 };
 
-export const pointDatabase = createDynamoDatabase(pointParser, "id", {
+const pointDatabase = createDynamoDatabase(pointParser, "id", {
   tableName: "test-db-one",
 });
 
-export const titleDatabase = createDynamoDatabase(titleParser, "id", {
+const titleDatabase = createDynamoDatabase(titleParser, "id", {
   tableName: "test-db-two",
 });
+
+export const testDatabases = {
+  point: pointDatabase,
+  title: titleDatabase,
+};
 
 export type PointDatabaseReadContext = ReadBoundDynamoDatabase<PointItem, "id">;
 export type PointDatabaseWriteContext = WriteBoundDynamoDatabase<PointItem, "id">;

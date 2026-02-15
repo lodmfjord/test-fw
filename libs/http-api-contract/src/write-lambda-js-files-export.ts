@@ -4,12 +4,13 @@
 import type { EndpointRuntimeDefinition, LambdaJsGenerationOptions } from "./types";
 
 /**
- * Handles write lambda js files.
+ * Runs write lambda js files.
  * @param outputDirectory - Output directory parameter.
  * @param endpoints - Endpoints parameter.
  * @param options - Options parameter.
  * @example
  * await writeLambdaJsFiles(outputDirectory, endpoints, options)
+ * @returns Output value.
  */
 export async function writeLambdaJsFiles(
   outputDirectory: string,

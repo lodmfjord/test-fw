@@ -28,6 +28,8 @@ import { writeTerraformFiles } from "./write-terraform-files";
  * @param settingsFilePath - Settings file path parameter.
  * @example
  * await runContractGeneratorFromSettings(settingsFilePath)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export async function runContractGeneratorFromSettings(
   settingsFilePath: string,

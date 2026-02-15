@@ -4,12 +4,13 @@
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 
 /**
- * Handles render sqs listener lambda source.
+ * Runs render sqs listener lambda source.
  * @param listener - Listener parameter.
  * @param endpointModulePath - Endpoint module path parameter.
  * @param runtimeSqsImportSpecifier - Runtime sqs import specifier parameter.
  * @example
  * renderSqsListenerLambdaSource(listener, endpointModulePath, runtimeSqsImportSpecifier)
+ * @returns Output value.
  */
 export function renderSqsListenerLambdaSource(
   listener: SqsListenerRuntimeDefinition,

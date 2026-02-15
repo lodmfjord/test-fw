@@ -11,7 +11,7 @@ type Command = {
 const sentCommands: Command[] = [];
 const signedUrlCalls: Array<{ command: Command; expiresIn: number }> = [];
 
-/** Handles mocked S3Client.send behavior. */
+/** Runs mocked S3Client.send behavior. */
 let sendImplementation: (command: Command) => Promise<unknown> = async () => ({});
 
 class DeleteObjectCommand {

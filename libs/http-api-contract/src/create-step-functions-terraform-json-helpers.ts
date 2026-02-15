@@ -24,7 +24,7 @@ function createCollections(): TerraformCollections {
   };
 }
 
-/** Handles append endpoint state machine resources. */
+/** Runs append endpoint state machine resources. */
 function appendEndpointStateMachineResources(collections: TerraformCollections): void {
   const { toRouteStateMachineRolePolicy, toTerraformReference } =
     createStepFunctionsTerraformJsonCommon;
@@ -42,7 +42,7 @@ function appendEndpointStateMachineResources(collections: TerraformCollections):
   };
 }
 
-/** Handles append sqs listener state machine resources. */
+/** Runs append sqs listener state machine resources. */
 function appendSqsListenerStateMachineResources(
   collections: TerraformCollections,
   usesManagedSqsQueues: boolean,
@@ -114,7 +114,7 @@ function appendSqsListenerStateMachineResources(
   };
 }
 
-/** Handles append api gateway resources. */
+/** Runs append api gateway resources. */
 function appendApiGatewayResources(collections: TerraformCollections): void {
   const { toApiGatewayRolePolicy, toTerraformReference } = createStepFunctionsTerraformJsonCommon;
   collections.iamRoles.apigateway_step_function_route = {
@@ -152,7 +152,7 @@ function appendApiGatewayResources(collections: TerraformCollections): void {
   };
 }
 
-export const createStepFunctionsTerraformJsonHelpers = {
+const createStepFunctionsTerraformJsonHelpers = {
   appendApiGatewayResources,
   appendEndpointStateMachineResources,
   appendSqsListenerStateMachineResources,
@@ -160,3 +160,5 @@ export const createStepFunctionsTerraformJsonHelpers = {
   toResourceBlock: createStepFunctionsTerraformJsonCommon.toResourceBlock,
   toVariableBlock: createStepFunctionsTerraformJsonCommon.toVariableBlock,
 };
+
+export { createStepFunctionsTerraformJsonHelpers };

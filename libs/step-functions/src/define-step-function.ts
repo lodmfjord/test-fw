@@ -13,6 +13,7 @@ import type {
  * @param definition - Definition parameter.
  * @example
  * defineStepFunction(definition)
+ * @returns Output value.
  */ export function defineStepFunction<
   const TStates extends Record<string, StepFunctionStateInput>,
 >(definition: StepFunctionDefinitionShape<TStates>): StepFunctionDefinition {

@@ -11,7 +11,7 @@ type EndpointDatabaseContext = {
   db: EndpointDb;
 };
 
-/** Converts values to db for endpoint. */
+/** Converts to db for endpoint. */
 function toDbForEndpoint(db: DynamoDbClient, endpoint: EndpointRuntimeDefinition): EndpointDb {
   if (endpoint.access?.db === "read") {
     return {
@@ -22,7 +22,7 @@ function toDbForEndpoint(db: DynamoDbClient, endpoint: EndpointRuntimeDefinition
   return db;
 }
 
-/** Converts values to database for endpoint. */
+/** Converts to database for endpoint. */
 function toDatabaseForEndpoint(
   db: DynamoDbClient,
   endpoint: EndpointRuntimeDefinition,
@@ -49,11 +49,12 @@ function toDatabaseForEndpoint(
 }
 
 /**
- * Converts values to endpoint database context.
+ * Converts to endpoint database context.
  * @param db - Db parameter.
  * @param endpoint - Endpoint parameter.
  * @example
  * toEndpointDatabaseContext(db, endpoint)
+ * @returns Output value.
  */
 export function toEndpointDatabaseContext(
   db: DynamoDbClient,

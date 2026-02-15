@@ -2,12 +2,12 @@
  * @fileoverview Tests db.
  */
 import { describe, expect, it } from "bun:test";
-import { pointDatabase, titleDatabase } from "./db";
+import { testDatabases } from "./db";
 
 describe("db schema parsers", () => {
   it("parses valid point and title items", () => {
     expect(
-      pointDatabase.parse({
+      testDatabases.point.parse({
         id: "point-1",
         name: "alpha",
         points: 3,
@@ -19,7 +19,7 @@ describe("db schema parsers", () => {
     });
 
     expect(
-      titleDatabase.parse({
+      testDatabases.title.parse({
         enabled: true,
         id: "title-1",
         title: "Bravo",
@@ -33,7 +33,7 @@ describe("db schema parsers", () => {
 
   it("returns path-aware validation errors", () => {
     expect(() =>
-      pointDatabase.parse({
+      testDatabases.point.parse({
         id: "point-1",
         name: "alpha",
         points: "not-a-number",

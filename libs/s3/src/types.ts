@@ -1,6 +1,8 @@
 /**
  * @fileoverview Implements types.
  */
+import type { Logger } from "@babbstack/logger";
+
 export type S3Body = Uint8Array | string;
 
 export type S3ObjectSummary = {
@@ -66,11 +68,12 @@ export type CreateAwsS3Input = {
   operations?: AwsS3Operations;
 };
 
-export type MemoryS3Logger = (message: string) => void;
+export type MemoryS3Log = (message: string) => void;
 
 export type CreateMemoryS3Input = {
   baseUrl?: string;
-  logger?: MemoryS3Logger;
+  log?: MemoryS3Log;
+  logger?: Logger | MemoryS3Log;
   rootDir?: string;
 };
 

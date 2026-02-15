@@ -139,20 +139,15 @@ defineGet({
     const source = await readFile(join(outputDirectory, "get_users.mjs"), "utf8");
 
     const handler = getHandlerFromSource(source);
-    const capturedErrors: Array<Record<string, unknown>> = [];
-    const originalConsoleError = console.error;
-    console.error = (...args: unknown[]) => {
-      if (args.length > 0 && args[0] && typeof args[0] === "object") {
-        capturedErrors.push(args[0] as Record<string, unknown>);
-      }
-    };
     const response = await handler({
       body: "",
       headers: {},
       pathParameters: {},
       queryStringParameters: {},
     });
-    console.error = originalConsoleError;
+    const capturedErrors =
+      (globalThis as { __simpleApiPowertoolsLogs?: Array<Record<string, unknown>> })
+        .__simpleApiPowertoolsLogs ?? [];
 
     expect(response.statusCode).toBe(500);
     expect(JSON.parse(response.body)).toEqual({ error: "Handler execution failed" });

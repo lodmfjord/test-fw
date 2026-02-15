@@ -77,20 +77,59 @@ function toParamTagsByName(jsDoc: ts.JSDoc): Map<string, ts.JSDocParameterTag> {
 
 /** Checks whether function JSDoc includes `@example`. */
 function hasExampleTag(jsDoc: ts.JSDoc): boolean {
-  const hasTypedTag = jsDoc.tags?.some((tag) => tag.tagName.text === "example") ?? false;
+  return hasTag(jsDoc, "example");
+}
+
+/** Checks whether function JSDoc includes `@returns`. */
+function hasReturnsTag(jsDoc: ts.JSDoc): boolean {
+  return hasTag(jsDoc, "returns");
+}
+
+/** Checks whether function JSDoc includes `@throws`. */
+function hasThrowsTag(jsDoc: ts.JSDoc): boolean {
+  return hasTag(jsDoc, "throws");
+}
+
+/** Returns summary text from the first sentence or text line before tags. */
+function toSummaryText(jsDoc: ts.JSDoc): string {
+  const commentText = toCommentText(jsDoc.comment);
+  if (commentText.length === 0) {
+    return "";
+  }
+
+  const firstSummaryLine = commentText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .find((line) => line.length > 0);
+  if (!firstSummaryLine) {
+    return "";
+  }
+
+  const sentenceMatch = firstSummaryLine.match(/^(.+?[.!?])(?:\s|$)/);
+  return (sentenceMatch?.[1] ?? firstSummaryLine).trim();
+}
+
+/** Checks whether JSDoc contains a tag by name. */
+function hasTag(jsDoc: ts.JSDoc, tagName: string): boolean {
+  const hasTypedTag = jsDoc.tags?.some((tag) => tag.tagName.text === tagName) ?? false;
   if (hasTypedTag) {
     return true;
   }
 
-  return /@example\b/.test(jsDoc.getText());
+  return new RegExp(`@${tagName}\\b`).test(jsDoc.getText());
 }
 
-export const findDocumentationConstraintsJsdoc = {
+const findDocumentationConstraintsJsdoc = {
   hasExampleTag,
   hasFunctionJsDoc,
+  hasReturnsTag,
+  hasThrowsTag,
   isMultilineJsDocText,
   toCommentText,
   toFileLevelJsDocText,
   toParamTagsByName,
   toPrimaryJsDoc,
+  toSummaryText,
 };
+
+export { findDocumentationConstraintsJsdoc };

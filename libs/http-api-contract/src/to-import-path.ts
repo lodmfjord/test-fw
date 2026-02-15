@@ -4,10 +4,11 @@
 import { pathToFileURL } from "node:url";
 
 /**
- * Converts values to import path.
+ * Converts to import path.
  * @param pathValue - Path value parameter.
  * @example
  * toImportPath(pathValue)
+ * @returns Output value.
  */
 export function toImportPath(pathValue: string): string {
   const cacheBuster = `${Date.now()}-${Math.random()}`;

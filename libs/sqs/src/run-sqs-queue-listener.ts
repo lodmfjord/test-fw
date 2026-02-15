@@ -4,7 +4,7 @@
 import { executeStepFunctionDefinition } from "./execute-step-function-definition";
 import type { RunSqsQueueListenerOptions, SqsClient, SqsMessage, SqsQueueListener } from "./types";
 
-/** Converts values to batch size. */
+/** Converts to batch size. */
 function toBatchSize(listener: SqsQueueListener<SqsMessage>): number {
   const value = listener.aws?.batchSize ?? 10;
   if (!Number.isInteger(value) || value <= 0) {
@@ -21,6 +21,8 @@ function toBatchSize(listener: SqsQueueListener<SqsMessage>): number {
  * @param options - Options parameter.
  * @example
  * await runSqsQueueListener(listener, sqs, options)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */ export async function runSqsQueueListener<TMessage extends SqsMessage>(
   listener: SqsQueueListener<TMessage>,
   sqs: SqsClient,

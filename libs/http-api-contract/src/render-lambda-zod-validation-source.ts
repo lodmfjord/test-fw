@@ -5,9 +5,10 @@ import { toZodValidationCompilerSource } from "./render-lambda-zod-validation-co
 import { toZodValidationFoundationSource } from "./render-lambda-zod-validation-foundation-source";
 
 /**
- * Converts values to zod validation support source.
+ * Converts to zod validation support source.
  * @example
  * toZodValidationSupportSource()
+ * @returns Output value.
  */
 export function toZodValidationSupportSource(): string {
   return `${toZodValidationFoundationSource()}\n${toZodValidationCompilerSource()}`;

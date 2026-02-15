@@ -5,9 +5,10 @@ import { endpointRegistry } from "./endpoint-registry-store";
 import type { EndpointRuntimeDefinition } from "./types";
 
 /**
- * Handles list defined endpoints.
+ * Runs list defined endpoints.
  * @example
  * listDefinedEndpoints()
+ * @returns Output value.
  */
 export function listDefinedEndpoints(): EndpointRuntimeDefinition[] {
   return endpointRegistry.map((endpoint) => ({

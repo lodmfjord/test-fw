@@ -2,6 +2,10 @@
  * @fileoverview Implements render lambda observability source.
  */
 const LAMBDA_OBSERVABILITY_SUPPORT_SOURCE = `
+const simpleApiLogger = new simpleApiPowertoolsLogger({
+  serviceName: "simple-api-generated-lambda"
+});
+
 /** Converts values to header value. */
 function toHeaderValue(headers, name) {
   if (!headers || typeof headers !== "object") {
@@ -83,24 +87,25 @@ function emitStructuredLog(level, eventName, context, details) {
   const payload = {
     ...toBaseLogFields(context),
     ...(details ?? {}),
-    event: eventName,
-    level,
-    timestamp: new Date().toISOString()
+    event: eventName
   };
 
   if (level === "error") {
-    console.error(payload);
+    simpleApiLogger.error(eventName, payload);
     return;
   }
 
   if (level === "warn") {
-    if (typeof console.warn === "function") {
-      console.warn(payload);
-      return;
-    }
+    simpleApiLogger.warn(eventName, payload);
+    return;
   }
 
-  console.log(payload);
+  if (level === "debug") {
+    simpleApiLogger.debug(eventName, payload);
+    return;
+  }
+
+  simpleApiLogger.info(eventName, payload);
 }
 
 /** Creates invocation log context. */
@@ -162,9 +167,10 @@ function logOutputValidationFailure(context, error) {
 `;
 
 /**
- * Converts values to lambda observability support source.
+ * Converts to lambda observability support source.
  * @example
  * toLambdaObservabilitySupportSource()
+ * @returns Output value.
  */
 export function toLambdaObservabilitySupportSource(): string {
   return LAMBDA_OBSERVABILITY_SUPPORT_SOURCE;

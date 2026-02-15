@@ -11,7 +11,7 @@ import type {
   RoutesManifest,
 } from "./types";
 
-/** Handles validate duplicate routes. */
+/** Runs validate duplicate routes. */
 function validateDuplicateRoutes(routes: RouteDefinition[]): void {
   const seen = new Set<string>();
 
@@ -27,7 +27,7 @@ function validateDuplicateRoutes(routes: RouteDefinition[]): void {
   assertUniqueRouteIds(routes);
 }
 
-/** Converts values to routes manifest. */
+/** Converts to routes manifest. */
 function toRoutesManifest(input: BuildContractInput): RoutesManifest {
   return {
     apiName: input.apiName,
@@ -37,7 +37,7 @@ function toRoutesManifest(input: BuildContractInput): RoutesManifest {
   };
 }
 
-/** Converts values to lambdas manifest. */
+/** Converts to lambdas manifest. */
 function toLambdasManifest(input: BuildContractInput): LambdasManifest {
   const lambdaRoutes = input.routes.filter((route) => route.execution?.kind !== "step-function");
 
@@ -60,7 +60,7 @@ function toLambdasManifest(input: BuildContractInput): LambdasManifest {
   };
 }
 
-/** Converts values to deploy contract. */
+/** Converts to deploy contract. */
 function toDeployContract(input: BuildContractInput): DeployContract {
   return {
     apiGateway: {
@@ -84,7 +84,7 @@ function toDeployContract(input: BuildContractInput): DeployContract {
   };
 }
 
-/** Converts values to env schema. */
+/** Converts to env schema. */
 function toEnvSchema(input: BuildContractInput): EnvSchema {
   const env = input.env ?? [];
 
@@ -116,10 +116,12 @@ function toEnvSchema(input: BuildContractInput): EnvSchema {
   };
 }
 
-export const buildContractHelpers = {
+const buildContractHelpers = {
   toDeployContract,
   toEnvSchema,
   toLambdasManifest,
   toRoutesManifest,
   validateDuplicateRoutes,
 };
+
+export { buildContractHelpers };

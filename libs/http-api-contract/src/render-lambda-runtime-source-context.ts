@@ -26,7 +26,7 @@ type LambdaRuntimeSourceContext = {
 };
 
 /**
- * Converts values to lambda runtime source context.
+ * Converts to lambda runtime source context.
  * @param endpoint - Endpoint parameter.
  * @param handlerSource - Handler source parameter.
  * @param importLines - Import lines parameter.
@@ -34,6 +34,7 @@ type LambdaRuntimeSourceContext = {
  * @param runtimeSqsImportSpecifier - Runtime sqs import specifier parameter.
  * @example
  * toLambdaRuntimeSourceContext(endpoint, handlerSource, importLines, runtimeDbImportSpecifier, runtimeSqsImportSpecifier)
+ * @returns Output value.
  */
 export function toLambdaRuntimeSourceContext(
   endpoint: EndpointRuntimeDefinition,
@@ -79,8 +80,11 @@ export function toLambdaRuntimeSourceContext(
   const endpointSqsValue = hasContextSqs ? "endpointSqs" : "undefined";
   const envBootstrapSource = renderLambdaEnvBootstrapSource(endpoint);
   const zodImportLine = 'import { z as simpleApiZod } from "zod";';
+  const loggerImportLine =
+    'import { Logger as simpleApiPowertoolsLogger } from "@aws-lambda-powertools/logger";';
   const preludeLines = [
     zodImportLine,
+    loggerImportLine,
     ...importLines,
     ...(runtimeDbImport.length > 0 ? [runtimeDbImport] : []),
     ...(runtimeSqsImport.length > 0 ? [runtimeSqsImport] : []),

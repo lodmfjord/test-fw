@@ -2,6 +2,7 @@
  * @fileoverview Tests create dev app env.
  */
 import { beforeEach, describe, expect, it } from "bun:test";
+import type { Logger } from "@babbstack/logger";
 import { createDevApp } from "./create-dev-app";
 import { createEnv } from "./create-env";
 import { createSecret } from "./create-secret";
@@ -44,16 +45,25 @@ describe("createDevApp env startup", () => {
     delete process.env.APP_NAME;
     delete process.env.API_TOKEN;
 
-    const logged: string[] = [];
-    const originalConsoleLog = console.log;
-    console.log = (...parts: unknown[]) => {
-      logged.push(parts.map((part) => String(part)).join(" "));
+    const logged: Array<Record<string, unknown>> = [];
+    const logger: Logger = {
+      debug() {},
+      error() {},
+      getPersistentKeys() {
+        return {};
+      },
+      info(_message, payload) {
+        if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+          logged.push(payload as Record<string, unknown>);
+        }
+      },
+      warn() {},
     };
 
-    const appFetch = createDevApp(listDefinedEndpoints());
+    const appFetch = createDevApp(listDefinedEndpoints(), {
+      logger,
+    });
     const response = await appFetch(new Request("http://local/env", { method: "GET" }));
-
-    console.log = originalConsoleLog;
     if (previousAppName === undefined) delete process.env.APP_NAME;
     else process.env.APP_NAME = previousAppName;
     if (previousApiToken === undefined) delete process.env.API_TOKEN;
@@ -65,8 +75,8 @@ describe("createDevApp env startup", () => {
       appName: "dev-app-v2",
     });
     expect(
-      logged.some((entry) =>
-        entry.includes("Would load parameter /app/private/token into API_TOKEN"),
+      logged.some(
+        (entry) => entry.envName === "API_TOKEN" && entry.parameterName === "/app/private/token",
       ),
     ).toBe(true);
   });

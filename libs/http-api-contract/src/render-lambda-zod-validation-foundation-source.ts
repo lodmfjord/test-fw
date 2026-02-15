@@ -148,9 +148,10 @@ function withCommonModifiers(validator, schema) {
 `;
 
 /**
- * Converts values to zod validation foundation source.
+ * Converts to zod validation foundation source.
  * @example
  * toZodValidationFoundationSource()
+ * @returns Output value.
  */
 export function toZodValidationFoundationSource(): string {
   return ZOD_VALIDATION_FOUNDATION_SOURCE;

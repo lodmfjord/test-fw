@@ -19,12 +19,12 @@ import type {
   SqsSendInput,
 } from "./types";
 
-/** Converts values to message body. */
+/** Converts to message body. */
 function toMessageBody(message: SqsMessage): string {
   return JSON.stringify(message);
 }
 
-/** Converts values to parsed body. */
+/** Converts to parsed body. */
 function toParsedBody(body: string | undefined): SqsMessage {
   if (!body) {
     return {};
@@ -49,7 +49,7 @@ async function createDefaultOperations(): Promise<AwsSqsOperations> {
   const client = new SQSClient({});
   const queueUrlByName = new Map<string, string>();
 
-  /** Handles get queue url. */ const getQueueUrl = async (queueName: string): Promise<string> => {
+  /** Runs get queue url. */ const getQueueUrl = async (queueName: string): Promise<string> => {
     const existing = queueUrlByName.get(queueName);
     if (existing) {
       return existing;
@@ -114,6 +114,7 @@ async function createDefaultOperations(): Promise<AwsSqsOperations> {
  * @param input - Input parameter.
  * @example
  * createAwsSqs(input)
+ * @returns Output value.
  */
 export function createAwsSqs(input: CreateAwsSqsInput = {}): SqsClient {
   const operationsPromise = input.operations

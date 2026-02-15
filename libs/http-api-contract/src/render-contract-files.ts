@@ -3,16 +3,17 @@
  */
 import type { Contract } from "./types";
 
-/** Handles format json. */
+/** Runs format json. */
 function formatJson(value: unknown): string {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
 /**
- * Handles render contract files.
+ * Runs render contract files.
  * @param contract - Contract parameter.
  * @example
  * renderContractFiles(contract)
+ * @returns Output value.
  */
 export function renderContractFiles(contract: Contract): Record<string, string> {
   return {

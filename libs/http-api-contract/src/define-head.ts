@@ -41,6 +41,7 @@ type HeadEndpointDefinition<
  * @param input - Input parameter.
  * @example
  * defineHead(input)
+ * @returns Output value.
  */ export function defineHead<
   TParams,
   TQuery,

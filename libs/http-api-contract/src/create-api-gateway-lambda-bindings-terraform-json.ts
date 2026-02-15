@@ -3,7 +3,7 @@
  */
 import type { TerraformJson } from "./terraform-render-types";
 
-/** Converts values to terraform reference. */
+/** Converts to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
@@ -12,6 +12,7 @@ function toTerraformReference(expression: string): string {
  * Creates api gateway lambda bindings terraform json.
  * @example
  * createApiGatewayLambdaBindingsTerraformJson()
+ * @returns Output value.
  */
 export function createApiGatewayLambdaBindingsTerraformJson(): TerraformJson {
   return {

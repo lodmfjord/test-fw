@@ -6,7 +6,7 @@ import { renderLambdaEnvBootstrapSource } from "./render-lambda-env-bootstrap-so
 import { renderLambdaRuntimeSourceBlocks } from "./render-lambda-runtime-source-blocks";
 import type { EndpointRuntimeDefinition, LambdaJsGenerationOptions } from "./types";
 
-/** Handles render endpoint lookup. */
+/** Runs render endpoint lookup. */
 function renderEndpointLookup(routeId: string, method: string, variableName: string): string {
   return `const ${variableName} = listDefinedEndpoints().find((item) => {
       return item.routeId === "${routeId}" && item.method === "${method}";
@@ -14,7 +14,7 @@ function renderEndpointLookup(routeId: string, method: string, variableName: str
 `;
 }
 
-/** Handles render file. */
+/** Runs render file. */
 function renderFile(
   endpoint: EndpointRuntimeDefinition,
   options: LambdaJsGenerationOptions,
@@ -23,6 +23,7 @@ function renderFile(
   const hasContextDatabase = Boolean(endpoint.context?.database);
   const hasContextSqs = Boolean(endpoint.context?.sqs);
   const runtimeImportLines = [
+    'import { Logger as simpleApiPowertoolsLogger } from "@aws-lambda-powertools/logger";',
     hasContextDatabase
       ? 'import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@babbstack/dynamodb";'
       : 'import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@babbstack/dynamodb";',
@@ -58,6 +59,9 @@ import { listDefinedEndpoints } from "${frameworkImportPath}";
 
 let endpointPromise;
 const db = createSimpleApiRuntimeDynamoDb();
+const simpleApiLogger = new simpleApiPowertoolsLogger({
+  serviceName: "simple-api-generated-lambda"
+});
 ${endpointSqsStateLine}
 const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};
 const endpointSuccessStatusCode = ${JSON.stringify(endpoint.successStatusCode)};
@@ -123,7 +127,12 @@ export async function handler(event) {
     const handlerOutput = toHandlerOutput(output, endpointSuccessStatusCode);
     return toResponse(handlerOutput.statusCode, handlerOutput.value, handlerOutput.contentType, handlerOutput.headers);
   } catch (error) {
-    console.error("Handler execution failed for ${endpoint.method} ${endpoint.path}", error);
+    simpleApiLogger.error("lambda.handler.failed", {
+      errorMessage: error instanceof Error ? error.message : String(error),
+      method: "${endpoint.method}",
+      path: "${endpoint.path}",
+      routeId: "${endpoint.routeId}"
+    });
     return toResponse(500, { error: "Handler execution failed" });
   }
 }
@@ -131,11 +140,13 @@ export async function handler(event) {
 }
 
 /**
- * Handles render lambda js files.
+ * Runs render lambda js files.
  * @param endpoints - Endpoints parameter.
  * @param options - Options parameter.
  * @example
  * renderLambdaJsFiles(endpoints, options)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export function renderLambdaJsFiles(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

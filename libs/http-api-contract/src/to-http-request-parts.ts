@@ -6,7 +6,7 @@ type HttpRequestParts = {
   query: Record<string, string>;
 };
 
-/** Converts values to query. */
+/** Converts to query. */
 function toQuery(url: URL): Record<string, string> {
   const query: Record<string, string> = {};
 
@@ -17,7 +17,7 @@ function toQuery(url: URL): Record<string, string> {
   return query;
 }
 
-/** Converts values to headers. */
+/** Converts to headers. */
 function toHeaders(headers: Headers): Record<string, string> {
   const result: Record<string, string> = {};
 
@@ -29,11 +29,12 @@ function toHeaders(headers: Headers): Record<string, string> {
 }
 
 /**
- * Converts values to http request parts.
+ * Converts to http request parts.
  * @param url - Url parameter.
  * @param headers - Headers parameter.
  * @example
  * toHttpRequestParts(url, headers)
+ * @returns Output value.
  */
 export function toHttpRequestParts(url: URL, headers: Headers): HttpRequestParts {
   return {

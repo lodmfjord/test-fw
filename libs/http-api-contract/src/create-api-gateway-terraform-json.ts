@@ -5,12 +5,12 @@ import type { Contract } from "./types";
 
 type TerraformJson = Record<string, unknown>;
 
-/** Converts values to terraform reference. */
+/** Converts to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
-/** Converts values to cors configuration. */
+/** Converts to cors configuration. */
 function toCorsConfiguration(contract: Contract): Record<string, unknown> | undefined {
   const cors = contract.deployContract.apiGateway.cors;
   if (!cors) {
@@ -36,6 +36,7 @@ function toCorsConfiguration(contract: Contract): Record<string, unknown> | unde
  * @param contract - Contract parameter.
  * @example
  * createApiGatewayTerraformJson(contract)
+ * @returns Output value.
  */
 export function createApiGatewayTerraformJson(contract: Contract): TerraformJson {
   const corsConfiguration = toCorsConfiguration(contract);

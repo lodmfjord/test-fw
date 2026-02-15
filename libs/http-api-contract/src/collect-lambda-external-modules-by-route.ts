@@ -6,12 +6,12 @@ import { createRequire } from "node:module";
 import { join } from "node:path";
 import { toRequiredRuntimeExternalModules } from "./to-required-runtime-external-modules";
 
-/** Converts values to external modules. */
+/** Converts to external modules. */
 function toExternalModules(externalModules: string[] | undefined): string[] {
   return toRequiredRuntimeExternalModules(externalModules);
 }
 
-/** Converts values to route id. */
+/** Converts to route id. */
 function toRouteId(fileName: string): string {
   return fileName.endsWith(".mjs") ? fileName.slice(0, -".mjs".length) : fileName;
 }
@@ -21,7 +21,7 @@ function hasModuleImport(source: string, moduleName: string): boolean {
   return source.includes(`"${moduleName}"`) || source.includes(`'${moduleName}'`);
 }
 
-/** Converts values to module specifiers. */
+/** Converts to module specifiers. */
 function toModuleSpecifiers(
   externalModules: ReadonlyArray<string>,
   resolveFromPath: string,
@@ -42,13 +42,14 @@ function toModuleSpecifiers(
 }
 
 /**
- * Handles collect lambda external modules by route.
+ * Runs collect lambda external modules by route.
  * @param lambdaOutputDirectory - Lambda output directory parameter.
  * @param lambdaFileNames - Lambda file names parameter.
  * @param externalModules - External modules parameter.
  * @param resolveFromPath - Resolve from path parameter.
  * @example
  * await collectLambdaExternalModulesByRoute(lambdaOutputDirectory, lambdaFileNames, externalModules, resolveFromPath)
+ * @returns Output value.
  */
 export async function collectLambdaExternalModulesByRoute(
   lambdaOutputDirectory: string,

@@ -20,19 +20,21 @@ type StepFunctionEndpointExecutionOptions = {
   taskHandlers?: Record<string, StepFunctionTaskHandler>;
 };
 
-/** Converts values to local execution arn. */
+/** Converts to local execution arn. */
 function toLocalExecutionArn(routeId: string): string {
   const timestamp = Date.now();
   return `arn:aws:states:local:000000000000:execution:${routeId}:${timestamp}`;
 }
 
 /**
- * Converts values to step function endpoint output.
+ * Converts to step function endpoint output.
  * @param endpoint - Endpoint parameter.
  * @param input - Input parameter.
  * @param options - Options parameter.
  * @example
  * await toStepFunctionEndpointOutput(endpoint, input, options)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export async function toStepFunctionEndpointOutput(
   endpoint: EndpointRuntimeDefinition,

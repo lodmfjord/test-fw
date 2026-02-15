@@ -24,16 +24,17 @@ const DYNAMODB_WRITE_ACTIONS = [
   "dynamodb:UpdateItem",
 ];
 
-/** Converts values to table key. */
+/** Converts to table key. */
 function toTableKey(tableName: string): string {
   return tableName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
 /**
- * Converts values to route dynamodb access.
+ * Converts to route dynamodb access.
  * @param endpoints - Endpoints parameter.
  * @example
  * toRouteDynamodbAccess(endpoints)
+ * @returns Output value.
  */
 export function toRouteDynamodbAccess(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

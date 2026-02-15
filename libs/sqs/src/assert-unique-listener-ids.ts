@@ -4,10 +4,11 @@
 import type { SqsListenerRuntimeDefinition } from "./types";
 
 /**
- * Handles assert unique listener ids.
+ * Runs assert unique listener ids.
  * @param listeners - Listeners parameter.
  * @example
  * assertUniqueListenerIds(listeners)
+ * @throws Error when operation fails.
  */
 export function assertUniqueListenerIds(
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,

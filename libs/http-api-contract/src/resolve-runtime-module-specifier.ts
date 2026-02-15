@@ -5,12 +5,13 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 /**
- * Handles resolve runtime module specifier.
+ * Runs resolve runtime module specifier.
  * @param endpointModulePath - Endpoint module path parameter.
  * @param moduleName - Module name parameter.
  * @param fallbackPath - Fallback path parameter.
  * @example
  * resolveRuntimeModuleSpecifier(endpointModulePath, moduleName, fallbackPath)
+ * @returns Output value.
  */
 export function resolveRuntimeModuleSpecifier(
   endpointModulePath: string,

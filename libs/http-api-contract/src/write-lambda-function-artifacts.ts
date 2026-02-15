@@ -11,7 +11,7 @@ import type { LambdasManifest } from "./types";
 
 const execFileAsync = promisify(execFile);
 
-/** Handles write lambda artifact. */
+/** Runs write lambda artifact. */
 async function writeLambdaArtifact(
   artifactFilePath: string,
   lambdaSourceFilePath: string,
@@ -29,20 +29,21 @@ async function writeLambdaArtifact(
   }
 }
 
-/** Converts values to lambda source code hash. */
+/** Converts to lambda source code hash. */
 async function toLambdaSourceCodeHash(lambdaSourceFilePath: string): Promise<string> {
   const source = await readFile(lambdaSourceFilePath);
   return createHash("sha256").update(source).digest("base64");
 }
 
 /**
- * Handles write lambda function artifacts.
+ * Runs write lambda function artifacts.
  * @param outputDirectory - Output directory parameter.
  * @param lambdasManifest - Lambdas manifest parameter.
  * @param lambdaOutputDirectory - Lambda output directory parameter.
  * @param additionalFunctionIds - Additional function ids parameter.
  * @example
  * await writeLambdaFunctionArtifacts(outputDirectory, lambdasManifest, lambdaOutputDirectory, additionalFunctionIds)
+ * @returns Output value.
  */
 export async function writeLambdaFunctionArtifacts(
   outputDirectory: string,

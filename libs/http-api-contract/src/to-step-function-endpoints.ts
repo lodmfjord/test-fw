@@ -14,7 +14,7 @@ type StepFunctionEndpointConfig = {
   workflow_type: "STANDARD" | "EXPRESS";
 };
 
-/** Converts values to integration subtype. */
+/** Converts to integration subtype. */
 function toIntegrationSubtype(
   invocationType: "sync" | "async",
 ): StepFunctionEndpointConfig["integration_subtype"] {
@@ -25,7 +25,7 @@ function toIntegrationSubtype(
   return "StepFunctions-StartExecution";
 }
 
-/** Converts values to start action. */
+/** Converts to start action. */
 function toStartAction(
   invocationType: "sync" | "async",
 ): StepFunctionEndpointConfig["start_action"] {
@@ -37,10 +37,11 @@ function toStartAction(
 }
 
 /**
- * Converts values to step function endpoints.
+ * Converts to step function endpoints.
  * @param endpoints - Endpoints parameter.
  * @example
  * toStepFunctionEndpoints(endpoints)
+ * @returns Output value.
  */
 export function toStepFunctionEndpoints(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

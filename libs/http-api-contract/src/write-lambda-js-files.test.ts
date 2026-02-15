@@ -47,6 +47,11 @@ defineGet({
 
     const source = await readFile(join(outputDirectory, "get_health.mjs"), "utf8");
     expect(source.includes('import { z as simpleApiZod } from "zod";')).toBe(true);
+    expect(
+      source.includes(
+        'import { Logger as simpleApiPowertoolsLogger } from "@aws-lambda-powertools/logger";',
+      ),
+    ).toBe(true);
     expect(source.includes("Handler execution failed")).toBe(true);
     expect(source.includes('const dynamoClientModuleName = "@aws-sdk/client-dynamodb";')).toBe(
       false,
@@ -114,7 +119,7 @@ defineGet({
     expect(source.includes("node_modules/.bun/@aws-sdk+client-dynamodb")).toBe(false);
   });
 
-  it("keeps zod as an external runtime import in generated lambdas", async () => {
+  it("keeps required runtime modules as external imports in generated lambdas", async () => {
     const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-endpoint-module-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
@@ -143,7 +148,9 @@ defineGet({
     const source = await readFile(join(outputDirectory, "get_health.mjs"), "utf8");
 
     expect(source.includes('from "zod"')).toBe(true);
+    expect(source.includes('from "@aws-lambda-powertools/logger"')).toBe(true);
     expect(source.includes("node_modules/zod")).toBe(false);
+    expect(source.includes("node_modules/@aws-lambda-powertools/logger")).toBe(false);
   });
 
   it("rejects endpoints with colliding route ids", async () => {

@@ -5,10 +5,12 @@ import type { GlobalCors } from "./cors-types";
 import type { BuildContractInput } from "./types";
 
 /**
- * Converts values to normalized global cors.
+ * Converts to normalized global cors.
  * @param input - Input parameter.
  * @example
  * toNormalizedGlobalCors(input)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export function toNormalizedGlobalCors(input: BuildContractInput["cors"]): GlobalCors | undefined {
   if (!input) {
@@ -26,7 +28,7 @@ export function toNormalizedGlobalCors(input: BuildContractInput["cors"]): Globa
     }
   }
 
-  /** Converts values to normalized list. */ const toNormalizedList = (
+  /** Converts to normalized list. */ const toNormalizedList = (
     values: string[] | undefined,
     settingName: "allowHeaders" | "exposeHeaders",
   ): string[] | undefined => {

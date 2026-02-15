@@ -11,16 +11,17 @@ type LambdaSqsSendAccess = {
 
 const SQS_SEND_ACTIONS = ["sqs:SendMessage"];
 
-/** Converts values to queue key. */
+/** Converts to queue key. */
 function toQueueKey(queueName: string): string {
   return queueName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
 /**
- * Converts values to route sqs send access.
+ * Converts to route sqs send access.
  * @param endpoints - Endpoints parameter.
  * @example
  * toRouteSqsSendAccess(endpoints)
+ * @returns Output value.
  */
 export function toRouteSqsSendAccess(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

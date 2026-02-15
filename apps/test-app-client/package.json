@@ -7,6 +7,7 @@
     "test": "bun test src/client-requests.test.ts"
   },
   "dependencies": {
-    "@babbstack/client": "workspace:*"
+    "@babbstack/client": "workspace:*",
+    "@babbstack/logger": "workspace:*"
   }
 }

@@ -41,6 +41,7 @@ type PatchEndpointDefinition<
  * @param input - Input parameter.
  * @example
  * definePatch(input)
+ * @returns Output value.
  */ export function definePatch<
   TParams,
   TQuery,

@@ -112,7 +112,7 @@ export const contract = buildContractFromEndpoints({
     expect(hashManifest.get_health).toBe(expectedHash);
   });
 
-  it("creates layer artifacts that include zod for generated route lambdas", async () => {
+  it("creates layer artifacts that include required runtime modules for generated lambdas", async () => {
     const workspaceDirectory = await mkdtemp(join(tmpdir(), "babbstack-generator-settings-"));
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
     const endpointsPath = join(workspaceDirectory, "endpoints.ts");
@@ -197,5 +197,8 @@ export const contract = buildContractFromEndpoints({
       join(layerArtifactsDirectory, layerZipName),
     ]);
     expect(listing.stdout.includes("nodejs/node_modules/zod/index.js")).toBe(true);
+    expect(
+      listing.stdout.includes("nodejs/node_modules/@aws-lambda-powertools/logger/index.js"),
+    ).toBe(true);
   });
 });

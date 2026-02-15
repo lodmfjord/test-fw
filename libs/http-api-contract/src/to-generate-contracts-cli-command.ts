@@ -8,7 +8,7 @@ type GenerateContractsCliCommand = {
   settingsFilePath: string;
 };
 
-/** Converts values to settings file path. */
+/** Converts to settings file path. */
 function toSettingsFilePath(argv: string[]): string {
   const settingsFlagIndex = argv.indexOf("--settings");
   if (settingsFlagIndex >= 0) {
@@ -29,10 +29,11 @@ function toSettingsFilePath(argv: string[]): string {
 }
 
 /**
- * Converts values to generate contracts cli command.
+ * Converts to generate contracts cli command.
  * @param argv - Argv parameter.
  * @example
  * toGenerateContractsCliCommand(argv)
+ * @returns Output value.
  */
 export function toGenerateContractsCliCommand(argv: string[]): GenerateContractsCliCommand {
   const command = argv[0];

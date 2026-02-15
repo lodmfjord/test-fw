@@ -56,7 +56,7 @@ type Assert<TValue extends true> = TValue;
 
 const typeSafeClient = createClient("https://api.example.com", testEndpoints);
 
-/** Handles assert client types. */
+/** Runs assert client types. */
 function _assertClientTypes(): void {
   const typedGetRequest = typeSafeClient.request.endpoint(getUserEndpoint, {
     params: { id: "user-1" },

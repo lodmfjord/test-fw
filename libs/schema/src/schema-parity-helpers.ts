@@ -8,7 +8,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-/** Handles append values to queue. */
+/** Runs append values to queue. */
 function appendValuesToQueue(queue: unknown[], source: Record<string, unknown>): void {
   for (const value of Object.values(source)) {
     if (Array.isArray(value)) {
@@ -22,7 +22,7 @@ function appendValuesToQueue(queue: unknown[], source: Record<string, unknown>):
   }
 }
 
-/** Converts values to zod definition. */
+/** Converts to zod definition. */
 function toZodDefinition(node: Record<string, unknown>): Record<string, unknown> | undefined {
   if (isRecord(node._def)) {
     return node._def;
@@ -35,7 +35,7 @@ function toZodDefinition(node: Record<string, unknown>): Record<string, unknown>
   return undefined;
 }
 
-/** Converts values to unsupported construct from type. */
+/** Converts to unsupported construct from type. */
 function toUnsupportedConstructFromType(definitionType: unknown): string | undefined {
   if (definitionType === "pipe" || definitionType === "transform") {
     return "transforms/preprocess operations";
@@ -44,7 +44,7 @@ function toUnsupportedConstructFromType(definitionType: unknown): string | undef
   return undefined;
 }
 
-/** Converts values to unsupported construct from checks. */
+/** Converts to unsupported construct from checks. */
 function toUnsupportedConstructFromChecks(checks: unknown[], queue: unknown[]): string | undefined {
   for (const check of checks) {
     if (isRecord(check) && isRecord(check.def) && check.def.type === "custom") {
@@ -63,7 +63,7 @@ function toUnsupportedConstructFromChecks(checks: unknown[], queue: unknown[]): 
   return undefined;
 }
 
-/** Converts values to unsupported zod construct. */
+/** Converts to unsupported zod construct. */
 function toUnsupportedZodConstruct(zodSchema: ZodType<unknown>): string | undefined {
   const queue: unknown[] = [zodSchema];
   const visited = new Set<object>();
@@ -98,7 +98,7 @@ function toUnsupportedZodConstruct(zodSchema: ZodType<unknown>): string | undefi
   return undefined;
 }
 
-/** Handles assert lambda parity safe from zod schema. */
+/** Runs assert lambda parity safe from zod schema. */
 function assertLambdaParitySafeFromZodSchema(zodSchema: ZodType<unknown>): void {
   const unsupportedConstruct = toUnsupportedZodConstruct(zodSchema);
   if (!unsupportedConstruct) {
@@ -110,6 +110,8 @@ function assertLambdaParitySafeFromZodSchema(zodSchema: ZodType<unknown>): void 
   );
 }
 
-export const schemaParityHelpers = {
+const schemaParityHelpers = {
   assertLambdaParitySafeFromZodSchema,
 };
+
+export { schemaParityHelpers };

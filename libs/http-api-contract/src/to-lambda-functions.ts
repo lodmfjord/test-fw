@@ -4,10 +4,11 @@
 import type { Contract } from "./types";
 
 /**
- * Converts values to lambda functions.
+ * Converts to lambda functions.
  * @param contract - Contract parameter.
  * @example
  * toLambdaFunctions(contract)
+ * @returns Output value.
  */
 export function toLambdaFunctions(contract: Contract): Record<string, Record<string, unknown>> {
   const lambdas = [...contract.lambdasManifest.functions].sort((left, right) =>

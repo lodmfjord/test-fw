@@ -5,7 +5,7 @@ import type { GlobalCors } from "./cors-types";
 import { defineRoute } from "./define-route";
 import type { RouteDefinition } from "./types";
 
-/** Converts values to route copy. */
+/** Converts to route copy. */
 function toRouteCopy(route: RouteDefinition): RouteDefinition {
   return {
     ...route,
@@ -15,11 +15,12 @@ function toRouteCopy(route: RouteDefinition): RouteDefinition {
 }
 
 /**
- * Converts values to routes with global cors options.
+ * Converts to routes with global cors options.
  * @param routes - Routes parameter.
  * @param cors - Cors parameter.
  * @example
  * toRoutesWithGlobalCorsOptions(routes, cors)
+ * @returns Output value.
  */
 export function toRoutesWithGlobalCorsOptions(
   routes: ReadonlyArray<RouteDefinition>,

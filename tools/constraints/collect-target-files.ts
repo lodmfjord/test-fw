@@ -14,9 +14,7 @@ const IGNORED_DIRECTORIES = new Set([
   "node_modules",
 ]);
 
-/** Handles walk directory. */ async function walkDirectory(
-  directoryPath: string,
-): Promise<string[]> {
+/** Runs walk directory. */ async function walkDirectory(directoryPath: string): Promise<string[]> {
   const entries = await readdir(directoryPath, { withFileTypes: true });
   const files: string[] = [];
 
@@ -40,10 +38,11 @@ const IGNORED_DIRECTORIES = new Set([
 }
 
 /**
- * Handles collect target files.
+ * Runs collect target files.
  * @param rootDirectories - Root directories parameter.
  * @example
  * await collectTargetFiles(rootDirectories)
+ * @returns Output value.
  */ export async function collectTargetFiles(rootDirectories: string[]): Promise<string[]> {
   const allFiles: string[] = [];
 

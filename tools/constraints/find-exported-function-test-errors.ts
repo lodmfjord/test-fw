@@ -45,7 +45,7 @@ function shouldValidateFilePath(filePath: string, targetRoots: Set<string>): boo
   return true;
 }
 
-/** Converts values to expected sibling test file path. */
+/** Converts to expected sibling test file path. */
 function toSiblingTestFilePath(filePath: string): string {
   const extension = extname(filePath);
   const directory = dirname(filePath);
@@ -60,6 +60,7 @@ function toSiblingTestFilePath(filePath: string): string {
  * findExportedFunctionTestErrors({
  *   fileSources: [{ filePath: "libs/example/src/do-work.ts", source: "export function doWork() {}" }],
  * })
+ * @returns Output value.
  */
 export function findExportedFunctionTestErrors(
   input: FindExportedFunctionTestErrorsInput,

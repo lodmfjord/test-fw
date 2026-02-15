@@ -4,7 +4,7 @@
 const bootTime = new Date().toISOString();
 let lastUpdateTime = bootTime;
 
-export const lastUpdateStore = {
+const lastUpdateStore = {
   read() {
     return lastUpdateTime;
   },
@@ -12,3 +12,5 @@ export const lastUpdateStore = {
     lastUpdateTime = value;
   },
 };
+
+export { lastUpdateStore };

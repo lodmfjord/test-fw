@@ -13,10 +13,11 @@ function isSameRoute(left: RouteIdentity, right: RouteIdentity): boolean {
 }
 
 /**
- * Handles assert unique route ids.
+ * Runs assert unique route ids.
  * @param routes - Routes parameter.
  * @example
  * assertUniqueRouteIds(routes)
+ * @throws Error when operation fails.
  */
 export function assertUniqueRouteIds(routes: ReadonlyArray<RouteIdentity>): void {
   const routeById = new Map<string, RouteIdentity>();

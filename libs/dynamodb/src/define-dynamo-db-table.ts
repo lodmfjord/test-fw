@@ -16,6 +16,8 @@ type DefineDynamoDbTableInput<
  * @param input - Input parameter.
  * @example
  * defineDynamoDbTable(input)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */ export function defineDynamoDbTable<
   TItem extends DynamoDbItem,
   TKeyField extends keyof TItem & string,

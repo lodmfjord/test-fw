@@ -41,6 +41,7 @@ type GetEndpointDefinition<
  * @param input - Input parameter.
  * @example
  * defineGet(input)
+ * @returns Output value.
  */ export function defineGet<
   TParams,
   TQuery,

@@ -5,10 +5,11 @@ const SECRET_PREFIX = "simple-api:ssm:";
 const LOCAL_ENV_MARKER = "|local-env:";
 
 /**
- * Converts values to secret definition.
+ * Converts to secret definition.
  * @param value - Value parameter.
  * @example
  * toSecretDefinition(value)
+ * @returns Output value.
  */
 export function toSecretDefinition(
   value: string,

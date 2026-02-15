@@ -18,8 +18,9 @@ function toDocumentedExportedFunctionSource(functionName: string): string {
  * @fileoverview Valid file.
  */
 /**
- * Handles ${functionName}.
+ * Runs ${functionName}.
  * @param input - Input value.
+ * @returns Output value.
  * @example
  * ${functionName}(input)
  */
@@ -37,7 +38,7 @@ describe("validateFileConstraints", () => {
     expect(validateFileConstraints("valid.ts", source)).toEqual([]);
   });
 
-  it("reports too many exported functions", () => {
+  it("reports too many exported runtime symbols", () => {
     const source = `
 /**
  * @fileoverview Too many exports.
@@ -63,7 +64,9 @@ export function two(input: string) {
     `;
 
     const errors = validateFileConstraints("too-many-exports.ts", source);
-    expect(errors.includes("too-many-exports.ts: has 2 exported functions (max 1).")).toBe(true);
+    expect(errors.includes("too-many-exports.ts: has 2 exported runtime symbols (max 1).")).toBe(
+      true,
+    );
   });
 
   it("reports too many lines", () => {
@@ -72,6 +75,25 @@ export function two(input: string) {
     expect(
       errors.some(
         (error) => error.includes("too-many-lines.ts: has") && error.includes("lines (max 220)."),
+      ),
+    ).toBe(true);
+  });
+
+  it("allows test files up to 260 lines", () => {
+    const source = `/**\n * @fileoverview Long test file.\n */\n${makeLineBlock(257)}`;
+    const errors = validateFileConstraints("libs/sample/src/long-file.test.ts", source);
+
+    expect(errors.some((error) => error.includes("lines (max"))).toBe(false);
+  });
+
+  it("reports test files above 260 lines", () => {
+    const source = `/**\n * @fileoverview Too many test lines.\n */\n${makeLineBlock(260)}`;
+    const errors = validateFileConstraints("libs/sample/src/too-many-lines.test.ts", source);
+
+    expect(
+      errors.some(
+        (error) =>
+          error.includes("too-many-lines.test.ts: has") && error.includes("lines (max 260)."),
       ),
     ).toBe(true);
   });
@@ -142,6 +164,33 @@ export function nested(input: number) {
     );
   });
 
+  it("reports exported helper-object bags", () => {
+    const source = `
+/**
+ * @fileoverview File.
+ */
+function one() {
+  return 1;
+}
+
+function two() {
+  return 2;
+}
+
+export const helpers = {
+  one,
+  two,
+};
+`;
+    const errors = validateFileConstraints("helpers.ts", source);
+
+    expect(
+      errors.includes(
+        'helpers.ts: exported helper-object bags are not allowed ("helpers"). Keep helpers file-local and export one public entry function.',
+      ),
+    ).toBe(true);
+  });
+
   it("reports src function density violations", () => {
     const source = `
 /**
@@ -162,6 +211,24 @@ ${makeLineBlock(200)}
 
     expect(
       errors.includes('libs/sample/src/too-long.ts:11: function "run" has 203 lines (max 160).'),
+    ).toBe(true);
+  });
+
+  it("reports direct console usage in runtime files", () => {
+    const source = `
+/**
+ * @fileoverview File.
+ */
+export function run() {
+  console.error("x");
+}
+`;
+    const errors = validateFileConstraints("libs/sample/src/runtime.ts", source);
+
+    expect(
+      errors.includes(
+        "libs/sample/src/runtime.ts:6: direct console.error calls are not allowed in runtime code; inject a logger instead.",
+      ),
     ).toBe(true);
   });
 });

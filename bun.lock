@@ -19,6 +19,7 @@
         "@aws-sdk/util-dynamodb": "^3.988.0",
         "@babbstack/dynamodb": "workspace:*",
         "@babbstack/http-api-contract": "workspace:*",
+        "@babbstack/logger": "workspace:*",
         "@babbstack/s3": "workspace:*",
         "@babbstack/schema": "workspace:*",
         "@babbstack/sqs": "workspace:*",
@@ -30,12 +31,22 @@
       "name": "@babbstack/test-app-client",
       "dependencies": {
         "@babbstack/client": "workspace:*",
+        "@babbstack/logger": "workspace:*",
       },
     },
     "libs/client": {
       "name": "@babbstack/client",
       "dependencies": {
         "@babbstack/http-api-contract": "workspace:*",
+      },
+    },
+    "libs/create-app-cli": {
+      "name": "@babbstack/create-app-cli",
+      "bin": {
+        "create-babbstack-app": "./dist/create-app-bin.js",
+      },
+      "dependencies": {
+        "@babbstack/logger": "workspace:*",
       },
     },
     "libs/dynamodb": {
@@ -54,7 +65,9 @@
         "generate-contracts-bin.js": "./dist/generate-contracts-bin.js",
       },
       "dependencies": {
+        "@aws-lambda-powertools/logger": "^2.31.0",
         "@babbstack/dynamodb": "workspace:*",
+        "@babbstack/logger": "workspace:*",
         "@babbstack/schema": "workspace:*",
         "@babbstack/sqs": "workspace:*",
         "@babbstack/step-functions": "workspace:*",
@@ -62,11 +75,18 @@
         "zod": "^4.3.6",
       },
     },
+    "libs/logger": {
+      "name": "@babbstack/logger",
+      "dependencies": {
+        "@aws-lambda-powertools/logger": "^2.31.0",
+      },
+    },
     "libs/s3": {
       "name": "@babbstack/s3",
       "dependencies": {
         "@aws-sdk/client-s3": "^3.0.0",
         "@aws-sdk/s3-request-presigner": "^3.0.0",
+        "@babbstack/logger": "workspace:*",
       },
     },
     "libs/schema": {
@@ -100,6 +120,10 @@
     "@aws-crypto/supports-web-crypto": ["@aws-crypto/supports-web-crypto@5.2.0", "", { "dependencies": { "tslib": "^2.6.2" } }, "sha512-iAvUotm021kM33eCdNfwIN//F77/IADDSs58i+MDaOqFrVjZo9bAal0NK7HurRuWLLpF1iLX7gbWrjHjeo+YFg=="],
 
     "@aws-crypto/util": ["@aws-crypto/util@5.2.0", "", { "dependencies": { "@aws-sdk/types": "^3.222.0", "@smithy/util-utf8": "^2.0.0", "tslib": "^2.6.2" } }, "sha512-4RkU9EsI6ZpBve5fseQlGNUWKMa1RLPQ1dnjnQoe07ldfIzcsGb5hC5W0Dm7u423KWzawlrpbjXBrXCEv9zazQ=="],
+
+    "@aws-lambda-powertools/commons": ["@aws-lambda-powertools/commons@2.31.0", "", { "dependencies": { "@aws/lambda-invoke-store": "0.2.3" } }, "sha512-K5Hy3WtU/n0M8/kgsgw6OVlF709PHOfnTfsWrJS2Cs1vVjEeBvW22a6u9n3VPNpDeqJ7GIodmSkbuzvQzq6vaA=="],
+
+    "@aws-lambda-powertools/logger": ["@aws-lambda-powertools/logger@2.31.0", "", { "dependencies": { "@aws-lambda-powertools/commons": "2.31.0", "@aws/lambda-invoke-store": "0.2.3" }, "peerDependencies": { "@aws-lambda-powertools/jmespath": "2.31.0", "@middy/core": "4.x || 5.x || 6.x || 7.x" }, "optionalPeers": ["@aws-lambda-powertools/jmespath", "@middy/core"] }, "sha512-FCchy2g/cK5poDvDWnVCBSN9uSDGSWDldDiHGC/bn1/oU2cCxIZu06QnYEOOOAUbCWdzgcT1F9fRjzzHbu0GxQ=="],
 
     "@aws-sdk/client-dynamodb": ["@aws-sdk/client-dynamodb@3.988.0", "", { "dependencies": { "@aws-crypto/sha256-browser": "5.2.0", "@aws-crypto/sha256-js": "5.2.0", "@aws-sdk/core": "^3.973.8", "@aws-sdk/credential-provider-node": "^3.972.7", "@aws-sdk/dynamodb-codec": "^3.972.9", "@aws-sdk/middleware-endpoint-discovery": "^3.972.3", "@aws-sdk/middleware-host-header": "^3.972.3", "@aws-sdk/middleware-logger": "^3.972.3", "@aws-sdk/middleware-recursion-detection": "^3.972.3", "@aws-sdk/middleware-user-agent": "^3.972.8", "@aws-sdk/region-config-resolver": "^3.972.3", "@aws-sdk/types": "^3.973.1", "@aws-sdk/util-endpoints": "3.988.0", "@aws-sdk/util-user-agent-browser": "^3.972.3", "@aws-sdk/util-user-agent-node": "^3.972.6", "@smithy/config-resolver": "^4.4.6", "@smithy/core": "^3.23.0", "@smithy/fetch-http-handler": "^5.3.9", "@smithy/hash-node": "^4.2.8", "@smithy/invalid-dependency": "^4.2.8", "@smithy/middleware-content-length": "^4.2.8", "@smithy/middleware-endpoint": "^4.4.14", "@smithy/middleware-retry": "^4.4.31", "@smithy/middleware-serde": "^4.2.9", "@smithy/middleware-stack": "^4.2.8", "@smithy/node-config-provider": "^4.3.8", "@smithy/node-http-handler": "^4.4.10", "@smithy/protocol-http": "^5.3.8", "@smithy/smithy-client": "^4.11.3", "@smithy/types": "^4.12.0", "@smithy/url-parser": "^4.2.8", "@smithy/util-base64": "^4.3.0", "@smithy/util-body-length-browser": "^4.2.0", "@smithy/util-body-length-node": "^4.2.1", "@smithy/util-defaults-mode-browser": "^4.3.30", "@smithy/util-defaults-mode-node": "^4.2.33", "@smithy/util-endpoints": "^3.2.8", "@smithy/util-middleware": "^4.2.8", "@smithy/util-retry": "^4.2.8", "@smithy/util-utf8": "^4.2.0", "@smithy/util-waiter": "^4.2.8", "tslib": "^2.6.2" } }, "sha512-rK9seN2TS3+Iqzc958kcDIJ83n0BYGargpRyZsyh9GCiBaipelFqOIUlZ/gXZzkhFxNBLTKmdkMAioahvmQkoQ=="],
 
@@ -189,9 +213,13 @@
 
     "@babbstack/client": ["@babbstack/client@workspace:libs/client"],
 
+    "@babbstack/create-app-cli": ["@babbstack/create-app-cli@workspace:libs/create-app-cli"],
+
     "@babbstack/dynamodb": ["@babbstack/dynamodb@workspace:libs/dynamodb"],
 
     "@babbstack/http-api-contract": ["@babbstack/http-api-contract@workspace:libs/http-api-contract"],
+
+    "@babbstack/logger": ["@babbstack/logger@workspace:libs/logger"],
 
     "@babbstack/s3": ["@babbstack/s3@workspace:libs/s3"],
 

@@ -7,7 +7,7 @@ import { expect, test } from "bun:test";
 
 const APP_DIRECTORY = dirname(import.meta.dir);
 
-/** Handles read json file. */ async function readJsonFile(
+/** Runs read json file. */ async function readJsonFile(
   pathFromAppDirectory: string,
 ): Promise<unknown> {
   const source = await readFile(join(APP_DIRECTORY, pathFromAppDirectory), "utf8");

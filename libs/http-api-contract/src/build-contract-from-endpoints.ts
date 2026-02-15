@@ -12,12 +12,12 @@ import type {
   OpenApiPathItem,
 } from "./types";
 
-/** Converts values to open api method. */
+/** Converts to open api method. */
 function toOpenApiMethod(method: string): keyof OpenApiPathItem {
   return method.toLowerCase() as keyof OpenApiPathItem;
 }
 
-/** Converts values to parameters. */
+/** Converts to parameters. */
 function toParameters(
   location: OpenApiParameter["in"],
   validator: Schema<unknown> | undefined,
@@ -40,7 +40,7 @@ function toParameters(
   }));
 }
 
-/** Converts values to open api responses. */
+/** Converts to open api responses. */
 function toOpenApiResponses(
   responseByStatusCode: Record<string, Schema<unknown>>,
 ): OpenApiOperation["responses"] {
@@ -64,7 +64,7 @@ function toOpenApiResponses(
   );
 }
 
-/** Converts values to open api document. */
+/** Converts to open api document. */
 function toOpenApiDocument(input: BuildContractFromEndpointsInput): OpenApiDocument {
   const paths: Record<string, OpenApiPathItem> = {};
 
@@ -119,7 +119,7 @@ function toOpenApiDocument(input: BuildContractFromEndpointsInput): OpenApiDocum
   };
 }
 
-/** Handles with options operations. */
+/** Runs with options operations. */
 function withOptionsOperations(
   contractOpenApi: OpenApiDocument,
   openApiWithSchemas: OpenApiDocument,
@@ -148,10 +148,11 @@ function withOptionsOperations(
 }
 
 /**
- * Handles build contract from endpoints.
+ * Runs build contract from endpoints.
  * @param input - Input parameter.
  * @example
  * buildContractFromEndpoints(input)
+ * @returns Output value.
  */
 export function buildContractFromEndpoints(input: BuildContractFromEndpointsInput): Contract {
   const baseContract = buildContract({

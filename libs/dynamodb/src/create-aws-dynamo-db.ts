@@ -13,7 +13,7 @@ import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import type { NativeAttributeValue } from "@aws-sdk/util-dynamodb";
 import type { AwsDynamoDbOperations, CreateAwsDynamoDbInput, DynamoDbClient } from "./types";
 
-/** Converts values to marshall record. */
+/** Converts to marshall record. */
 function toMarshallRecord(input: Record<string, unknown>): Record<string, NativeAttributeValue> {
   return input as Record<string, NativeAttributeValue>;
 }
@@ -102,6 +102,7 @@ async function createDefaultOperations(): Promise<AwsDynamoDbOperations> {
  * @param input - Input parameter.
  * @example
  * createAwsDynamoDb(input)
+ * @returns Output value.
  */
 export function createAwsDynamoDb(input: CreateAwsDynamoDbInput = {}): DynamoDbClient {
   const operationsPromise = input.operations

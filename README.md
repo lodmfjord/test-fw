@@ -18,6 +18,7 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
 - `@babbstack/sqs` (`libs/sqs`): runtime SQS adapters, queue definitions, listener registration.
 - `@babbstack/dynamodb` (`libs/dynamodb`): runtime DynamoDB adapters and typed table helpers.
 - `@babbstack/s3` (`libs/s3`): runtime S3 adapters for local and AWS execution.
+- `@babbstack/logger` (`libs/logger`): structured logging wrapper around AWS Lambda Powertools Logger.
 - `@babbstack/create-app-cli` (`libs/create-app-cli`): CLI scaffold generator that creates a new `apps/<name>` hello-world app.
 - `@babbstack/test-app` (`apps/test-app`): showcase app that exercises the framework end to end.
 - `@babbstack/test-app-client` (`apps/test-app-client`): typed client smoke app using `@babbstack/client` against `test-app` endpoints.
@@ -34,7 +35,7 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
 - Generated Lambda runtime entries validate request parts (`params`, `query`, `headers`, `body`) with Zod-backed validators derived from endpoint schemas and return `400` on input validation failures.
 - Generated Lambda runtime entries validate handler output with the response schema selected by status code and return `500` on output validation failures.
 - Generated Lambda runtime entries keep `zod` external (`import "zod"`). Terraform generation now always includes `zod` in lambda layer module planning.
-- Generated Lambda runtime entries emit structured lifecycle and failure logs (`lambda.invocation.start`, `lambda.invocation.complete`, `lambda.validation.input_failed`, `lambda.handler.failed`, `lambda.validation.output_failed`) with request correlation fields.
+- Generated Lambda runtime entries emit structured lifecycle and failure logs (`lambda.invocation.start`, `lambda.invocation.complete`, `lambda.validation.input_failed`, `lambda.handler.failed`, `lambda.validation.output_failed`) with request correlation fields using AWS Lambda Powertools Logger.
 - Generated Lambda runtime responses always include `x-request-id` (reusing inbound `x-request-id` when provided).
 - `schema.fromZod(...)` is parity-safe for JSON-schema-representable behavior; custom refinements and transform/preprocess pipelines are rejected.
 
@@ -111,26 +112,9 @@ Lint commands treat warnings as failing diagnostics (`--error-on-warnings`), so 
 
 ## Constraints
 
-- Strict TDD: test first, minimal implementation, then refactor.
-- File names must use kebab-case.
-- Each source file may export at most one function.
-- Export counting is AST-based and includes `export { fn }` / `export default fn` forms for local functions.
-- Each source and test file must be 220 lines or fewer.
-- Each top-level function in non-test `src` files must be 160 lines or fewer.
-- Each top-level function in non-test `src` files must keep cognitive complexity at 30 or lower.
-- Each source file must begin with a file-level JSDoc header.
-- File-level JSDoc headers must include `@fileoverview`, must use multiline format, and must not include `@module`.
-- Function declarations and function-valued variable declarations must have JSDoc.
-- Exported function declarations and exported function-valued variable declarations must use multiline JSDoc.
-- Exported function declarations and exported function-valued variable declarations must include `@param` descriptions for all parameters.
-- Exported function declarations and exported function-valued variable declarations must include `@example` in JSDoc.
-- `libs/*` sources cannot import from `apps/*`.
-- `apps/*` sources can only import from other apps using type-only imports.
-- `export * from ...` is disallowed. Use explicit named exports.
-- Deep cross-package `src` imports are disallowed. Import from package entrypoints instead.
-- Exported-function source files must have a sibling test file (`*.test.ts`) for configured roots.
-- Tested-export roots default to `libs` and can include apps by setting `CONSTRAINT_TESTED_EXPORTS_ROOTS=libs,apps`.
-- Deprecated APIs and types are disallowed across `apps/`, `libs/`, and `tools/`.
+For authoritative repository standards and exact constraint values, see AGENTS.md.
+
+- Use strict TDD and keep changes within repository constraints.
 - `bun run check:constraints` enforces constraints for `apps/`, `libs/`, and `tools/`.
 - `bun run check` is fail-fast: constraints run first before format/lint/typecheck/tests.
 

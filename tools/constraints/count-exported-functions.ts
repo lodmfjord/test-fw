@@ -5,7 +5,7 @@ import * as ts from "typescript";
 
 type FunctionBindingMap = Map<string, string>;
 
-/** Converts values to binding id. */ function toBindingId(node: ts.Node): string {
+/** Converts to binding id. */ function toBindingId(node: ts.Node): string {
   return `${node.pos}:${node.end}`;
 }
 
@@ -18,9 +18,7 @@ type FunctionBindingMap = Map<string, string>;
   return node.modifiers?.some((modifier) => modifier.kind === kind) ?? false;
 }
 
-/** Handles unwrap expression. */ function unwrapExpression(
-  expression: ts.Expression,
-): ts.Expression {
+/** Runs unwrap expression. */ function unwrapExpression(expression: ts.Expression): ts.Expression {
   if (ts.isParenthesizedExpression(expression)) {
     return unwrapExpression(expression.expression);
   }
@@ -28,7 +26,7 @@ type FunctionBindingMap = Map<string, string>;
   return expression;
 }
 
-/** Converts values to bound function expression. */ function toBoundFunctionExpression(
+/** Converts to bound function expression. */ function toBoundFunctionExpression(
   expression: ts.Expression | undefined,
 ): ts.FunctionExpression | ts.ArrowFunction | undefined {
   if (!expression) {
@@ -43,7 +41,7 @@ type FunctionBindingMap = Map<string, string>;
   return undefined;
 }
 
-/** Converts values to function binding map. */ function toFunctionBindingMap(
+/** Converts to function binding map. */ function toFunctionBindingMap(
   sourceFile: ts.SourceFile,
 ): FunctionBindingMap {
   const bindings: FunctionBindingMap = new Map();
@@ -101,7 +99,7 @@ type FunctionBindingMap = Map<string, string>;
   return bindings;
 }
 
-/** Handles collect named exported functions. */ function collectNamedExportedFunctions(
+/** Runs collect named exported functions. */ function collectNamedExportedFunctions(
   sourceFile: ts.SourceFile,
   bindings: FunctionBindingMap,
   exportedBindingIds: Set<string>,
@@ -186,10 +184,11 @@ type FunctionBindingMap = Map<string, string>;
 }
 
 /**
- * Handles count exported functions.
+ * Runs count exported functions.
  * @param source - Source parameter.
  * @example
  * countExportedFunctions(source)
+ * @returns Output value.
  */ export function countExportedFunctions(source: string): number {
   const sourceFile = ts.createSourceFile(
     "source.ts",

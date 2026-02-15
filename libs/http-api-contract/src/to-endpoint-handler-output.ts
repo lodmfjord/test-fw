@@ -3,7 +3,7 @@
  */
 import type { EndpointHandlerOutput } from "./types";
 
-/** Converts values to output headers. */
+/** Converts to output headers. */
 function toOutputHeaders(headers: unknown): Record<string, string> | undefined {
   if (headers === undefined) {
     return undefined;
@@ -26,11 +26,13 @@ function toOutputHeaders(headers: unknown): Record<string, string> | undefined {
 }
 
 /**
- * Converts values to endpoint handler output.
+ * Converts to endpoint handler output.
  * @param output - Output parameter.
  * @param defaultStatusCode - Default status code parameter.
  * @example
  * toEndpointHandlerOutput(output, defaultStatusCode)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export function toEndpointHandlerOutput(
   output: unknown,

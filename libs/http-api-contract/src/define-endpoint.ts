@@ -17,6 +17,8 @@ import type {
  * @param input - Input parameter.
  * @example
  * defineEndpoint(input)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */ export function defineEndpoint<
   TParams,
   TQuery,

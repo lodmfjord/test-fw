@@ -2,6 +2,7 @@
  * @fileoverview Implements create dev app.
  */
 import { createRuntimeDynamoDb } from "@babbstack/dynamodb";
+import { createNoopLogger } from "@babbstack/logger";
 import { createRuntimeSqs } from "@babbstack/sqs";
 import { findEndpointRuntimeDefinition } from "./find-endpoint-runtime-definition";
 import { initializeEndpointEnv } from "./initialize-endpoint-env";
@@ -16,7 +17,7 @@ import { toEndpointSqsContext } from "./to-endpoint-sqs-context";
 import { toEndpointHandlerOutput } from "./to-endpoint-handler-output";
 import { toStepFunctionEndpointOutput } from "./to-step-function-endpoint-output";
 
-/** Handles read json body. */
+/** Runs read json body. */
 async function readJsonBody(request: Request): Promise<unknown> {
   const source = await request.text();
 
@@ -37,20 +38,22 @@ async function readJsonBody(request: Request): Promise<unknown> {
  * @param options - Options parameter.
  * @example
  * createDevApp(endpoints, options)
+ * @returns Output value.
  */
 export function createDevApp(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   options: CreateDevAppOptions = {},
 ): (request: Request) => Promise<Response> {
   const db = options.db ?? createRuntimeDynamoDb();
+  const logger = options.logger ?? createNoopLogger();
   const sqs = options.sqs ?? createRuntimeSqs();
-  initializeEndpointEnv(endpoints);
+  initializeEndpointEnv(endpoints, logger);
 
   return async function fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const method = request.method.toUpperCase();
     const requestId = toRequestCorrelationId(request);
-    /** Converts values to response. */ const toResponse = (
+    /** Converts to response. */ const toResponse = (
       status: number,
       payload: unknown,
       contentType?: string,
@@ -154,6 +157,7 @@ export function createDevApp(
       logDevAppFailure({
         error,
         event: "dev_app.handler_execution_failed",
+        logger,
         method,
         path: url.pathname,
         requestId,
@@ -186,6 +190,7 @@ export function createDevApp(
       logDevAppFailure({
         error,
         event: "dev_app.output_validation_failed",
+        logger,
         method,
         path: url.pathname,
         requestId,

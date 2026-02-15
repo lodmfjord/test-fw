@@ -15,7 +15,7 @@ export type ImportDescriptor = {
   sideEffectOnly: boolean;
 };
 
-/** Handles escape reg exp. */
+/** Runs escape reg exp. */
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -30,7 +30,7 @@ function isNameUsed(handlerSource: string, name: string): boolean {
   return new RegExp(`\\b${escapeRegExp(name)}\\b`, "m").test(handlerSource);
 }
 
-/** Handles resolve import specifier. */
+/** Runs resolve import specifier. */
 function resolveImportSpecifier(moduleSpecifier: string, endpointModulePath: string): string {
   if (isLocalImportPath(moduleSpecifier)) {
     return resolve(endpointModulePath, "..", moduleSpecifier);
@@ -47,12 +47,13 @@ function resolveImportSpecifier(moduleSpecifier: string, endpointModulePath: str
 }
 
 /**
- * Converts values to import lines.
+ * Converts to import lines.
  * @param endpointModulePath - Endpoint module path parameter.
  * @param handlerSource - Handler source parameter.
  * @param imports - Imports parameter.
  * @example
  * toImportLines(endpointModulePath, handlerSource, imports)
+ * @returns Output value.
  */
 export function toImportLines(
   endpointModulePath: string,

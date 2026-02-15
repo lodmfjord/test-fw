@@ -5,11 +5,12 @@ import type { SqsClient, SqsMessage } from "@babbstack/sqs";
 import type { EndpointRuntimeDefinition } from "./types";
 
 /**
- * Converts values to endpoint sqs context.
+ * Converts to endpoint sqs context.
  * @param sqs - Sqs parameter.
  * @param endpoint - Endpoint parameter.
  * @example
  * toEndpointSqsContext(sqs, endpoint)
+ * @returns Output value.
  */
 export function toEndpointSqsContext(
   sqs: SqsClient,

@@ -11,7 +11,7 @@ import type {
   DynamoDbWriteInput,
 } from "./types";
 
-/** Handles normalize key. */
+/** Runs normalize key. */
 function normalizeKey(value: unknown): unknown {
   if (Array.isArray(value)) {
     return value.map((entry) => normalizeKey(entry));
@@ -30,17 +30,17 @@ function normalizeKey(value: unknown): unknown {
   return value;
 }
 
-/** Converts values to storage key. */
+/** Converts to storage key. */
 function toStorageKey(input: { key: DynamoDbKey; tableName: string }): string {
   return `${input.tableName}:${JSON.stringify(normalizeKey(input.key))}`;
 }
 
-/** Handles clone item. */
+/** Runs clone item. */
 function cloneItem(item: DynamoDbItem): DynamoDbItem {
   return structuredClone(item);
 }
 
-/** Handles read stored item. */
+/** Runs read stored item. */
 function readStoredItem(
   store: Map<string, DynamoDbItem>,
   input: DynamoDbReadInput | DynamoDbUpdateInput | DynamoDbRemoveInput | DynamoDbWriteInput,
@@ -53,6 +53,7 @@ function readStoredItem(
  * Creates memory dynamo db.
  * @example
  * createMemoryDynamoDb()
+ * @returns Output value.
  */
 export function createMemoryDynamoDb(): DynamoDbClient {
   const store = new Map<string, DynamoDbItem>();

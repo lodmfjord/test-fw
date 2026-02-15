@@ -9,6 +9,7 @@ import { stepFunctionTaskHandlerMap } from "./step-function-task-handler-map";
  * @param resource - Resource parameter.
  * @example
  * getRegisteredStepFunctionTaskHandler(resource)
+ * @returns Output value.
  */
 export function getRegisteredStepFunctionTaskHandler(
   resource: string,

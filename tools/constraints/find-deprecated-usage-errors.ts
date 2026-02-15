@@ -4,12 +4,12 @@
 import { dirname, relative, resolve } from "node:path";
 import * as ts from "typescript";
 
-/** Converts values to normalized absolute path. */
+/** Converts to normalized absolute path. */
 function toAbsolutePath(filePath: string): string {
   return resolve(filePath);
 }
 
-/** Converts values to flattened diagnostic message text. */
+/** Converts to flattened diagnostic message text. */
 function toDiagnosticMessage(diagnostic: ts.Diagnostic): string {
   return ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n").trim();
 }
@@ -23,7 +23,7 @@ function isDeprecatedDiagnostic(diagnostic: ts.Diagnostic): boolean {
   return /\bdeprecated\b/i.test(toDiagnosticMessage(diagnostic));
 }
 
-/** Converts values to TypeScript config errors. */
+/** Converts to TypeScript config errors. */
 function toConfigErrors(filePath: string, diagnostics: readonly ts.Diagnostic[]): string[] {
   const errors: string[] = [];
   for (const diagnostic of diagnostics) {
@@ -34,7 +34,7 @@ function toConfigErrors(filePath: string, diagnostics: readonly ts.Diagnostic[])
   return errors;
 }
 
-/** Converts values to language service host. */
+/** Converts to language service host. */
 function toLanguageServiceHost(parsedConfig: ts.ParsedCommandLine): ts.LanguageServiceHost {
   const normalizedFileNames = parsedConfig.fileNames.map((filePath) => toAbsolutePath(filePath));
   const fileSet = new Set(normalizedFileNames);
@@ -75,7 +75,7 @@ function toLanguageServiceHost(parsedConfig: ts.ParsedCommandLine): ts.LanguageS
   };
 }
 
-/** Converts values to deprecated usage errors for one source file. */
+/** Converts to deprecated usage errors for one source file. */
 function toFileErrors(
   sourceFilePath: string,
   suggestions: readonly ts.DiagnosticWithLocation[],
@@ -124,6 +124,7 @@ function toFileErrors(
  * @param tsconfigPath - Path to the TypeScript config file.
  * @example
  * findDeprecatedUsageErrors(["libs/schema/src/schema.ts"], "tsconfig.json")
+ * @returns Output value.
  */
 export function findDeprecatedUsageErrors(filePaths: string[], tsconfigPath: string): string[] {
   const configPath = toAbsolutePath(tsconfigPath);

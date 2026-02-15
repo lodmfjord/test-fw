@@ -160,7 +160,7 @@ function toSqsForContext(client, config) {
 }
 `;
 
-export const renderLambdaRuntimeSourceBlocks = {
+const renderLambdaRuntimeSourceBlocks = {
   toDatabaseContextHelperSource(): string {
     return DATABASE_CONTEXT_HELPER_SOURCE;
   },
@@ -180,3 +180,5 @@ export const renderLambdaRuntimeSourceBlocks = {
     return SQS_CONTEXT_HELPER_SOURCE;
   },
 };
+
+export { renderLambdaRuntimeSourceBlocks };

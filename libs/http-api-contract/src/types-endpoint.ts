@@ -2,6 +2,7 @@
  * @fileoverview Implements types endpoint.
  */
 import type { DynamoDbClient } from "@babbstack/dynamodb";
+import type { Logger } from "@babbstack/logger";
 import type { Schema } from "@babbstack/schema";
 import type { StepFunctionTaskHandler } from "@babbstack/step-functions";
 import type { SqsClient } from "@babbstack/sqs";
@@ -24,6 +25,7 @@ export type EndpointRequest<TParams, TQuery, THeaders, TBody> = {
 
 export type CreateDevAppOptions = {
   db?: DynamoDbClient;
+  logger?: Logger;
   sqs?: SqsClient;
   stepFunctionTaskHandlers?: Record<string, StepFunctionTaskHandler>;
 };

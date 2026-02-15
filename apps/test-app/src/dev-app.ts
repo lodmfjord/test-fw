@@ -1,11 +1,10 @@
 /**
  * @fileoverview Implements dev app.
  */
-import { createMemorySqs } from "@babbstack/sqs";
 import { createDevApp } from "@babbstack/http-api-contract";
 import { endpoints } from "./endpoints";
+import { testAppSqs } from "./test-app-sqs";
 
-export const testAppSqs = createMemorySqs();
 export const testAppFetch = createDevApp(endpoints.flat(), {
   sqs: testAppSqs,
 });

@@ -3,7 +3,7 @@
  */
 import type { EndpointRuntimeDefinition } from "./types";
 
-/** Handles match path. */
+/** Runs match path. */
 function matchPath(templatePath: string, requestPath: string): Record<string, string> | null {
   const templateSegments = templatePath.split("/").filter((segment) => segment.length > 0);
   const requestSegments = requestPath.split("/").filter((segment) => segment.length > 0);
@@ -33,12 +33,13 @@ function matchPath(templatePath: string, requestPath: string): Record<string, st
 }
 
 /**
- * Handles find endpoint runtime definition.
+ * Runs find endpoint runtime definition.
  * @param endpoints - Endpoints parameter.
  * @param method - Method parameter.
  * @param path - Path parameter.
  * @example
  * findEndpointRuntimeDefinition(endpoints, method, path)
+ * @returns Output value.
  */
 export function findEndpointRuntimeDefinition(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

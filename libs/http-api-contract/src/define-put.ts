@@ -41,6 +41,7 @@ type PutEndpointDefinition<
  * @param input - Input parameter.
  * @example
  * definePut(input)
+ * @returns Output value.
  */ export function definePut<
   TParams,
   TQuery,

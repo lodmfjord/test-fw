@@ -8,7 +8,7 @@ import type {
   TypedDynamoDbClient,
 } from "./types";
 
-/** Converts values to key from item. */ function toKeyFromItem<
+/** Converts to key from item. */ function toKeyFromItem<
   TItem extends DynamoDbItem,
   TKeyField extends keyof TItem & string,
 >(item: TItem, keyFields: ReadonlyArray<TKeyField>): Pick<TItem, TKeyField> {
@@ -27,6 +27,7 @@ import type {
  * @param tables - Tables parameter.
  * @example
  * createTypedDynamoDb(db, tables)
+ * @returns Output value.
  */ export function createTypedDynamoDb<
   TTables extends Record<string, DynamoDbTableDefinition<DynamoDbItem, string>>,
 >(db: DynamoDbClient, tables: TTables): TypedDynamoDbClient<TTables> {

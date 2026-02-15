@@ -3,16 +3,18 @@
  */
 import type { EndpointRuntimeDefinition } from "./types";
 
-/** Converts values to table key. */
+/** Converts to table key. */
 function toTableKey(tableName: string): string {
   return tableName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
 /**
- * Converts values to dynamodb tables.
+ * Converts to dynamodb tables.
  * @param endpoints - Endpoints parameter.
  * @example
  * toDynamodbTables(endpoints)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export function toDynamodbTables(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

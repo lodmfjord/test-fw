@@ -10,7 +10,7 @@ import { renderLambdaRuntimeEntrySource } from "./render-lambda-runtime-entry";
 import { toRequiredRuntimeExternalModules } from "./to-required-runtime-external-modules";
 import type { EndpointRuntimeDefinition, LambdaJsGenerationOptions } from "./types";
 
-/** Handles resolve endpoint module path. */
+/** Runs resolve endpoint module path. */
 function resolveEndpointModulePath(endpointModulePath: string): string {
   const source = endpointModulePath.trim();
   if (source.length === 0) {
@@ -20,7 +20,7 @@ function resolveEndpointModulePath(endpointModulePath: string): string {
   return isAbsolute(source) ? source : resolve(process.cwd(), source);
 }
 
-/** Handles bundle entry. */
+/** Runs bundle entry. */
 async function bundleEntry(
   entryPath: string,
   absWorkingDirectory: string,
@@ -48,7 +48,7 @@ async function bundleEntry(
   return bundled.text;
 }
 
-/** Handles resolve external modules. */
+/** Runs resolve external modules. */
 function resolveExternalModules(
   externalModules: string[] | undefined,
   endpointModulePath: string,
@@ -74,18 +74,20 @@ function resolveExternalModules(
   return [...expanded].sort((left, right) => left.localeCompare(right));
 }
 
-/** Handles strip bundler module markers. */
+/** Runs strip bundler module markers. */
 function stripBundlerModuleMarkers(source: string): string {
   return source.replace(/^\/\/\s+(?:\.\.\/|\/).+\.(?:[cm]?[jt]s|tsx?)$/gm, "").trimStart();
 }
 
 /**
- * Handles write lambda js files.
+ * Runs write lambda js files.
  * @param outputDirectory - Output directory parameter.
  * @param endpoints - Endpoints parameter.
  * @param options - Options parameter.
  * @example
  * await writeLambdaJsFiles(outputDirectory, endpoints, options)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export async function writeLambdaJsFiles(
   outputDirectory: string,

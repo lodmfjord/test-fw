@@ -33,13 +33,28 @@
 
 ## File Constraints
 
-- Every source file may export at most one function.
-- Maximum line length is 220 characters.
+- AGENTS.md is the authoritative standards document for this repository.
+- In non-test source files, each file may export at most one runtime symbol.
+- Runtime symbols include exported `function`, `const`, `class`, `enum`, and `export default` values.
+- Type-only exports are excluded from runtime export counting.
+- `index.ts` files are exempt from runtime export limits and may re-export public API.
+- Exported helper-object bags are disallowed (`export const x = { ... }`) when object members are function-valued or use method shorthand.
+- Each non-test source file outside `src` must be at most 220 lines.
+- Each non-test source file in `src` must be at most 220 lines.
+- Each test source file must be at most 260 lines.
 - Each top-level function in non-test `src` files must be at most 160 lines.
 - Each top-level function in non-test `src` files must have cognitive complexity at most 30.
 - Nested ternary operations are not allowed.
 - Constraints are enforced by `bun run check:constraints`.
 - Full validation command: `bun run check` (tests + constraints).
+
+## Logging Policy
+
+- Use `@babbstack/logger` for runtime logging in apps/libs/tools.
+- Reusable library runtime code should default to `createNoopLogger()` unless a caller injects a logger.
+- For public APIs that previously accepted `options.log`, keep temporary compatibility and prefer `options.logger`.
+- Direct `console.*` calls are disallowed in non-test runtime files.
+- Allowed exceptions for direct `console.*`: test files and explicit CLI entry files named `*-bin.ts`.
 
 ## Documentation Standards
 
@@ -56,7 +71,10 @@
 - Every function must have JSDoc.
 - Exported function JSDoc must use multiline format.
 - Exported function JSDoc must include `@param` descriptions for all parameters.
+- Exported function JSDoc must include `@returns` unless the function is explicitly typed as `void` or `Promise<void>`.
+- Exported function JSDoc must include `@throws` when the function body contains a `throw` statement.
 - Exported function JSDoc must include at least one `@example`.
+- Function JSDoc summary text must not start with `Handles ` or `Converts values to ` (applies to function JSDoc only, not file-level `@fileoverview` blocks).
 
 ## Package Export Policy
 
@@ -70,6 +88,7 @@
 ## Quality Gate Before Handoff
 
 - Run `bun run check`.
+- Run `bun run check` as the final step at the end of every task to catch formatting/lint/type/test regressions and fix issues from your changes before handoff.
 - Do not hand off changes with failing tests or failing constraints.
 - Ensure formatting, linting, and typecheck pass via the `check` script.
 

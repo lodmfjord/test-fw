@@ -9,7 +9,7 @@ import { describe, expect, it } from "bun:test";
 import { createFakeLayerModulesForTest } from "./create-fake-layer-modules-for-test";
 import { runContractGeneratorFromSettings } from "./run-contract-generator-from-settings";
 
-/** Converts values to terraform reference. */
+/** Converts to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }

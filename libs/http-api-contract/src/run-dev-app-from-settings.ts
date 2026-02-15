@@ -3,22 +3,18 @@
  */
 import { readFile } from "node:fs/promises";
 import { dirname } from "node:path";
+import { createNoopLogger } from "@babbstack/logger";
+import type { Logger } from "@babbstack/logger";
 import {
   createRuntimeSqs,
   listDefinedSqsListeners,
   resetDefinedSqsListeners,
-  runSqsQueueListener,
-} from "@babbstack/sqs";
-import type {
-  SqsClient,
-  SqsListenerRuntimeDefinition,
-  SqsMessage,
-  SqsQueueListener,
 } from "@babbstack/sqs";
 import { createDevApp } from "./create-dev-app";
 import { loadEndpointsFromModule } from "./load-endpoints-from-module";
 import { parseJsonc } from "./parse-jsonc";
 import { resolvePathFromSettings } from "./resolve-path-from-settings";
+import { startSqsListenerPolling } from "./start-sqs-listener-polling";
 
 type DevServeInput = {
   fetch: (request: Request) => Promise<Response>;
@@ -28,11 +24,12 @@ type DevServeInput = {
 type RunDevAppFromSettingsOptions = {
   env?: Record<string, string | undefined>;
   listenerPollMs?: number;
+  logger?: Logger;
   log?: (message: string) => void;
   serve?: (input: DevServeInput) => unknown;
 };
 
-/** Converts values to string setting. */
+/** Converts to string setting. */
 function toStringSetting(
   value: unknown,
   settingName: string,
@@ -62,7 +59,7 @@ function toStringSetting(
   return source;
 }
 
-/** Converts values to port. */
+/** Converts to port. */
 function toPort(value: string | undefined): number {
   const source = (value ?? "3000").trim();
   const parsed = Number(source);
@@ -74,7 +71,7 @@ function toPort(value: string | undefined): number {
   return parsed;
 }
 
-/** Converts values to endpoint settings. */
+/** Converts to endpoint settings. */
 function toEndpointSettings(value: unknown): {
   endpointExportName: string;
   endpointModulePath: string;
@@ -95,7 +92,7 @@ function toEndpointSettings(value: unknown): {
   };
 }
 
-/** Converts values to listener poll ms. */
+/** Converts to listener poll ms. */
 function toListenerPollMs(value: number | undefined): number {
   const resolved = value ?? 250;
   if (!Number.isInteger(resolved) || resolved <= 0) {
@@ -105,46 +102,33 @@ function toListenerPollMs(value: number | undefined): number {
   return resolved;
 }
 
-/** Handles start sqs listeners. */
-function startSqsListeners(
-  listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
-  sqs: SqsClient,
-  pollMs: number,
-  log: (message: string) => void,
-): void {
-  if (listeners.length === 0) {
-    return;
+/** Converts to logger. */
+function toLogger(options: RunDevAppFromSettingsOptions): Logger {
+  if (options.logger) {
+    return options.logger;
   }
 
-  let isPolling = false;
-  /** Handles poll. */ const poll = async (): Promise<void> => {
-    if (isPolling) {
-      return;
-    }
+  if (options.log) {
+    return {
+      debug(message) {
+        options.log?.(message);
+      },
+      error(message) {
+        options.log?.(message);
+      },
+      getPersistentKeys() {
+        return {};
+      },
+      info(message) {
+        options.log?.(message);
+      },
+      warn(message) {
+        options.log?.(message);
+      },
+    };
+  }
 
-    isPolling = true;
-    try {
-      for (const listener of listeners) {
-        const typedListener = listener as unknown as SqsQueueListener<SqsMessage>;
-        const processed = await runSqsQueueListener(typedListener, sqs);
-        if (processed > 0) {
-          log(`babbstack sqs listener ${listener.listenerId} processed ${processed} message(s)`);
-        }
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown SQS listener error";
-      log(`babbstack sqs listener polling error: ${message}`);
-    } finally {
-      isPolling = false;
-    }
-  };
-
-  const timer = setInterval(() => {
-    void poll();
-  }, pollMs);
-  timer.unref?.();
-  void poll();
-  log(`babbstack sqs listener polling started for ${listeners.length} listener(s) at ${pollMs}ms`);
+  return createNoopLogger();
 }
 
 /**
@@ -153,6 +137,8 @@ function startSqsListeners(
  * @param options - Options parameter.
  * @example
  * await runDevAppFromSettings(settingsFilePath, options)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export async function runDevAppFromSettings(
   settingsFilePath: string,
@@ -184,21 +170,22 @@ export async function runDevAppFromSettings(
   resetDefinedSqsListeners();
   const endpoints = await loadEndpointsFromModule(endpointModulePath, settings.endpointExportName);
   const sqsListeners = listDefinedSqsListeners();
+  const logger = toLogger(options);
 
   const sqs = createRuntimeSqs();
   const fetch = createDevApp(endpoints, {
+    logger,
     sqs,
   });
   const port = toPort((options.env ?? process.env).PORT);
   const serve = options.serve ?? ((input: DevServeInput) => Bun.serve(input));
-  const log = options.log ?? console.log;
 
   serve({
     fetch,
     port,
   });
-  startSqsListeners(sqsListeners, sqs, listenerPollMs, log);
-  log(`babbstack dev server listening on http://localhost:${port}`);
+  startSqsListenerPolling(sqsListeners, sqs, listenerPollMs, logger);
+  logger.info(`babbstack dev server listening on http://localhost:${port}`);
 
   return port;
 }

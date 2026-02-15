@@ -15,6 +15,7 @@
     "@aws-sdk/util-dynamodb": "^3.988.0",
     "@babbstack/dynamodb": "workspace:*",
     "@babbstack/http-api-contract": "workspace:*",
+    "@babbstack/logger": "workspace:*",
     "@babbstack/schema": "workspace:*",
     "@babbstack/s3": "workspace:*",
     "@babbstack/sqs": "workspace:*",

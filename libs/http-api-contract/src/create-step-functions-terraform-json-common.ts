@@ -11,12 +11,12 @@ type TerraformCollections = {
   stateMachines: Record<string, unknown>;
 };
 
-/** Converts values to terraform reference. */
+/** Converts to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
-/** Converts values to route state machine role policy. */
+/** Converts to route state machine role policy. */
 function toRouteStateMachineRolePolicy(): string {
   return JSON.stringify({
     Statement: [
@@ -32,7 +32,7 @@ function toRouteStateMachineRolePolicy(): string {
   });
 }
 
-/** Converts values to api gateway role policy. */
+/** Converts to api gateway role policy. */
 function toApiGatewayRolePolicy(): string {
   return JSON.stringify({
     Statement: [
@@ -48,7 +48,7 @@ function toApiGatewayRolePolicy(): string {
   });
 }
 
-/** Converts values to pipe role policy. */
+/** Converts to pipe role policy. */
 function toPipeRolePolicy(): string {
   return JSON.stringify({
     Statement: [
@@ -64,14 +64,14 @@ function toPipeRolePolicy(): string {
   });
 }
 
-/** Converts values to unmanaged sqs queue arn. */
+/** Converts to unmanaged sqs queue arn. */
 function toUnmanagedSqsQueueArn(queueNameExpression: string): string {
   const awsRegion = "$" + "{var.aws_region}";
   const accountId = "$" + "{data.aws_caller_identity.current.account_id}";
   return `arn:aws:sqs:${awsRegion}:${accountId}:${queueNameExpression}`;
 }
 
-/** Converts values to resource block. */
+/** Converts to resource block. */
 function toResourceBlock(collections: TerraformCollections): Record<string, unknown> {
   return {
     ...(Object.keys(collections.iamRoles).length > 0
@@ -107,7 +107,7 @@ function toResourceBlock(collections: TerraformCollections): Record<string, unkn
   };
 }
 
-/** Converts values to variable block. */
+/** Converts to variable block. */
 function toVariableBlock(): Record<string, unknown> {
   return {
     apigateway_step_function_policy_name_prefix: { default: "", type: "string" },
@@ -121,7 +121,7 @@ function toVariableBlock(): Record<string, unknown> {
   };
 }
 
-export const createStepFunctionsTerraformJsonCommon = {
+const createStepFunctionsTerraformJsonCommon = {
   toApiGatewayRolePolicy,
   toPipeRolePolicy,
   toResourceBlock,
@@ -130,3 +130,5 @@ export const createStepFunctionsTerraformJsonCommon = {
   toUnmanagedSqsQueueArn,
   toVariableBlock,
 };
+
+export { createStepFunctionsTerraformJsonCommon };

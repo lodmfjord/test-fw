@@ -21,7 +21,7 @@ type HashInputFile = {
   sourcePath: string;
 };
 
-/** Handles should copy package path. */
+/** Runs should copy package path. */
 function shouldCopyPackagePath(sourcePath: string, packageRoot: string): boolean {
   if (sourcePath === packageRoot) {
     return true;
@@ -34,7 +34,7 @@ function shouldCopyPackagePath(sourcePath: string, packageRoot: string): boolean
   return !/(^|\/)node_modules(\/|$)/.test(relativePath);
 }
 
-/** Converts values to dependencies from package json. */
+/** Converts to dependencies from package json. */
 function toDependenciesFromPackageJson(source: string): string[] {
   const parsed = JSON.parse(source) as {
     dependencies?: Record<string, string>;
@@ -46,7 +46,7 @@ function toDependenciesFromPackageJson(source: string): string[] {
   ];
 }
 
-/** Converts values to package root path. */
+/** Converts to package root path. */
 function toPackageRootPath(moduleName: string, resolveFromDirectory: string): string {
   const resolver = createRequire(join(resolveFromDirectory, "__simple_api_resolver__.cjs"));
   try {
@@ -59,7 +59,7 @@ function toPackageRootPath(moduleName: string, resolveFromDirectory: string): st
   }
 }
 
-/** Converts values to package roots. */
+/** Converts to package roots. */
 async function toPackageRoots(
   moduleNames: ReadonlyArray<string>,
   resolveFromDirectory: string,
@@ -93,7 +93,7 @@ async function toPackageRoots(
   return packageRoots;
 }
 
-/** Converts values to hash input files for package. */
+/** Converts to hash input files for package. */
 async function toHashInputFilesForPackage(
   packageRoot: string,
   packageOutputRoot: string,
@@ -133,7 +133,7 @@ async function toHashInputFilesForPackage(
   return files.sort((left, right) => left.hashPath.localeCompare(right.hashPath));
 }
 
-/** Converts values to layer source code hash. */
+/** Converts to layer source code hash. */
 async function toLayerSourceCodeHash(packageRoots: Map<string, string>): Promise<string> {
   const hash = createHash("sha256");
   const layerFiles: HashInputFile[] = [];
@@ -159,7 +159,7 @@ async function toLayerSourceCodeHash(packageRoots: Map<string, string>): Promise
   return hash.digest("base64");
 }
 
-/** Handles write layer archive. */
+/** Runs write layer archive. */
 async function writeLayerArchive(
   artifactFilePath: string,
   moduleNames: ReadonlyArray<string>,
@@ -193,6 +193,8 @@ async function writeLayerArchive(
   }
 }
 
-export const lambdaLayerArtifactsHelpers = {
+const lambdaLayerArtifactsHelpers = {
   writeLayerArchive,
 };
+
+export { lambdaLayerArtifactsHelpers };

@@ -5,7 +5,7 @@ import { schema } from "@babbstack/schema";
 import type { GlobalCors } from "./cors-types";
 import type { Contract, EndpointRuntimeDefinition } from "./types";
 
-/** Converts values to cors headers. */
+/** Converts to cors headers. */
 function toCorsHeaders(cors: GlobalCors, methods: string[]): Record<string, string> {
   return {
     ...(cors.allowCredentials ? { "access-control-allow-credentials": "true" } : {}),
@@ -25,7 +25,7 @@ function toCorsHeaders(cors: GlobalCors, methods: string[]): Record<string, stri
   };
 }
 
-/** Converts values to methods by path. */
+/** Converts to methods by path. */
 function toMethodsByPath(contract: Contract): Map<string, Set<string>> {
   const methodsByPath = new Map<string, Set<string>>();
 
@@ -39,11 +39,12 @@ function toMethodsByPath(contract: Contract): Map<string, Set<string>> {
 }
 
 /**
- * Converts values to runtime endpoints with global cors options.
+ * Converts to runtime endpoints with global cors options.
  * @param contract - Contract parameter.
  * @param endpoints - Endpoints parameter.
  * @example
  * toRuntimeEndpointsWithGlobalCorsOptions(contract, endpoints)
+ * @returns Output value.
  */
 export function toRuntimeEndpointsWithGlobalCorsOptions(
   contract: Contract,

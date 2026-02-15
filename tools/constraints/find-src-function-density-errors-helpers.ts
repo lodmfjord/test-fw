@@ -17,7 +17,7 @@ type FunctionDensity = {
   startLine: number;
 };
 
-/** Converts values to posix path. */
+/** Converts to posix path. */
 function toPosixPath(filePath: string): string {
   return filePath.replaceAll("\\", "/");
 }
@@ -28,7 +28,7 @@ function isSrcSourceFilePath(filePath: string): boolean {
   return normalized.includes(SRC_PATH_SEGMENT) && !TEST_FILE_PATTERN.test(normalized);
 }
 
-/** Converts values to function name. */
+/** Converts to function name. */
 function toFunctionName(node: FunctionNode): string {
   if ((ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) && node.name) {
     return node.name.text;
@@ -44,19 +44,19 @@ function toFunctionName(node: FunctionNode): string {
   return "<anonymous>";
 }
 
-/** Converts values to source line number. */
+/** Converts to source line number. */
 function toLineNumber(sourceFile: ts.SourceFile, position: number): number {
   return sourceFile.getLineAndCharacterOfPosition(position).line + 1;
 }
 
-/** Converts values to function line count. */
+/** Converts to function line count. */
 function toFunctionLineCount(sourceFile: ts.SourceFile, node: FunctionNode): number {
   const startLine = toLineNumber(sourceFile, node.getStart(sourceFile));
   const endLine = toLineNumber(sourceFile, node.end);
   return endLine - startLine + 1;
 }
 
-/** Handles visit complexity node. */
+/** Runs visit complexity node. */
 function visitComplexityNode(
   node: ts.Node,
   nesting: number,
@@ -127,7 +127,7 @@ function visitComplexityNode(
   ts.forEachChild(node, (child) => visitComplexityNode(child, nesting, onComplexityPoint));
 }
 
-/** Converts values to cognitive complexity. */
+/** Converts to cognitive complexity. */
 function toCognitiveComplexity(node: FunctionNode): number {
   let score = 0;
   const body = node.body;
@@ -135,7 +135,7 @@ function toCognitiveComplexity(node: FunctionNode): number {
     return 0;
   }
 
-  /** Handles complexity point accounting. */
+  /** Runs complexity point accounting. */
   const onComplexityPoint = (point: number): void => {
     score += point;
   };
@@ -150,7 +150,7 @@ function toCognitiveComplexity(node: FunctionNode): number {
   return score;
 }
 
-/** Converts values to function density records. */
+/** Converts to function density records. */
 function toFunctionDensities(sourceFile: ts.SourceFile): FunctionDensity[] {
   const densities: FunctionDensity[] = [];
 
@@ -191,13 +191,15 @@ function toFunctionDensities(sourceFile: ts.SourceFile): FunctionDensity[] {
   return densities;
 }
 
-/** Converts values to source file. */
+/** Converts to source file. */
 function toSourceFile(filePath: string, source: string): ts.SourceFile {
   return ts.createSourceFile(filePath, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 }
 
-export const findSrcFunctionDensityErrorsHelpers = {
+const findSrcFunctionDensityErrorsHelpers = {
   isSrcSourceFilePath,
   toFunctionDensities,
   toSourceFile,
 };
+
+export { findSrcFunctionDensityErrorsHelpers };

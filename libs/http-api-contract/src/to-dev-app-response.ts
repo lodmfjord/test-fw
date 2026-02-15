@@ -4,7 +4,7 @@
 import { toHttpResponseParts } from "./to-http-response-parts";
 
 /**
- * Converts values to dev app response.
+ * Converts to dev app response.
  * @param status - Status parameter.
  * @param payload - Payload parameter.
  * @param contentType - Content type parameter.
@@ -12,6 +12,7 @@ import { toHttpResponseParts } from "./to-http-response-parts";
  * @param requestId - Request id parameter.
  * @example
  * toDevAppResponse(status, payload, contentType, headers, requestId)
+ * @returns Output value.
  */
 export function toDevAppResponse(
   status: number,

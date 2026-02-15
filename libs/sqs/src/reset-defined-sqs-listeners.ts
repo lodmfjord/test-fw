@@ -4,7 +4,7 @@
 import { sqsListenerRegistry } from "./sqs-listener-registry-store";
 
 /**
- * Handles reset defined sqs listeners.
+ * Runs reset defined sqs listeners.
  * @example
  * resetDefinedSqsListeners()
  */

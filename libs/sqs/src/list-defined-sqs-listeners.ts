@@ -5,9 +5,10 @@ import { sqsListenerRegistry } from "./sqs-listener-registry-store";
 import type { SqsListenerRuntimeDefinition } from "./types";
 
 /**
- * Handles list defined sqs listeners.
+ * Runs list defined sqs listeners.
  * @example
  * listDefinedSqsListeners()
+ * @returns Output value.
  */
 export function listDefinedSqsListeners(): SqsListenerRuntimeDefinition[] {
   return sqsListenerRegistry.map((listener) => ({

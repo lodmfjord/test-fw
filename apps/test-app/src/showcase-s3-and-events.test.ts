@@ -2,9 +2,21 @@
  * @fileoverview Tests showcase s3 and step-function event behavior.
  */
 import { describe, expect, it } from "bun:test";
-import { runSqsQueueListener } from "@babbstack/sqs";
-import { testAppFetch, testAppSqs } from "./dev-app";
-import { stepFunctionEventsListener } from "./endpoints";
+import { listDefinedSqsListeners, runSqsQueueListener } from "@babbstack/sqs";
+import { testAppFetch } from "./dev-app";
+import { testAppSqs } from "./test-app-sqs";
+
+/** Converts to step-function events listener. */
+function toStepFunctionEventsListener(): Parameters<typeof runSqsQueueListener>[0] {
+  const listener = listDefinedSqsListeners().find(
+    (item) => item.listenerId === "step_function_events",
+  );
+  if (!listener) {
+    throw new Error('missing listener "step_function_events"');
+  }
+
+  return listener as Parameters<typeof runSqsQueueListener>[0];
+}
 
 describe("test-app showcase s3 and events", () => {
   it("runs /step-function-events and processes the step-function targeted listener locally", async () => {
@@ -25,6 +37,7 @@ describe("test-app showcase s3 and events", () => {
       eventId: "event-1",
     });
 
+    const stepFunctionEventsListener = toStepFunctionEventsListener();
     const processed = await runSqsQueueListener(stepFunctionEventsListener, testAppSqs);
     expect(processed).toBe(1);
     expect(stepFunctionEventsListener.target.kind).toBe("step-function");

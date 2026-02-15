@@ -11,16 +11,17 @@ type LambdaSqsListenerConfig = {
   timeout_seconds: number;
 };
 
-/** Converts values to queue key. */
+/** Converts to queue key. */
 function toQueueKey(queueName: string): string {
   return queueName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
 /**
- * Converts values to sqs listeners by id.
+ * Converts to sqs listeners by id.
  * @param listeners - Listeners parameter.
  * @example
  * toSqsListenersById(listeners)
+ * @returns Output value.
  */
 export function toSqsListenersById(
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,

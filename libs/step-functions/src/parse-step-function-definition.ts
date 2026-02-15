@@ -5,10 +5,12 @@ import type { StepFunctionDefinition, StepFunctionDefinitionInput } from "./asl-
 import { parseStepFunctionDefinitionHelpers } from "./parse-step-function-definition-helpers";
 
 /**
- * Handles parse step function definition.
+ * Runs parse step function definition.
  * @param definition - Definition parameter.
  * @example
  * parseStepFunctionDefinition(definition)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export function parseStepFunctionDefinition(
   definition: StepFunctionDefinitionInput,

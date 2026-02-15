@@ -13,7 +13,7 @@ type ToStringSetting = (
   options: { defaultValue?: string; required: boolean },
 ) => string;
 
-/** Converts values to boolean setting. */
+/** Converts to boolean setting. */
 function toBooleanSetting(value: unknown, settingName: string): boolean {
   if (typeof value === "boolean") {
     return value;
@@ -22,7 +22,7 @@ function toBooleanSetting(value: unknown, settingName: string): boolean {
   throw new Error(`Setting "${settingName}" must be a boolean`);
 }
 
-/** Converts values to terraform resources. */
+/** Converts to terraform resources. */
 function toTerraformResources(value: unknown): TerraformResourceSelection {
   if (value === undefined) {
     return {
@@ -60,7 +60,7 @@ function toTerraformResources(value: unknown): TerraformResourceSelection {
   };
 }
 
-/** Converts values to terraform state. */
+/** Converts to terraform state. */
 function toTerraformState(
   value: unknown,
   toStringSetting: ToStringSetting,
@@ -98,11 +98,13 @@ function toTerraformState(
 }
 
 /**
- * Converts values to terraform settings.
+ * Converts to terraform settings.
  * @param value - Value parameter.
  * @param toStringSetting - To string setting parameter.
  * @example
  * toTerraformSettings(value, toStringSetting)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export function toTerraformSettings(
   value: unknown,

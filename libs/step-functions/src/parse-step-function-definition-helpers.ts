@@ -4,7 +4,7 @@
 import { parseStepFunctionStateBuilders } from "./parse-step-function-state-builders";
 import type { StepFunctionDefinition, StepFunctionDefinitionInput } from "./asl-types";
 
-/** Converts values to state record. */
+/** Converts to state record. */
 function toStateRecord(states: unknown): Record<string, StepFunctionDefinition["States"][string]> {
   if (!states || typeof states !== "object" || Array.isArray(states)) {
     throw new Error("Step-function definition States is required");
@@ -36,7 +36,7 @@ function toStateRecord(states: unknown): Record<string, StepFunctionDefinition["
   );
 }
 
-/** Handles validate transitions. */
+/** Runs validate transitions. */
 function validateTransitions(
   startAt: string,
   states: Record<string, StepFunctionDefinition["States"][string]>,
@@ -72,7 +72,7 @@ function validateTransitions(
   }
 }
 
-/** Converts values to definition source. */
+/** Converts to definition source. */
 function toDefinitionSource(definition: StepFunctionDefinitionInput): StepFunctionDefinition {
   if (typeof definition !== "string") {
     return definition;
@@ -92,8 +92,10 @@ function toDefinitionSource(definition: StepFunctionDefinitionInput): StepFuncti
   return parsed as StepFunctionDefinition;
 }
 
-export const parseStepFunctionDefinitionHelpers = {
+const parseStepFunctionDefinitionHelpers = {
   toDefinitionSource,
   toStateRecord,
   validateTransitions,
 };
+
+export { parseStepFunctionDefinitionHelpers };

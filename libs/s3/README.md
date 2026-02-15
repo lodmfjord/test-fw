@@ -11,6 +11,15 @@ S3 adapters for local and AWS runtimes.
 
 `createRuntimeS3()` selects AWS S3 in Lambda runtime and a local memory/tmp-backed adapter outside Lambda.
 
+## Memory Logger Injection
+
+`createMemoryS3()` accepts:
+
+- `logger`: shared `Logger` from `@babbstack/logger` (preferred)
+- `log`: legacy `(message: string) => void` callback (temporary compatibility)
+
+When neither is provided, memory S3 uses a no-op logger.
+
 ## Basic Example
 
 ```ts

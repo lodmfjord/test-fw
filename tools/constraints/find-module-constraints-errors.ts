@@ -4,11 +4,12 @@
 import { findModuleConstraintsErrorsHelpers } from "./find-module-constraints-errors-helpers";
 
 /**
- * Handles find module constraints errors.
+ * Runs find module constraints errors.
  * @param filePath - File path parameter.
  * @param source - Source parameter.
  * @example
  * findModuleConstraintsErrors(filePath, source)
+ * @returns Output value.
  */
 export function findModuleConstraintsErrors(filePath: string, source: string): string[] {
   const { links, scope, sourceFile } = findModuleConstraintsErrorsHelpers.toModuleConstraintContext(

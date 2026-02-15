@@ -4,7 +4,7 @@
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-/** Handles remove legacy main terraform file. */
+/** Runs remove legacy main terraform file. */
 async function removeLegacyMainTerraformFile(
   outputDirectory: string,
   generatedFileNames: ReadonlyArray<string>,
@@ -23,11 +23,13 @@ async function removeLegacyMainTerraformFile(
 }
 
 /**
- * Handles write terraform files.
+ * Runs write terraform files.
  * @param outputDirectory - Output directory parameter.
  * @param files - Files parameter.
  * @example
  * await writeTerraformFiles(outputDirectory, files)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export async function writeTerraformFiles(
   outputDirectory: string,

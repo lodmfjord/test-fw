@@ -13,21 +13,21 @@ import type {
   SqsStepFunctionWorkflowType,
 } from "./listener-target-types";
 
-/** Converts values to workflow type. */
+/** Converts to workflow type. */
 function toWorkflowType(
   value: SqsStepFunctionWorkflowType | undefined,
 ): SqsStepFunctionWorkflowType {
   return value ?? "EXPRESS";
 }
 
-/** Converts values to invocation type. */
+/** Converts to invocation type. */
 function toInvocationType(
   value: SqsStepFunctionInvocationType | undefined,
 ): SqsStepFunctionInvocationType {
   return value ?? "async";
 }
 
-/** Converts values to step function target. */
+/** Converts to step function target. */
 function toStepFunctionTarget(
   target: SqsListenerTargetInput,
 ): SqsListenerStepFunctionTarget | undefined {
@@ -60,10 +60,11 @@ function toStepFunctionTarget(
 }
 
 /**
- * Converts values to listener target.
+ * Converts to listener target.
  * @param target - Target parameter.
  * @example
  * toListenerTarget(target)
+ * @returns Output value.
  */
 export function toListenerTarget(target: SqsListenerTargetInput | undefined): SqsListenerTarget {
   if (!target || target.kind === "lambda") {

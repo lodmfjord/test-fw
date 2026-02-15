@@ -1,18 +1,22 @@
 /**
  * @fileoverview Implements log dev app failure.
  */
+import { createNoopLogger } from "@babbstack/logger";
+import type { Logger } from "@babbstack/logger";
+
 type DevAppFailureEvent = "dev_app.handler_execution_failed" | "dev_app.output_validation_failed";
 
 type LogDevAppFailureInput = {
   error: unknown;
   event: DevAppFailureEvent;
+  logger?: Logger;
   method: string;
   path: string;
   requestId: string;
   routeId: string;
 };
 
-/** Converts values to error metadata. */
+/** Converts to error metadata. */
 function toErrorMetadata(error: unknown): {
   errorMessage: string;
   errorName: string;
@@ -33,13 +37,15 @@ function toErrorMetadata(error: unknown): {
 }
 
 /**
- * Handles log dev app failure.
+ * Runs log dev app failure.
  * @param input - Input parameter.
  * @example
  * logDevAppFailure(input)
  */
 export function logDevAppFailure(input: LogDevAppFailureInput): void {
-  console.error({
+  const logger = input.logger ?? createNoopLogger();
+
+  logger.error("dev app request failed", {
     ...toErrorMetadata(input.error),
     event: input.event,
     method: input.method,

@@ -2,16 +2,20 @@
  * @fileoverview Implements index.
  */
 import { createClient } from "@babbstack/client";
+import { createLogger } from "@babbstack/logger";
 import type { endpoints as testAppEndpoints } from "../../test-app/src/endpoints";
 
 type TestAppEndpoints = typeof testAppEndpoints;
 
 const baseUrl = process.argv[2] ?? "http://localhost:3000";
 const client = createClient<TestAppEndpoints>(baseUrl);
+const logger = createLogger({
+  serviceName: "test-app-client",
+});
 
-/** Handles expect type. */ function expectType<TValue>(_value: TValue): void {}
+/** Runs expect type. */ function expectType<TValue>(_value: TValue): void {}
 
-/** Handles run. */ async function run(): Promise<void> {
+/** Runs run. */ async function run(): Promise<void> {
   const lastUpdate = await client.request.GET["last-update"]({});
   const stepFunctionDemo = await client.request.POST["step-function-demo"]({
     body: { value: "demo" },
@@ -40,20 +44,20 @@ const client = createClient<TestAppEndpoints>(baseUrl);
   expectType<{ methods: string[] }>(optionsOrder.data);
   expectType<{ exists: boolean }>(headOrder.data);
 
-  console.log("test-app-client smoke results");
-  console.log("GET /last-update", lastUpdate);
-  console.log("POST /step-function-demo", stepFunctionDemo);
-  console.log("PUT /order/{id}", putOrder);
-  console.log("PATCH /order/{id}", patchOrder);
-  console.log("DELETE /order/{id}", deleteOrder);
-  console.log("OPTIONS /order", optionsOrder);
-  console.log("HEAD /order/{id}", headOrder);
+  logger.info("test-app-client smoke results");
+  logger.info("GET /last-update", { response: lastUpdate });
+  logger.info("POST /step-function-demo", { response: stepFunctionDemo });
+  logger.info("PUT /order/{id}", { response: putOrder });
+  logger.info("PATCH /order/{id}", { response: patchOrder });
+  logger.info("DELETE /order/{id}", { response: deleteOrder });
+  logger.info("OPTIONS /order", { response: optionsOrder });
+  logger.info("HEAD /order/{id}", { response: headOrder });
 }
 
 try {
   await run();
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error);
-  console.error("test-app-client smoke failed", { baseUrl, message });
+  logger.error("test-app-client smoke failed", { baseUrl, message });
   process.exit(1);
 }

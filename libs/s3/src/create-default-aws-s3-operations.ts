@@ -25,6 +25,7 @@ import type {
  * Creates default aws s3 operations.
  * @example
  * await createDefaultAwsS3Operations()
+ * @returns Output value.
  */
 export async function createDefaultAwsS3Operations(): Promise<AwsS3Operations> {
   const client = new AwsS3Client({});

@@ -35,15 +35,36 @@ type LoggedEntry = {
 function getHandlerFromSource(
   source: string,
 ): (event: LambdaLikeEvent) => Promise<LambdaLikeResponse> {
+  (globalThis as { __simpleApiPowertoolsLogs?: unknown[] }).__simpleApiPowertoolsLogs = [];
   const sourceWithoutZodImport = source.replace(
     /import\s+\{\s*z\s+as\s+simpleApiZod\s*\}\s+from\s+["']zod["'];?\s*/g,
     'const { z: simpleApiZod } = require("zod");\n',
   );
-  if (/^\s*import\s/m.test(sourceWithoutZodImport)) {
+  const sourceWithoutLoggerImport = sourceWithoutZodImport.replace(
+    /import\s+\{\s*Logger\s+as\s+simpleApiPowertoolsLogger\s*\}\s+from\s+["']@aws-lambda-powertools\/logger["'];?\s*/g,
+    `const simpleApiPowertoolsLogSink = globalThis.__simpleApiPowertoolsLogs ?? (globalThis.__simpleApiPowertoolsLogs = []);
+class simpleApiPowertoolsLogger {
+  constructor() {}
+  debug(message, payload) {
+    simpleApiPowertoolsLogSink.push({ ...(payload ?? {}), level: "debug", message });
+  }
+  info(message, payload) {
+    simpleApiPowertoolsLogSink.push({ ...(payload ?? {}), level: "info", message });
+  }
+  warn(message, payload) {
+    simpleApiPowertoolsLogSink.push({ ...(payload ?? {}), level: "warn", message });
+  }
+  error(message, payload) {
+    simpleApiPowertoolsLogSink.push({ ...(payload ?? {}), level: "error", message });
+  }
+}
+`,
+  );
+  if (/^\s*import\s/m.test(sourceWithoutLoggerImport)) {
     throw new Error("Imports are forbidden in enclosed lambda runtime");
   }
 
-  const transformedSource = sourceWithoutZodImport
+  const transformedSource = sourceWithoutLoggerImport
     .replace(/export\s+async\s+function\s+handler\s*\(/, "async function handler(")
     .replace(/export\s*\{\s*handler\s*\};?/g, "");
   const runtimeRequire = createRequire(import.meta.url);
@@ -55,7 +76,7 @@ function getHandlerFromSource(
   return factory(runtimeRequire);
 }
 
-/** Converts values to event log. */
+/** Converts to event log. */
 function toEventLog(loggedEntries: LoggedEntry[], event: string): LoggedEntry | undefined {
   return loggedEntries.find((entry) => entry.event === event);
 }
@@ -98,14 +119,6 @@ defineGet({
     const source = await readFile(join(outputDirectory, "get_health.mjs"), "utf8");
 
     const handler = getHandlerFromSource(source);
-    const originalConsoleLog = console.log;
-    const loggedEntries: LoggedEntry[] = [];
-    console.log = (...args: unknown[]) => {
-      if (args.length > 0 && args[0] && typeof args[0] === "object") {
-        loggedEntries.push(args[0] as LoggedEntry);
-      }
-    };
-
     const response = await handler({
       body: "",
       headers: {
@@ -118,7 +131,8 @@ defineGet({
         requestId: "aws-req-123",
       },
     });
-    console.log = originalConsoleLog;
+    const loggedEntries =
+      (globalThis as { __simpleApiPowertoolsLogs?: LoggedEntry[] }).__simpleApiPowertoolsLogs ?? [];
 
     expect(response.statusCode).toBe(200);
     expect(response.headers["x-request-id"]).toBe("req-abc");
@@ -176,14 +190,6 @@ defineGet({
     const source = await readFile(join(outputDirectory, "get_boom.mjs"), "utf8");
 
     const handler = getHandlerFromSource(source);
-    const originalConsoleError = console.error;
-    const loggedErrors: LoggedEntry[] = [];
-    console.error = (...args: unknown[]) => {
-      if (args.length > 0 && args[0] && typeof args[0] === "object") {
-        loggedErrors.push(args[0] as LoggedEntry);
-      }
-    };
-
     const response = await handler({
       body: "",
       headers: {},
@@ -193,7 +199,8 @@ defineGet({
         requestId: "aws-req-500",
       },
     });
-    console.error = originalConsoleError;
+    const loggedErrors =
+      (globalThis as { __simpleApiPowertoolsLogs?: LoggedEntry[] }).__simpleApiPowertoolsLogs ?? [];
 
     expect(response.statusCode).toBe(500);
     const failureLog = toEventLog(loggedErrors, "lambda.handler.failed");

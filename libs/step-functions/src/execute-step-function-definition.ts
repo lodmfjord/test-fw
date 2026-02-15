@@ -10,12 +10,14 @@ import { parseStepFunctionDefinition } from "./parse-step-function-definition";
 import { stepFunctionExecutionUtils } from "./step-function-execution-utils";
 
 /**
- * Handles execute step function definition.
+ * Runs execute step function definition.
  * @param definition - Definition parameter.
  * @param input - Input parameter.
  * @param options - Options parameter.
  * @example
  * await executeStepFunctionDefinition(definition, input, options)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export async function executeStepFunctionDefinition(
   definition: StepFunctionDefinitionInput,

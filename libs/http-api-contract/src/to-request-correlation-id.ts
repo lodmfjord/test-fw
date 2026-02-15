@@ -1,7 +1,7 @@
 /**
  * @fileoverview Implements to request correlation id.
  */
-/** Converts values to generated request id. */
+/** Converts to generated request id. */
 function toGeneratedRequestId(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
@@ -11,10 +11,11 @@ function toGeneratedRequestId(): string {
 }
 
 /**
- * Converts values to request correlation id.
+ * Converts to request correlation id.
  * @param request - Request parameter.
  * @example
  * toRequestCorrelationId(request)
+ * @returns Output value.
  */
 export function toRequestCorrelationId(request: Request): string {
   const providedRequestId = request.headers.get("x-request-id")?.trim();

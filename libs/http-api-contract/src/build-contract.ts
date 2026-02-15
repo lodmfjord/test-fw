@@ -8,10 +8,12 @@ import { toRoutesWithGlobalCorsOptions } from "./to-routes-with-global-cors-opti
 import type { BuildContractInput, Contract } from "./types";
 
 /**
- * Handles build contract.
+ * Runs build contract.
  * @param input - Input parameter.
  * @example
  * buildContract(input)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export function buildContract(input: BuildContractInput): Contract {
   const apiName = input.apiName.trim();

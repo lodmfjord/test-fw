@@ -6,7 +6,7 @@ import {
   type ImportDescriptor,
 } from "./render-used-import-lines-helpers";
 
-/** Converts values to import lines. */
+/** Converts to import lines. */
 function toImportLines(handlerSource: string, imports: ImportDescriptor[]): string[] {
   const lines: string[] = [];
   const seen = new Set<string>();
@@ -75,12 +75,13 @@ function toImportLines(handlerSource: string, imports: ImportDescriptor[]): stri
 }
 
 /**
- * Handles render used import lines.
+ * Runs render used import lines.
  * @param endpointModulePath - Endpoint module path parameter.
  * @param endpointModuleSource - Endpoint module source parameter.
  * @param handlerSource - Handler source parameter.
  * @example
  * renderUsedImportLines(endpointModulePath, endpointModuleSource, handlerSource)
+ * @returns Output value.
  */
 export function renderUsedImportLines(
   endpointModulePath: string,

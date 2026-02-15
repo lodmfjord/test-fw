@@ -16,13 +16,14 @@ import type { EndpointRuntimeDefinition } from "./types";
 import type { Contract } from "./types";
 
 /**
- * Handles render terraform files.
+ * Runs render terraform files.
  * @param contract - Contract parameter.
  * @param endpoints - Endpoints parameter.
  * @param sqsListeners - Sqs listeners parameter.
  * @param settings - Settings parameter.
  * @example
  * renderTerraformFiles(contract, endpoints, sqsListeners, settings)
+ * @returns Output value.
  */
 export function renderTerraformFiles(
   contract: Contract,

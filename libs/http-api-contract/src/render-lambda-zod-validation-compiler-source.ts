@@ -7,9 +7,10 @@ import { ZOD_VALIDATION_COMPILER_SOURCE_TAIL } from "./render-lambda-zod-validat
 const ZOD_VALIDATION_COMPILER_SOURCE = `${ZOD_VALIDATION_COMPILER_SOURCE_HEAD}${ZOD_VALIDATION_COMPILER_SOURCE_TAIL}`;
 
 /**
- * Converts values to zod validation compiler source.
+ * Converts to zod validation compiler source.
  * @example
  * toZodValidationCompilerSource()
+ * @returns Output value.
  */
 export function toZodValidationCompilerSource(): string {
   return ZOD_VALIDATION_COMPILER_SOURCE;

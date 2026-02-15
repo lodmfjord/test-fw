@@ -14,7 +14,7 @@ const SUPPORTED_METHODS: HttpMethod[] = [
   "HEAD",
 ];
 
-/** Handles normalize method. */
+/** Runs normalize method. */
 function normalizeMethod(method: string): HttpMethod {
   const normalizedMethod = method.trim().toUpperCase();
   if (SUPPORTED_METHODS.includes(normalizedMethod as HttpMethod)) {
@@ -24,7 +24,7 @@ function normalizeMethod(method: string): HttpMethod {
   throw new Error(`Unsupported method: ${method}`);
 }
 
-/** Handles normalize path. */
+/** Runs normalize path. */
 function normalizePath(path: string): string {
   const trimmedPath = path.trim();
   if (trimmedPath.length === 0) {
@@ -47,7 +47,7 @@ function normalizePath(path: string): string {
   return segments.length === 0 ? "/" : `/${segments.join("/")}`;
 }
 
-/** Handles sanitize segment. */
+/** Runs sanitize segment. */
 function sanitizeSegment(segment: string): string {
   return segment
     .toLowerCase()
@@ -56,7 +56,7 @@ function sanitizeSegment(segment: string): string {
     .replace(/_+/g, "_");
 }
 
-/** Converts values to route id. */
+/** Converts to route id. */
 function toRouteId(method: HttpMethod, path: string): string {
   if (path === "/") {
     return `${method.toLowerCase()}_root`;
@@ -78,7 +78,7 @@ function toRouteId(method: HttpMethod, path: string): string {
   return [method.toLowerCase(), ...pathSegments].join("_");
 }
 
-/** Converts values to operation id. */
+/** Converts to operation id. */
 function toOperationId(routeId: string): string {
   const parts = routeId.split("_");
   const head = parts[0] ?? "route";
@@ -90,7 +90,7 @@ function toOperationId(routeId: string): string {
   return `${head}${tail}`;
 }
 
-/** Converts values to route env. */
+/** Converts to route env. */
 function toRouteEnv(input: RouteInput["env"]): Record<string, string> | undefined {
   if (!input || input.length === 0) {
     return undefined;
@@ -116,6 +116,8 @@ function toRouteEnv(input: RouteInput["env"]): Record<string, string> | undefine
  * @param input - Input parameter.
  * @example
  * defineRoute(input)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export function defineRoute(input: RouteInput): RouteDefinition {
   const method = normalizeMethod(input.method);

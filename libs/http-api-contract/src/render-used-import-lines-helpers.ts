@@ -20,7 +20,7 @@ type ImportDescriptor = {
 
 const LOCAL_SOURCE_EXTENSIONS = [".ts", ".tsx", ".mts", ".cts", ".js", ".mjs", ".cjs"];
 
-/** Handles escape reg exp. */
+/** Runs escape reg exp. */
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -35,7 +35,7 @@ function isNameUsed(handlerSource: string, name: string): boolean {
   return new RegExp(`\\b${escapeRegExp(name)}\\b`, "m").test(handlerSource);
 }
 
-/** Converts values to resolved local module path. */
+/** Converts to resolved local module path. */
 function toResolvedLocalModulePath(
   importerPath: string,
   moduleSpecifier: string,
@@ -58,7 +58,7 @@ function toResolvedLocalModulePath(
   return undefined;
 }
 
-/** Handles resolve import specifier. */
+/** Runs resolve import specifier. */
 function resolveImportSpecifier(moduleSpecifier: string, importerPath: string): string {
   if (isLocalImportPath(moduleSpecifier)) {
     return (
@@ -75,7 +75,7 @@ function resolveImportSpecifier(moduleSpecifier: string, importerPath: string): 
   }
 }
 
-/** Converts values to import descriptor. */
+/** Converts to import descriptor. */
 function toImportDescriptor(
   statement: ts.ImportDeclaration,
   sourcePath: string,
@@ -130,7 +130,7 @@ function toImportDescriptor(
   return descriptor;
 }
 
-/** Converts values to imports for source. */
+/** Converts to imports for source. */
 function toImportsForSource(sourcePath: string, moduleSource: string): ImportDescriptor[] {
   const sourceFile = ts.createSourceFile(
     sourcePath,
@@ -155,7 +155,7 @@ function toImportsForSource(sourcePath: string, moduleSource: string): ImportDes
   return imports;
 }
 
-/** Converts values to module imports. */
+/** Converts to module imports. */
 function toModuleImports(endpointModulePath: string, moduleSource: string): ImportDescriptor[] {
   const visited = new Set<string>();
   const queue: Array<{ path: string; source: string }> = [
@@ -196,8 +196,10 @@ function toModuleImports(endpointModulePath: string, moduleSource: string): Impo
 }
 
 export type { ImportDescriptor };
-export const renderUsedImportLinesHelpers = {
+const renderUsedImportLinesHelpers = {
   isNameUsed,
   resolveImportSpecifier,
   toModuleImports,
 };
+
+export { renderUsedImportLinesHelpers };

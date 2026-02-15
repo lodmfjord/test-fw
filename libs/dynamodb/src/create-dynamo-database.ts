@@ -58,7 +58,7 @@ export type DynamoDatabase<TItem extends DynamoDbItem, TKeyField extends keyof T
   write(db: DynamoDatabaseWriteClient, item: TItem): Promise<TItem>;
 };
 
-/** Converts values to table name. */ function toTableName<TKeyField extends string>(
+/** Converts to table name. */ function toTableName<TKeyField extends string>(
   keyField: TKeyField,
   options: CreateDynamoDatabaseOptions | undefined,
 ): string {
@@ -71,7 +71,7 @@ export type DynamoDatabase<TItem extends DynamoDbItem, TKeyField extends keyof T
   return tableName;
 }
 
-/** Converts values to item key. */ function toItemKey<
+/** Converts to item key. */ function toItemKey<
   TItem extends DynamoDbItem,
   TKeyField extends keyof TItem & string,
 >(item: TItem, keyField: TKeyField): Pick<TItem, TKeyField> {
@@ -80,7 +80,7 @@ export type DynamoDatabase<TItem extends DynamoDbItem, TKeyField extends keyof T
   } as Pick<TItem, TKeyField>;
 }
 
-/** Converts values to record. */
+/** Converts to record. */
 function toRecord(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object") {
     return {};
@@ -96,6 +96,7 @@ function toRecord(value: unknown): Record<string, unknown> {
  * @param options - Options parameter.
  * @example
  * createDynamoDatabase(parser, keyField, options)
+ * @returns Output value.
  */ export function createDynamoDatabase<
   TItem extends DynamoDbItem,
   TKeyField extends keyof TItem & string,
@@ -106,7 +107,7 @@ function toRecord(value: unknown): Record<string, unknown> {
 ): DynamoDatabase<TItem, TKeyField> {
   const tableName = toTableName(keyField, options);
 
-  /** Handles read. */ const read = async (
+  /** Runs read. */ const read = async (
     db: DynamoDatabaseReadClient,
     key: Pick<TItem, TKeyField>,
   ): Promise<TItem | undefined> => {
@@ -117,7 +118,7 @@ function toRecord(value: unknown): Record<string, unknown> {
     return item ? parser.parse(item) : undefined;
   };
 
-  /** Handles write. */ const write = async (
+  /** Runs write. */ const write = async (
     db: DynamoDatabaseWriteClient,
     item: TItem,
   ): Promise<TItem> => {
@@ -130,7 +131,7 @@ function toRecord(value: unknown): Record<string, unknown> {
     return parsedItem;
   };
 
-  /** Handles update. */ const update = async (
+  /** Runs update. */ const update = async (
     db: DynamoDatabaseWriteClient,
     key: Pick<TItem, TKeyField>,
     changes: Partial<Omit<TItem, TKeyField>>,
@@ -143,7 +144,7 @@ function toRecord(value: unknown): Record<string, unknown> {
     return item ? parser.parse(item) : undefined;
   };
 
-  /** Handles remove. */ const remove = async (
+  /** Runs remove. */ const remove = async (
     db: DynamoDatabaseWriteClient,
     key: Pick<TItem, TKeyField>,
   ): Promise<void> => {
@@ -157,7 +158,7 @@ function toRecord(value: unknown): Record<string, unknown> {
   function bind(db: DynamoDatabaseWriteClient): WriteBoundDynamoDatabase<TItem, TKeyField>;
   /** Handles bind. */
   function bind(db: DynamoDatabaseReadClient): ReadBoundDynamoDatabase<TItem, TKeyField>;
-  /** Handles bind. */
+  /** Runs bind. */
   function bind(
     db: DynamoDatabaseReadClient | DynamoDatabaseWriteClient,
   ): ReadBoundDynamoDatabase<TItem, TKeyField> | WriteBoundDynamoDatabase<TItem, TKeyField> {

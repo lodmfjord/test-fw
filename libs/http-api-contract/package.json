@@ -19,7 +19,9 @@
     }
   },
   "dependencies": {
+    "@aws-lambda-powertools/logger": "^2.31.0",
     "@babbstack/dynamodb": "workspace:*",
+    "@babbstack/logger": "workspace:*",
     "@babbstack/schema": "workspace:*",
     "@babbstack/sqs": "workspace:*",
     "@babbstack/step-functions": "workspace:*",

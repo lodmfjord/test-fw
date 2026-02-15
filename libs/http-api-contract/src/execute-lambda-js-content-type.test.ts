@@ -33,11 +33,15 @@ function getHandlerFromSource(
     /import\s+\{\s*z\s+as\s+simpleApiZod\s*\}\s+from\s+["']zod["'];?\s*/g,
     'const { z: simpleApiZod } = require("zod");\n',
   );
-  if (/^\s*import\s/m.test(sourceWithoutZodImport)) {
+  const sourceWithoutLoggerImport = sourceWithoutZodImport.replace(
+    /import\s+\{\s*Logger\s+as\s+simpleApiPowertoolsLogger\s*\}\s+from\s+["']@aws-lambda-powertools\/logger["'];?\s*/g,
+    'const { Logger: simpleApiPowertoolsLogger } = require("@aws-lambda-powertools/logger");\n',
+  );
+  if (/^\s*import\s/m.test(sourceWithoutLoggerImport)) {
     throw new Error("Imports are forbidden in enclosed lambda runtime");
   }
 
-  const transformedSource = sourceWithoutZodImport
+  const transformedSource = sourceWithoutLoggerImport
     .replace(/export\s+async\s+function\s+handler\s*\(/, "async function handler(")
     .replace(/export\s*\{\s*handler\s*\};?/g, "");
   const runtimeRequire = createRequire(import.meta.url);

@@ -41,6 +41,7 @@ type DeleteEndpointDefinition<
  * @param input - Input parameter.
  * @example
  * defineDelete(input)
+ * @returns Output value.
  */ export function defineDelete<
   TParams,
   TQuery,

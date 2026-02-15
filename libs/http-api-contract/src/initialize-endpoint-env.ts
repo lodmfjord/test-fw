@@ -1,16 +1,22 @@
 /**
  * @fileoverview Implements initialize endpoint env.
  */
+import { createNoopLogger } from "@babbstack/logger";
+import type { Logger } from "@babbstack/logger";
 import { toSecretDefinition } from "./to-secret-definition";
 import type { EndpointRuntimeDefinition } from "./types";
 
 /**
- * Handles initialize endpoint env.
+ * Runs initialize endpoint env.
  * @param endpoints - Endpoints parameter.
+ * @param logger - Logger parameter.
  * @example
- * initializeEndpointEnv(endpoints)
+ * initializeEndpointEnv(endpoints, logger)
  */
-export function initializeEndpointEnv(endpoints: ReadonlyArray<EndpointRuntimeDefinition>): void {
+export function initializeEndpointEnv(
+  endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
+  logger: Logger = createNoopLogger(),
+): void {
   if (typeof process === "undefined" || !process.env) {
     return;
   }
@@ -26,7 +32,10 @@ export function initializeEndpointEnv(endpoints: ReadonlyArray<EndpointRuntimeDe
           continue;
         }
 
-        console.log(`[simple-api] Would load parameter ${secret.parameterName} into ${name}`);
+        logger.info("[simple-api] Would load parameter for env", {
+          envName: name,
+          parameterName: secret.parameterName,
+        });
         continue;
       }
 

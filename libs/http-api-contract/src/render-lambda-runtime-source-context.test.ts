@@ -40,6 +40,9 @@ describe("toLambdaRuntimeSourceContext", () => {
     );
 
     expect(context.prelude).toContain('import { z as simpleApiZod } from "zod";');
+    expect(context.prelude).toContain(
+      'import { Logger as simpleApiPowertoolsLogger } from "@aws-lambda-powertools/logger";',
+    );
     expect(context.prelude).toContain('import { helper } from "./helper";');
     expect(context.prelude).toContain("@runtime/db");
     expect(context.prelude).toContain("@runtime/sqs");

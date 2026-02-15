@@ -12,11 +12,12 @@ function isBufferValue(payload: unknown): payload is Buffer {
 }
 
 /**
- * Converts values to http response parts.
+ * Converts to http response parts.
  * @param payload - Payload parameter.
  * @param contentType - Content type parameter.
  * @example
  * toHttpResponseParts(payload, contentType)
+ * @returns Output value.
  */
 export function toHttpResponseParts(payload: unknown, contentType?: string): HttpResponseParts {
   const resolvedContentType =

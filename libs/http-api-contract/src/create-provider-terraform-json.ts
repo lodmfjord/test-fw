@@ -11,12 +11,12 @@ type TerraformResolvedState = {
   lockTableName?: string;
 };
 
-/** Converts values to terraform reference. */
+/** Converts to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
-/** Converts values to resolved state settings. */
+/** Converts to resolved state settings. */
 function toResolvedStateSettings(
   settings: TerraformRenderSettings,
   appName: string,
@@ -48,7 +48,7 @@ function toResolvedStateSettings(
   };
 }
 
-/** Converts values to terraform block. */
+/** Converts to terraform block. */
 function toTerraformBlock(settings: TerraformRenderSettings, appName: string): TerraformJson {
   const state = toResolvedStateSettings(settings, appName);
   const terraformBlock: TerraformJson = {
@@ -89,6 +89,7 @@ function toTerraformBlock(settings: TerraformRenderSettings, appName: string): T
  * @param appName - App name parameter.
  * @example
  * createProviderTerraformJson(settings, appName)
+ * @returns Output value.
  */
 export function createProviderTerraformJson(
   settings: TerraformRenderSettings,

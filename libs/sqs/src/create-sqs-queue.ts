@@ -21,7 +21,7 @@ type CreateSqsQueueOptions = {
   queueName: string;
 };
 
-/** Converts values to queue name. */
+/** Converts to queue name. */
 function toQueueName(options: CreateSqsQueueOptions): string {
   const queueName = options.queueName.trim();
   if (queueName.length === 0) {
@@ -31,7 +31,7 @@ function toQueueName(options: CreateSqsQueueOptions): string {
   return queueName;
 }
 
-/** Converts values to listener id. */
+/** Converts to listener id. */
 function toListenerId(queueName: string, providedListenerId: string | undefined): string {
   const source = providedListenerId?.trim() || `${queueName}_listener`;
   const normalized = source.replace(/[^a-zA-Z0-9_]/g, "_").replace(/_+/g, "_");
@@ -42,7 +42,7 @@ function toListenerId(queueName: string, providedListenerId: string | undefined)
   return normalized;
 }
 
-/** Converts values to runtime config. */
+/** Converts to runtime config. */
 function toRuntimeConfig(queueName: string): SqsQueueRuntimeConfig {
   return {
     kind: "sqs-queue",
@@ -50,7 +50,7 @@ function toRuntimeConfig(queueName: string): SqsQueueRuntimeConfig {
   };
 }
 
-/** Converts values to bound sqs queue. */ function bindQueue<TMessage extends SqsMessage>(
+/** Converts to bound sqs queue. */ function bindQueue<TMessage extends SqsMessage>(
   sqs: SqsClient,
   queueName: string,
   parse: (input: unknown) => TMessage,
@@ -114,6 +114,7 @@ function toRuntimeConfig(queueName: string): SqsQueueRuntimeConfig {
  * @param options - Options parameter.
  * @example
  * createSqsQueue(parser, options)
+ * @returns Output value.
  */ export function createSqsQueue<TMessage extends SqsMessage>(
   parser: Parser<TMessage>,
   options: CreateSqsQueueOptions,

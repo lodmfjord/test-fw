@@ -10,7 +10,7 @@ type EndpointDescriptor = {
   routeId: string;
 };
 
-/** Converts values to base url. */
+/** Converts to base url. */
 function toBaseUrl(baseUrl: string): string {
   const normalized = baseUrl.trim();
   if (normalized.length === 0) {
@@ -20,7 +20,7 @@ function toBaseUrl(baseUrl: string): string {
   return normalized.endsWith("/") ? normalized.slice(0, -1) : normalized;
 }
 
-/** Converts values to resolved path. */
+/** Converts to resolved path. */
 function toResolvedPath(
   pathTemplate: string,
   params: Record<string, string | number | boolean | undefined>,
@@ -36,7 +36,7 @@ function toResolvedPath(
   });
 }
 
-/** Converts values to path key. */
+/** Converts to path key. */
 function toPathKey(pathKey: string): string {
   const trimmed = pathKey.trim();
   if (trimmed.length === 0) {
@@ -47,7 +47,7 @@ function toPathKey(pathKey: string): string {
   return withLeadingSlash.replace(/\/+/g, "/");
 }
 
-/** Handles append query. */
+/** Runs append query. */
 function appendQuery(searchParams: URLSearchParams, query: QueryRecord | undefined): void {
   if (!query || typeof query !== "object") {
     return;
@@ -73,7 +73,7 @@ function appendQuery(searchParams: URLSearchParams, query: QueryRecord | undefin
   }
 }
 
-/** Converts values to string headers. */
+/** Converts to string headers. */
 function toStringHeaders(headers: unknown): Record<string, string> {
   if (!headers || typeof headers !== "object" || Array.isArray(headers)) {
     return {};
@@ -97,7 +97,7 @@ function hasHeader(headers: Record<string, string>, expectedName: string): boole
   return Object.keys(headers).some((name) => name.toLowerCase() === normalizedExpectedName);
 }
 
-/** Converts values to request body. */
+/** Converts to request body. */
 function toRequestBody(body: unknown, headers: Record<string, string>): BodyInit | undefined {
   if (body === undefined) {
     return undefined;
@@ -121,7 +121,7 @@ function toRequestBody(body: unknown, headers: Record<string, string>): BodyInit
   return JSON.stringify(body);
 }
 
-/** Converts values to response data. */
+/** Converts to response data. */
 async function toResponseData(response: Response): Promise<unknown> {
   const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
   if (contentType.includes("/json") || contentType.includes("+json")) {
@@ -136,7 +136,7 @@ async function toResponseData(response: Response): Promise<unknown> {
   return (await response.text()) as unknown;
 }
 
-/** Converts values to response headers. */
+/** Converts to response headers. */
 function toResponseHeaders(headers: Headers): Record<string, string> {
   const normalized: Record<string, string> = {};
   for (const [name, value] of headers.entries()) {
@@ -146,7 +146,7 @@ function toResponseHeaders(headers: Headers): Record<string, string> {
   return normalized;
 }
 
-/** Converts values to endpoint list. */
+/** Converts to endpoint list. */
 function toEndpointList(endpoints: unknown): EndpointDescriptor[] {
   if (!endpoints) {
     return [];
@@ -186,7 +186,7 @@ function toEndpointList(endpoints: unknown): EndpointDescriptor[] {
   return [];
 }
 
-export const createClientHelpers = {
+const createClientHelpers = {
   appendQuery,
   toBaseUrl,
   toEndpointList,
@@ -197,3 +197,5 @@ export const createClientHelpers = {
   toResponseHeaders,
   toStringHeaders,
 };
+
+export { createClientHelpers };

@@ -4,7 +4,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-/** Handles write fake module. */
+/** Runs write fake module. */
 async function writeFakeModule(
   nodeModulesDirectory: string,
   moduleName: string,
@@ -41,6 +41,7 @@ async function writeFakeModule(
  */
 export async function createFakeLayerModulesForTest(workspaceDirectory: string): Promise<void> {
   const nodeModulesDirectory = join(workspaceDirectory, "node_modules");
+  await writeFakeModule(nodeModulesDirectory, "@aws-lambda-powertools/logger", {}, "logger");
   await writeFakeModule(nodeModulesDirectory, "zod", {}, "z");
   await writeFakeModule(nodeModulesDirectory, "fake-layer-shared", {}, "shared");
   await writeFakeModule(

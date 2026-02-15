@@ -5,7 +5,7 @@ import { toDynamodbTables } from "./to-dynamodb-tables";
 import type { EndpointRuntimeDefinition } from "./types";
 import type { TerraformJson } from "./terraform-render-types";
 
-/** Converts values to terraform reference. */
+/** Converts to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
@@ -15,6 +15,7 @@ function toTerraformReference(expression: string): string {
  * @param endpoints - Endpoints parameter.
  * @example
  * createDynamodbTerraformJson(endpoints)
+ * @returns Output value.
  */
 export function createDynamodbTerraformJson(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

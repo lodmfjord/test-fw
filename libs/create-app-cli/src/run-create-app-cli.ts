@@ -1,6 +1,7 @@
 /**
  * @fileoverview Runs CLI argument handling to scaffold a minimal app in apps/.
  */
+import { createLogger } from "@babbstack/logger";
 import { createBaseApp } from "./create-base-app";
 
 /**
@@ -11,16 +12,20 @@ import { createBaseApp } from "./create-base-app";
  * ```ts
  * const exitCode = await runCreateAppCli(["hello-app"], process.cwd());
  * ```
+ * @returns Output value.
  */
 export async function runCreateAppCli(args: string[], repoRoot: string): Promise<number> {
   const [appName] = args;
+  const logger = createLogger({
+    serviceName: "create-app-cli",
+  });
 
   if (!appName) {
-    console.error("Usage: create-babbstack-app <app-name>");
+    logger.error("Usage: create-babbstack-app <app-name>");
     return 1;
   }
 
   await createBaseApp(appName, repoRoot);
-  console.log(`Created apps/${appName}`);
+  logger.info(`Created apps/${appName}`);
   return 0;
 }

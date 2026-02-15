@@ -14,6 +14,8 @@ type CreateSecretOptions = {
  * @param options - Options parameter.
  * @example
  * createSecret(parameterName, options)
+ * @returns Output value.
+ * @throws Error when operation fails.
  */
 export function createSecret(parameterName: string, options: CreateSecretOptions = {}): string {
   const source = parameterName.trim();

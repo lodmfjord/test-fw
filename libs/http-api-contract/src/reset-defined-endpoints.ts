@@ -4,7 +4,7 @@
 import { endpointRegistry } from "./endpoint-registry-store";
 
 /**
- * Handles reset defined endpoints.
+ * Runs reset defined endpoints.
  * @example
  * resetDefinedEndpoints()
  */

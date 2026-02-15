@@ -7,12 +7,13 @@ import { lambdaLayerArtifactsHelpers } from "./lambda-layer-artifacts-helpers";
 import type { LambdaLayerMetadata } from "./to-lambda-layer-metadata";
 
 /**
- * Handles write lambda layer artifacts.
+ * Runs write lambda layer artifacts.
  * @param outputDirectory - Output directory parameter.
  * @param layerMetadata - Layer metadata parameter.
  * @param resolveFromDirectory - Resolve from directory parameter.
  * @example
  * await writeLambdaLayerArtifacts(outputDirectory, layerMetadata, resolveFromDirectory)
+ * @returns Output value.
  */
 export async function writeLambdaLayerArtifacts(
   outputDirectory: string,

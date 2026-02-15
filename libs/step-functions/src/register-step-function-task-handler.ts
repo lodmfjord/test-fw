@@ -10,6 +10,7 @@ import { stepFunctionTaskHandlerMap } from "./step-function-task-handler-map";
  * @param handler - Handler parameter.
  * @example
  * registerStepFunctionTaskHandler(resource, handler)
+ * @throws Error when operation fails.
  */
 export function registerStepFunctionTaskHandler(
   resource: string,

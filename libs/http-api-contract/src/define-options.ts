@@ -41,6 +41,7 @@ type OptionsEndpointDefinition<
  * @param input - Input parameter.
  * @example
  * defineOptions(input)
+ * @returns Output value.
  */ export function defineOptions<
   TParams,
   TQuery,

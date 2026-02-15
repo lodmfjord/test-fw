@@ -15,7 +15,7 @@ afterEach(() => {
   globalThis.fetch = originalFetch;
 });
 
-/** Handles assert typed request input output. */ function _assertTypedRequestInputOutput(): void {
+/** Runs assert typed request input output. */ function _assertTypedRequestInputOutput(): void {
   const client = createClient<TestAppEndpoints>(baseUrl);
 
   const lastUpdateRequest = client.request.GET["last-update"]({});
