@@ -1,3 +1,4 @@
+/** @fileoverview Implements to sqs listeners by id. @module libs/http-api-contract/src/to-sqs-listeners-by-id */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 
 type LambdaSqsListenerConfig = {
@@ -8,10 +9,12 @@ type LambdaSqsListenerConfig = {
   timeout_seconds: number;
 };
 
+/** Converts values to queue key. */
 function toQueueKey(queueName: string): string {
   return queueName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
+/** Converts values to sqs listeners by id. @example `toSqsListenersById(input)` */
 export function toSqsListenersById(
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
 ): Record<string, LambdaSqsListenerConfig> {

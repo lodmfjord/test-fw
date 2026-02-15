@@ -1,3 +1,4 @@
+/** @fileoverview Implements index. @module apps/test-app-client/src/index */
 import { createClient } from "@babbstack/client";
 import type { endpoints as testAppEndpoints } from "../../test-app/src/endpoints";
 
@@ -6,9 +7,9 @@ type TestAppEndpoints = typeof testAppEndpoints;
 const baseUrl = process.argv[2] ?? "http://localhost:3000";
 const client = createClient<TestAppEndpoints>(baseUrl);
 
-function expectType<TValue>(_value: TValue): void {}
+/** Handles expect type. */ function expectType<TValue>(_value: TValue): void {}
 
-async function run(): Promise<void> {
+/** Handles run. */ async function run(): Promise<void> {
   const lastUpdate = await client.request.GET["last-update"]({});
   const stepFunctionDemo = await client.request.POST["step-function-demo"]({
     body: { value: "demo" },

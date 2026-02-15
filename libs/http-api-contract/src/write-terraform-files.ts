@@ -1,6 +1,8 @@
+/** @fileoverview Implements write terraform files. @module libs/http-api-contract/src/write-terraform-files */
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
+/** Handles remove legacy main terraform file. */
 async function removeLegacyMainTerraformFile(
   outputDirectory: string,
   generatedFileNames: ReadonlyArray<string>,
@@ -18,6 +20,7 @@ async function removeLegacyMainTerraformFile(
   }
 }
 
+/** Handles write terraform files. @example `await writeTerraformFiles(input)` */
 export async function writeTerraformFiles(
   outputDirectory: string,
   files: Record<string, string>,

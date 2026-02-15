@@ -1,6 +1,8 @@
+/** @fileoverview Implements create fake layer modules for test. @module libs/http-api-contract/src/create-fake-layer-modules-for-test */
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
+/** Handles write fake module. */
 async function writeFakeModule(
   nodeModulesDirectory: string,
   moduleName: string,
@@ -29,6 +31,7 @@ async function writeFakeModule(
   );
 }
 
+/** Creates fake layer modules for test. @example `await createFakeLayerModulesForTest(input)` */
 export async function createFakeLayerModulesForTest(workspaceDirectory: string): Promise<void> {
   const nodeModulesDirectory = join(workspaceDirectory, "node_modules");
   await writeFakeModule(nodeModulesDirectory, "zod", {}, "z");

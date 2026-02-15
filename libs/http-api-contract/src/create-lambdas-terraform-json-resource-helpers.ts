@@ -1,9 +1,12 @@
+/** @fileoverview Implements create lambdas terraform json resource helpers. @module libs/http-api-contract/src/create-lambdas-terraform-json-resource-helpers */
 import type { LambdasTerraformContext } from "./create-lambdas-terraform-json-helpers";
 
+/** Converts values to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
+/** Converts values to resource block. */
 function toResourceBlock(
   context: LambdasTerraformContext,
   iamRolePolicies: Record<string, unknown>,
@@ -112,6 +115,7 @@ function toResourceBlock(
   };
 }
 
+/** Converts values to variable block. */
 function toVariableBlock(context: LambdasTerraformContext): Record<string, unknown> {
   return {
     lambda_artifacts_base_path: { default: "lambda-artifacts", type: "string" },

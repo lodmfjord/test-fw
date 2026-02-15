@@ -1,11 +1,14 @@
+/** @fileoverview Implements schema. @module libs/schema/src/schema */
 import { z, type ZodIssue, type ZodType } from "zod";
 import type { JsonSchema, ObjectFromShape, OptionalSchema, Schema } from "./schema-types";
 
+/** Handles fail. */
 function fail(path: string | undefined, message: string): never {
   const scope = path && path.length > 0 ? path : "value";
   throw new Error(`${scope}: ${message}`);
 }
 
+/** Converts values to path. */
 function toPath(parentPath: string | undefined, key: string | undefined): string | undefined {
   if (!key || key.length === 0) {
     return parentPath;
@@ -18,6 +21,7 @@ function toPath(parentPath: string | undefined, key: string | undefined): string
   return `${parentPath}.${key}`;
 }
 
+/** Converts values to issue path. */
 function toIssuePath(path: PropertyKey[]): string | undefined {
   if (path.length === 0) {
     return undefined;
@@ -26,6 +30,7 @@ function toIssuePath(path: PropertyKey[]): string | undefined {
   return path.map((segment) => String(segment)).join(".");
 }
 
+/** Converts values to issue message. */
 function toIssueMessage(issue: ZodIssue): string {
   if (issue.code === "invalid_type") {
     return `expected ${issue.expected}`;
@@ -34,7 +39,7 @@ function toIssueMessage(issue: ZodIssue): string {
   return issue.message;
 }
 
-function parseWithZod<TValue>(
+/** Parses with zod. */ function parseWithZod<TValue>(
   zodSchema: ZodType<TValue>,
   value: unknown,
   path: string | undefined,
@@ -52,6 +57,7 @@ function parseWithZod<TValue>(
   fail(toPath(path, toIssuePath(issue.path)), toIssueMessage(issue));
 }
 
+/** Converts values to object schema. */
 function toObjectSchema(shape: Record<string, Schema<unknown>>): JsonSchema {
   const properties: Record<string, JsonSchema> = {};
   const required: string[] = [];
@@ -71,6 +77,7 @@ function toObjectSchema(shape: Record<string, Schema<unknown>>): JsonSchema {
   };
 }
 
+/** Converts values to json schema. */
 function toJsonSchema(zodSchema: ZodType<unknown>): JsonSchema {
   const schemaWithMeta = z.toJSONSchema(zodSchema) as JsonSchema & {
     $schema?: string;
@@ -84,10 +91,12 @@ function toJsonSchema(zodSchema: ZodType<unknown>): JsonSchema {
   return jsonSchema;
 }
 
+/** Checks whether record. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
+/** Converts values to unsupported zod construct. */
 function toUnsupportedZodConstruct(zodSchema: ZodType<unknown>): string | undefined {
   const queue: unknown[] = [zodSchema];
   const visited = new Set<object>();
@@ -146,6 +155,7 @@ function toUnsupportedZodConstruct(zodSchema: ZodType<unknown>): string | undefi
   return undefined;
 }
 
+/** Handles assert lambda parity safe from zod schema. */
 function assertLambdaParitySafeFromZodSchema(zodSchema: ZodType<unknown>): void {
   const unsupportedConstruct = toUnsupportedZodConstruct(zodSchema);
   if (!unsupportedConstruct) {
@@ -157,7 +167,10 @@ function assertLambdaParitySafeFromZodSchema(zodSchema: ZodType<unknown>): void 
   );
 }
 
-function toSchema<TValue>(zodSchema: ZodType<TValue>, jsonSchema: JsonSchema): Schema<TValue> {
+/** Converts values to schema. */ function toSchema<TValue>(
+  zodSchema: ZodType<TValue>,
+  jsonSchema: JsonSchema,
+): Schema<TValue> {
   return {
     jsonSchema,
     parse(value: unknown, path?: string): TValue {
@@ -167,7 +180,9 @@ function toSchema<TValue>(zodSchema: ZodType<TValue>, jsonSchema: JsonSchema): S
   };
 }
 
-function toOptionalSchema<TValue>(inner: Schema<TValue>): OptionalSchema<TValue> {
+/** Converts values to optional schema. */ function toOptionalSchema<TValue>(
+  inner: Schema<TValue>,
+): OptionalSchema<TValue> {
   const zodSchema = inner.zodSchema.optional();
 
   return {

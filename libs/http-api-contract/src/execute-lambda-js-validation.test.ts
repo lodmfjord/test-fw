@@ -1,3 +1,4 @@
+/** @fileoverview Tests execute lambda js validation. @module libs/http-api-contract/src/execute-lambda-js-validation.test */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -21,6 +22,7 @@ type LambdaLikeResponse = {
   statusCode: number;
 };
 
+/** Gets handler from source. */
 function getHandlerFromSource(
   source: string,
 ): (event: LambdaLikeEvent) => Promise<LambdaLikeResponse> {

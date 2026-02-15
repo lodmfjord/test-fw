@@ -1,9 +1,12 @@
+/** @fileoverview Implements create api gateway lambda bindings terraform json. @module libs/http-api-contract/src/create-api-gateway-lambda-bindings-terraform-json */
 import type { TerraformJson } from "./terraform-render-types";
 
+/** Converts values to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
+/** Creates api gateway lambda bindings terraform json. @example `createApiGatewayLambdaBindingsTerraformJson(input)` */
 export function createApiGatewayLambdaBindingsTerraformJson(): TerraformJson {
   return {
     resource: {

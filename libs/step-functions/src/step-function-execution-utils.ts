@@ -1,3 +1,4 @@
+/** @fileoverview Implements step function execution utils. @module libs/step-functions/src/step-function-execution-utils */
 import type {
   ExecuteStepFunctionDefinitionOptions,
   StepFunctionChoiceRule,
@@ -8,7 +9,7 @@ import type {
 } from "./asl-types";
 import { getRegisteredStepFunctionTaskHandler } from "./get-registered-step-function-task-handler";
 
-function cloneValue<TValue>(value: TValue): TValue {
+/** Clones value. */ function cloneValue<TValue>(value: TValue): TValue {
   if (typeof structuredClone === "function") {
     return structuredClone(value);
   }
@@ -16,6 +17,7 @@ function cloneValue<TValue>(value: TValue): TValue {
   return JSON.parse(JSON.stringify(value)) as TValue;
 }
 
+/** Converts values to path segments. */
 function toPathSegments(path: StepFunctionJsonPath): string[] {
   if (path === "$") {
     return [];
@@ -27,6 +29,7 @@ function toPathSegments(path: StepFunctionJsonPath): string[] {
     .filter((segment) => segment.length > 0);
 }
 
+/** Handles read path. */
 function readPath(value: unknown, path: StepFunctionJsonPath): unknown {
   const segments = toPathSegments(path);
   let currentValue: unknown = value;
@@ -41,6 +44,7 @@ function readPath(value: unknown, path: StepFunctionJsonPath): unknown {
   return currentValue;
 }
 
+/** Handles apply input or output path. */
 function applyInputOrOutputPath(
   value: unknown,
   path: StepFunctionJsonPathOrNull | undefined,
@@ -56,6 +60,7 @@ function applyInputOrOutputPath(
   return readPath(value, path);
 }
 
+/** Handles write path. */
 function writePath(value: unknown, path: StepFunctionJsonPath, result: unknown): unknown {
   if (path === "$") {
     return result;
@@ -92,6 +97,7 @@ function writePath(value: unknown, path: StepFunctionJsonPath, result: unknown):
   return output;
 }
 
+/** Handles apply result path. */
 function applyResultPath(
   input: unknown,
   result: unknown,
@@ -104,6 +110,7 @@ function applyResultPath(
   return writePath(input, resultPath ?? "$", result);
 }
 
+/** Converts values to next state name. */
 function toNextStateName(stateName: string, state: StepFunctionPassState): string | undefined {
   if (state.End) {
     return undefined;
@@ -116,6 +123,7 @@ function toNextStateName(stateName: string, state: StepFunctionPassState): strin
   return state.Next;
 }
 
+/** Converts values to next state name from task. */
 function toNextStateNameFromTask(
   stateName: string,
   state: StepFunctionTaskState,
@@ -131,6 +139,7 @@ function toNextStateNameFromTask(
   return state.Next;
 }
 
+/** Converts values to choice matches. */
 function toChoiceMatches(rule: StepFunctionChoiceRule, input: unknown): boolean {
   const value = readPath(input, rule.Variable);
   if (typeof value !== "number" || Number.isNaN(value)) {
@@ -156,6 +165,7 @@ function toChoiceMatches(rule: StepFunctionChoiceRule, input: unknown): boolean 
   return true;
 }
 
+/** Converts values to choice next state. */
 function toChoiceNextState(
   stateName: string,
   state: { Choices: StepFunctionChoiceRule[]; Default?: string },
@@ -174,6 +184,7 @@ function toChoiceNextState(
   throw new Error(`Step-function Choice state "${stateName}" had no matching rule`);
 }
 
+/** Converts values to task output. */
 async function toTaskOutput(
   stateName: string,
   state: StepFunctionTaskState,

@@ -1,5 +1,7 @@
+/** @fileoverview Implements to dev app response. @module libs/http-api-contract/src/to-dev-app-response */
 import { toHttpResponseParts } from "./to-http-response-parts";
 
+/** Converts values to dev app response. @example `toDevAppResponse(input)` */
 export function toDevAppResponse(
   status: number,
   payload: unknown,

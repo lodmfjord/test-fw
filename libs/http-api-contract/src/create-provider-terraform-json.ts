@@ -1,3 +1,4 @@
+/** @fileoverview Implements create provider terraform json. @module libs/http-api-contract/src/create-provider-terraform-json */
 import { toStateKey } from "./to-state-key";
 import type { TerraformJson, TerraformRenderSettings } from "./terraform-render-types";
 
@@ -8,10 +9,12 @@ type TerraformResolvedState = {
   lockTableName?: string;
 };
 
+/** Converts values to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
+/** Converts values to resolved state settings. */
 function toResolvedStateSettings(
   settings: TerraformRenderSettings,
   appName: string,
@@ -43,6 +46,7 @@ function toResolvedStateSettings(
   };
 }
 
+/** Converts values to terraform block. */
 function toTerraformBlock(settings: TerraformRenderSettings, appName: string): TerraformJson {
   const state = toResolvedStateSettings(settings, appName);
   const terraformBlock: TerraformJson = {
@@ -77,6 +81,7 @@ function toTerraformBlock(settings: TerraformRenderSettings, appName: string): T
   return terraformBlock;
 }
 
+/** Creates provider terraform json. @example `createProviderTerraformJson(input)` */
 export function createProviderTerraformJson(
   settings: TerraformRenderSettings,
   appName: string,

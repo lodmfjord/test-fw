@@ -1,3 +1,4 @@
+/** @fileoverview Implements asl types. @module libs/step-functions/src/asl-types */
 export type StepFunctionJsonPath = "$" | `$.${string}`;
 
 export type StepFunctionJsonPathOrNull = StepFunctionJsonPath | null;

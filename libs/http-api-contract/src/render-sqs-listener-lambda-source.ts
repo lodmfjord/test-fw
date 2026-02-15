@@ -1,5 +1,7 @@
+/** @fileoverview Implements render sqs listener lambda source. @module libs/http-api-contract/src/render-sqs-listener-lambda-source */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 
+/** Handles render sqs listener lambda source. @example `renderSqsListenerLambdaSource(input)` */
 export function renderSqsListenerLambdaSource(
   listener: SqsListenerRuntimeDefinition,
   endpointModulePath: string,
@@ -9,6 +11,7 @@ export function renderSqsListenerLambdaSource(
 
 let listenerPromise;
 
+/** Handles load listener. */
 async function loadListener() {
   if (!listenerPromise) {
     listenerPromise = (async () => {
@@ -35,10 +38,12 @@ async function loadListener() {
   return listenerPromise;
 }
 
+/** Converts values to records. */
 function toRecords(event) {
   return Array.isArray(event?.Records) ? event.Records : [];
 }
 
+/** Handles parse record body. */
 function parseRecordBody(record) {
   const rawBody = typeof record?.body === "string" ? record.body : "";
   if (rawBody.trim().length === 0) {

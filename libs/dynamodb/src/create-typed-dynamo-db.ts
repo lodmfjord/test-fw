@@ -1,3 +1,4 @@
+/** @fileoverview Implements create typed dynamo db. @module libs/dynamodb/src/create-typed-dynamo-db */
 import type {
   DynamoDbClient,
   DynamoDbItem,
@@ -5,10 +6,10 @@ import type {
   TypedDynamoDbClient,
 } from "./types";
 
-function toKeyFromItem<TItem extends DynamoDbItem, TKeyField extends keyof TItem & string>(
-  item: TItem,
-  keyFields: ReadonlyArray<TKeyField>,
-): Pick<TItem, TKeyField> {
+/** Converts values to key from item. */ function toKeyFromItem<
+  TItem extends DynamoDbItem,
+  TKeyField extends keyof TItem & string,
+>(item: TItem, keyFields: ReadonlyArray<TKeyField>): Pick<TItem, TKeyField> {
   const key: Partial<Pick<TItem, TKeyField>> = {};
 
   for (const keyField of keyFields) {
@@ -18,7 +19,7 @@ function toKeyFromItem<TItem extends DynamoDbItem, TKeyField extends keyof TItem
   return key as Pick<TItem, TKeyField>;
 }
 
-export function createTypedDynamoDb<
+/** Creates typed dynamo db. @example `createTypedDynamoDb(input)` */ export function createTypedDynamoDb<
   TTables extends Record<string, DynamoDbTableDefinition<DynamoDbItem, string>>,
 >(db: DynamoDbClient, tables: TTables): TypedDynamoDbClient<TTables> {
   const tableClients: Partial<Record<keyof TTables, unknown>> = {};

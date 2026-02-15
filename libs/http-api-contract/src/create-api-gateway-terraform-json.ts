@@ -1,11 +1,14 @@
+/** @fileoverview Implements create api gateway terraform json. @module libs/http-api-contract/src/create-api-gateway-terraform-json */
 import type { Contract } from "./types";
 
 type TerraformJson = Record<string, unknown>;
 
+/** Converts values to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
+/** Converts values to cors configuration. */
 function toCorsConfiguration(contract: Contract): Record<string, unknown> | undefined {
   const cors = contract.deployContract.apiGateway.cors;
   if (!cors) {
@@ -26,6 +29,7 @@ function toCorsConfiguration(contract: Contract): Record<string, unknown> | unde
   };
 }
 
+/** Creates api gateway terraform json. @example `createApiGatewayTerraformJson(input)` */
 export function createApiGatewayTerraformJson(contract: Contract): TerraformJson {
   const corsConfiguration = toCorsConfiguration(contract);
 

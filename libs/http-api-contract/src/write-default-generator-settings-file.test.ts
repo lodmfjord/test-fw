@@ -1,3 +1,4 @@
+/** @fileoverview Tests write default generator settings file. @module libs/http-api-contract/src/write-default-generator-settings-file.test */
 import { mkdtemp, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

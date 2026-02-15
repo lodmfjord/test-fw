@@ -1,3 +1,4 @@
+/** @fileoverview Tests create memory dynamo db. @module libs/dynamodb/src/create-memory-dynamo-db.test */
 import { describe, expect, it } from "bun:test";
 import { createMemoryDynamoDb } from "./create-memory-dynamo-db";
 

@@ -1,3 +1,4 @@
+/** @fileoverview Implements index. @module libs/s3/src/index */
 export { createAwsS3 } from "./create-aws-s3";
 export { createMemoryS3 } from "./create-memory-s3";
 export { createRuntimeS3 } from "./create-runtime-s3";

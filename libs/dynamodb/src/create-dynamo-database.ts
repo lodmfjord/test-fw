@@ -1,3 +1,4 @@
+/** @fileoverview Implements create dynamo database. @module libs/dynamodb/src/create-dynamo-database */
 import type { DynamoDbClient, DynamoDbItem } from "./types";
 
 type Parser<TItem extends DynamoDbItem> = {
@@ -55,7 +56,7 @@ export type DynamoDatabase<TItem extends DynamoDbItem, TKeyField extends keyof T
   write(db: DynamoDatabaseWriteClient, item: TItem): Promise<TItem>;
 };
 
-function toTableName<TKeyField extends string>(
+/** Converts values to table name. */ function toTableName<TKeyField extends string>(
   keyField: TKeyField,
   options: CreateDynamoDatabaseOptions | undefined,
 ): string {
@@ -68,15 +69,16 @@ function toTableName<TKeyField extends string>(
   return tableName;
 }
 
-function toItemKey<TItem extends DynamoDbItem, TKeyField extends keyof TItem & string>(
-  item: TItem,
-  keyField: TKeyField,
-): Pick<TItem, TKeyField> {
+/** Converts values to item key. */ function toItemKey<
+  TItem extends DynamoDbItem,
+  TKeyField extends keyof TItem & string,
+>(item: TItem, keyField: TKeyField): Pick<TItem, TKeyField> {
   return {
     [keyField]: item[keyField],
   } as Pick<TItem, TKeyField>;
 }
 
+/** Converts values to record. */
 function toRecord(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object") {
     return {};
@@ -85,7 +87,7 @@ function toRecord(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-export function createDynamoDatabase<
+/** Creates dynamo database. @example `createDynamoDatabase(input)` */ export function createDynamoDatabase<
   TItem extends DynamoDbItem,
   TKeyField extends keyof TItem & string,
 >(
@@ -95,7 +97,7 @@ export function createDynamoDatabase<
 ): DynamoDatabase<TItem, TKeyField> {
   const tableName = toTableName(keyField, options);
 
-  const read = async (
+  /** Handles read. */ const read = async (
     db: DynamoDatabaseReadClient,
     key: Pick<TItem, TKeyField>,
   ): Promise<TItem | undefined> => {
@@ -106,7 +108,10 @@ export function createDynamoDatabase<
     return item ? parser.parse(item) : undefined;
   };
 
-  const write = async (db: DynamoDatabaseWriteClient, item: TItem): Promise<TItem> => {
+  /** Handles write. */ const write = async (
+    db: DynamoDatabaseWriteClient,
+    item: TItem,
+  ): Promise<TItem> => {
     const parsedItem = parser.parse(item);
     await db.write({
       item: toRecord(parsedItem),
@@ -116,7 +121,7 @@ export function createDynamoDatabase<
     return parsedItem;
   };
 
-  const update = async (
+  /** Handles update. */ const update = async (
     db: DynamoDatabaseWriteClient,
     key: Pick<TItem, TKeyField>,
     changes: Partial<Omit<TItem, TKeyField>>,
@@ -129,7 +134,7 @@ export function createDynamoDatabase<
     return item ? parser.parse(item) : undefined;
   };
 
-  const remove = async (
+  /** Handles remove. */ const remove = async (
     db: DynamoDatabaseWriteClient,
     key: Pick<TItem, TKeyField>,
   ): Promise<void> => {
@@ -139,8 +144,11 @@ export function createDynamoDatabase<
     });
   };
 
+  /** Handles bind. */
   function bind(db: DynamoDatabaseWriteClient): WriteBoundDynamoDatabase<TItem, TKeyField>;
+  /** Handles bind. */
   function bind(db: DynamoDatabaseReadClient): ReadBoundDynamoDatabase<TItem, TKeyField>;
+  /** Handles bind. */
   function bind(
     db: DynamoDatabaseReadClient | DynamoDatabaseWriteClient,
   ): ReadBoundDynamoDatabase<TItem, TKeyField> | WriteBoundDynamoDatabase<TItem, TKeyField> {

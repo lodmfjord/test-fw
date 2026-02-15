@@ -1,3 +1,4 @@
+/** @fileoverview Tests run contract generator from settings lambda artifacts. @module libs/http-api-contract/src/run-contract-generator-from-settings-lambda-artifacts.test */
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";

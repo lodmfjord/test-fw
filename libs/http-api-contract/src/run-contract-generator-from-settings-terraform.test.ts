@@ -1,3 +1,4 @@
+/** @fileoverview Tests run contract generator from settings terraform. @module libs/http-api-contract/src/run-contract-generator-from-settings-terraform.test */
 import { mkdtemp, readdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -5,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "bun:test";
 import { createFakeLayerModulesForTest } from "./create-fake-layer-modules-for-test";
 import { runContractGeneratorFromSettings } from "./run-contract-generator-from-settings";
-
+/** Converts values to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }

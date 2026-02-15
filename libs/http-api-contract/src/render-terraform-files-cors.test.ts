@@ -1,3 +1,4 @@
+/** @fileoverview Tests render terraform files cors. @module libs/http-api-contract/src/render-terraform-files-cors.test */
 import { beforeEach, describe, expect, it } from "bun:test";
 import { schema } from "@babbstack/schema";
 import { buildContractFromEndpoints } from "./build-contract-from-endpoints";

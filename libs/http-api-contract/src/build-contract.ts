@@ -1,9 +1,11 @@
+/** @fileoverview Implements build contract. @module libs/http-api-contract/src/build-contract */
 import { buildContractHelpers } from "./build-contract-helpers";
 import { toNormalizedGlobalCors } from "./to-normalized-global-cors";
 import { toOpenApiDocumentFromRoutes } from "./to-openapi-document-from-routes";
 import { toRoutesWithGlobalCorsOptions } from "./to-routes-with-global-cors-options";
 import type { BuildContractInput, Contract } from "./types";
 
+/** Handles build contract. @example `buildContract(input)` */
 export function buildContract(input: BuildContractInput): Contract {
   const apiName = input.apiName.trim();
   if (apiName.length === 0) {

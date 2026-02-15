@@ -1,3 +1,4 @@
+/** @fileoverview Tests create client. @module libs/client/src/create-client.test */
 import { afterEach, describe, expect, it } from "bun:test";
 import { defineGet, definePost, schema } from "@babbstack/http-api-contract";
 import { createClient } from "./create-client";
@@ -53,6 +54,7 @@ type Assert<TValue extends true> = TValue;
 
 const typeSafeClient = createClient("https://api.example.com", testEndpoints);
 
+/** Handles assert client types. */
 function _assertClientTypes(): void {
   const typedGetRequest = typeSafeClient.request.endpoint(getUserEndpoint, {
     params: { id: "user-1" },

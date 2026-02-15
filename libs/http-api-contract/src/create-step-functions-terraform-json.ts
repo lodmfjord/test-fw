@@ -1,3 +1,4 @@
+/** @fileoverview Implements create step functions terraform json. @module libs/http-api-contract/src/create-step-functions-terraform-json */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import { createStepFunctionsTerraformJsonHelpers } from "./create-step-functions-terraform-json-helpers";
 import type { EndpointRuntimeDefinition } from "./types";
@@ -6,6 +7,7 @@ import { toStepFunctionSqsListeners } from "./to-step-function-sqs-listeners";
 
 type TerraformJson = Record<string, unknown>;
 
+/** Creates step functions terraform json. @example `createStepFunctionsTerraformJson(input)` */
 export function createStepFunctionsTerraformJson(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   sqsListeners: ReadonlyArray<SqsListenerRuntimeDefinition>,

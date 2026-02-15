@@ -1,7 +1,9 @@
+/** @fileoverview Implements to runtime endpoints with global cors options. @module libs/http-api-contract/src/to-runtime-endpoints-with-global-cors-options */
 import { schema } from "@babbstack/schema";
 import type { GlobalCors } from "./cors-types";
 import type { Contract, EndpointRuntimeDefinition } from "./types";
 
+/** Converts values to cors headers. */
 function toCorsHeaders(cors: GlobalCors, methods: string[]): Record<string, string> {
   return {
     ...(cors.allowCredentials ? { "access-control-allow-credentials": "true" } : {}),
@@ -21,6 +23,7 @@ function toCorsHeaders(cors: GlobalCors, methods: string[]): Record<string, stri
   };
 }
 
+/** Converts values to methods by path. */
 function toMethodsByPath(contract: Contract): Map<string, Set<string>> {
   const methodsByPath = new Map<string, Set<string>>();
 
@@ -33,6 +36,7 @@ function toMethodsByPath(contract: Contract): Map<string, Set<string>> {
   return methodsByPath;
 }
 
+/** Converts values to runtime endpoints with global cors options. @example `toRuntimeEndpointsWithGlobalCorsOptions(input)` */
 export function toRuntimeEndpointsWithGlobalCorsOptions(
   contract: Contract,
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

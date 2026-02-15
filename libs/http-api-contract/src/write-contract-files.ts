@@ -1,8 +1,10 @@
+/** @fileoverview Implements write contract files. @module libs/http-api-contract/src/write-contract-files */
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { renderContractFiles } from "./render-contract-files";
 import type { Contract } from "./types";
 
+/** Handles write contract files. @example `await writeContractFiles(input)` */
 export async function writeContractFiles(
   outputDirectory: string,
   contract: Contract,

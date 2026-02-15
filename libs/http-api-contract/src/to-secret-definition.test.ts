@@ -1,3 +1,4 @@
+/** @fileoverview Tests to secret definition. @module libs/http-api-contract/src/to-secret-definition.test */
 import { describe, expect, it } from "bun:test";
 import { toSecretDefinition } from "./to-secret-definition";
 

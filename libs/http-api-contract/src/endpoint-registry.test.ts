@@ -1,3 +1,4 @@
+/** @fileoverview Tests endpoint registry. @module libs/http-api-contract/src/endpoint-registry.test */
 import { beforeEach, describe, expect, it } from "bun:test";
 import { defineGet } from "./define-get";
 import { definePost } from "./define-post";

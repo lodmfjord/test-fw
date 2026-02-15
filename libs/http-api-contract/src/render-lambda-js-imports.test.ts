@@ -1,3 +1,4 @@
+/** @fileoverview Tests render lambda js imports. @module libs/http-api-contract/src/render-lambda-js-imports.test */
 import { beforeEach, describe, expect, it } from "bun:test";
 import { defineGet } from "./define-get";
 import { listDefinedEndpoints } from "./list-defined-endpoints";

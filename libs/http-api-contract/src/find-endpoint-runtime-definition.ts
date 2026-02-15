@@ -1,5 +1,7 @@
+/** @fileoverview Implements find endpoint runtime definition. @module libs/http-api-contract/src/find-endpoint-runtime-definition */
 import type { EndpointRuntimeDefinition } from "./types";
 
+/** Handles match path. */
 function matchPath(templatePath: string, requestPath: string): Record<string, string> | null {
   const templateSegments = templatePath.split("/").filter((segment) => segment.length > 0);
   const requestSegments = requestPath.split("/").filter((segment) => segment.length > 0);
@@ -28,6 +30,7 @@ function matchPath(templatePath: string, requestPath: string): Record<string, st
   return params;
 }
 
+/** Handles find endpoint runtime definition. @example `findEndpointRuntimeDefinition(input)` */
 export function findEndpointRuntimeDefinition(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   method: string,

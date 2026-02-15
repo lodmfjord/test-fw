@@ -1,3 +1,4 @@
+/** @fileoverview Implements create memory dynamo db. @module libs/dynamodb/src/create-memory-dynamo-db */
 import type {
   DynamoDbClient,
   DynamoDbItem,
@@ -8,6 +9,7 @@ import type {
   DynamoDbWriteInput,
 } from "./types";
 
+/** Handles normalize key. */
 function normalizeKey(value: unknown): unknown {
   if (Array.isArray(value)) {
     return value.map((entry) => normalizeKey(entry));
@@ -26,14 +28,17 @@ function normalizeKey(value: unknown): unknown {
   return value;
 }
 
+/** Converts values to storage key. */
 function toStorageKey(input: { key: DynamoDbKey; tableName: string }): string {
   return `${input.tableName}:${JSON.stringify(normalizeKey(input.key))}`;
 }
 
+/** Handles clone item. */
 function cloneItem(item: DynamoDbItem): DynamoDbItem {
   return structuredClone(item);
 }
 
+/** Handles read stored item. */
 function readStoredItem(
   store: Map<string, DynamoDbItem>,
   input: DynamoDbReadInput | DynamoDbUpdateInput | DynamoDbRemoveInput | DynamoDbWriteInput,
@@ -42,6 +47,7 @@ function readStoredItem(
   return value ? cloneItem(value) : undefined;
 }
 
+/** Creates memory dynamo db. @example `createMemoryDynamoDb(input)` */
 export function createMemoryDynamoDb(): DynamoDbClient {
   const store = new Map<string, DynamoDbItem>();
 

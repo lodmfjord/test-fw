@@ -1,3 +1,4 @@
+/** @fileoverview Implements to import lines. @module libs/http-api-contract/src/to-import-lines */
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 
@@ -12,18 +13,22 @@ export type ImportDescriptor = {
   sideEffectOnly: boolean;
 };
 
+/** Handles escape reg exp. */
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/** Checks whether local import path. */
 function isLocalImportPath(value: string): boolean {
   return value.startsWith("./") || value.startsWith("../");
 }
 
+/** Checks whether name used. */
 function isNameUsed(handlerSource: string, name: string): boolean {
   return new RegExp(`\\b${escapeRegExp(name)}\\b`, "m").test(handlerSource);
 }
 
+/** Handles resolve import specifier. */
 function resolveImportSpecifier(moduleSpecifier: string, endpointModulePath: string): string {
   if (isLocalImportPath(moduleSpecifier)) {
     return resolve(endpointModulePath, "..", moduleSpecifier);
@@ -39,6 +44,7 @@ function resolveImportSpecifier(moduleSpecifier: string, endpointModulePath: str
   return moduleSpecifier;
 }
 
+/** Converts values to import lines. @example `toImportLines(input)` */
 export function toImportLines(
   endpointModulePath: string,
   handlerSource: string,

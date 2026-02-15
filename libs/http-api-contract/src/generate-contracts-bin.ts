@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+/** @fileoverview Implements generate contracts bin. @module libs/http-api-contract/src/generate-contracts-bin */
 import { runContractGeneratorFromSettings } from "./run-contract-generator-from-settings";
 import { toGenerateContractsCliCommand } from "./to-generate-contracts-cli-command";
 import { writeDefaultGeneratorSettingsFile } from "./write-default-generator-settings-file";

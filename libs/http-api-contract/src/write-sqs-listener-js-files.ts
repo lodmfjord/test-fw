@@ -1,3 +1,4 @@
+/** @fileoverview Implements write sqs listener js files. @module libs/http-api-contract/src/write-sqs-listener-js-files */
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { isAbsolute, join, resolve } from "node:path";
@@ -7,6 +8,7 @@ import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import { renderSqsListenerLambdaSource } from "./render-sqs-listener-lambda-source";
 import type { LambdaJsGenerationOptions } from "./types";
 
+/** Handles resolve endpoint module path. */
 function resolveEndpointModulePath(endpointModulePath: string): string {
   const source = endpointModulePath.trim();
   if (source.length === 0) {
@@ -16,6 +18,7 @@ function resolveEndpointModulePath(endpointModulePath: string): string {
   return isAbsolute(source) ? source : resolve(process.cwd(), source);
 }
 
+/** Handles resolve runtime sqs import specifier. */
 function resolveRuntimeSqsImportSpecifier(endpointModulePath: string): string {
   const moduleSpecifier = "@babbstack/sqs";
 
@@ -32,6 +35,7 @@ function resolveRuntimeSqsImportSpecifier(endpointModulePath: string): string {
   }
 }
 
+/** Handles bundle entry. */
 async function bundleEntry(
   entryPath: string,
   absWorkingDirectory: string,
@@ -59,6 +63,7 @@ async function bundleEntry(
   return bundled.text;
 }
 
+/** Handles resolve external modules. */
 function resolveExternalModules(
   externalModules: string[] | undefined,
   endpointModulePath: string,
@@ -84,10 +89,12 @@ function resolveExternalModules(
   return [...expanded].sort((left, right) => left.localeCompare(right));
 }
 
+/** Handles strip bundler module markers. */
 function stripBundlerModuleMarkers(source: string): string {
   return source.replace(/^\/\/\s+(?:\.\.\/|\/).+\.(?:[cm]?[jt]s|tsx?)$/gm, "").trimStart();
 }
 
+/** Handles write sqs listener js files. @example `await writeSqsListenerJsFiles(input)` */
 export async function writeSqsListenerJsFiles(
   outputDirectory: string,
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,

@@ -1,3 +1,4 @@
+/** @fileoverview Tests execute sqs listener js. @module libs/http-api-contract/src/execute-sqs-listener-js.test */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -18,6 +19,7 @@ type SqsResponse = {
   batchItemFailures: unknown[];
 };
 
+/** Gets handler from source. */
 function getHandlerFromSource(source: string): (event: SqsEvent) => Promise<SqsResponse> {
   const sourceWithoutZodImport = source.replace(
     /import\s+\{\s*z\s+as\s+simpleApiZod\s*\}\s+from\s+["']zod["'];?\s*/g,

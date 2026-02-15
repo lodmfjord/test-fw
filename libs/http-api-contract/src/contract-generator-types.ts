@@ -1,3 +1,4 @@
+/** @fileoverview Implements contract generator types. @module libs/http-api-contract/src/contract-generator-types */
 export type TerraformResourceSelection = {
   apiGateway: boolean;
   dynamodb: boolean;

@@ -1,3 +1,4 @@
+/** @fileoverview Implements define put. @module libs/http-api-contract/src/define-put */
 import { defineEndpoint } from "./define-endpoint";
 import type {
   EndpointContextInput,
@@ -33,7 +34,7 @@ type PutEndpointDefinition<
   path: TPath;
 };
 
-export function definePut<
+/** @example `definePut(input)` */ export function definePut<
   TParams,
   TQuery,
   THeaders,

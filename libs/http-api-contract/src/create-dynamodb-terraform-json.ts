@@ -1,11 +1,14 @@
+/** @fileoverview Implements create dynamodb terraform json. @module libs/http-api-contract/src/create-dynamodb-terraform-json */
 import { toDynamodbTables } from "./to-dynamodb-tables";
 import type { EndpointRuntimeDefinition } from "./types";
 import type { TerraformJson } from "./terraform-render-types";
 
+/** Converts values to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
+/** Creates dynamodb terraform json. @example `createDynamodbTerraformJson(input)` */
 export function createDynamodbTerraformJson(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
 ): TerraformJson {

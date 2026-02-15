@@ -1,3 +1,4 @@
+/** @fileoverview Implements run dev app from settings. @module libs/http-api-contract/src/run-dev-app-from-settings */
 import { readFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import {
@@ -29,6 +30,7 @@ type RunDevAppFromSettingsOptions = {
   serve?: (input: DevServeInput) => unknown;
 };
 
+/** Converts values to string setting. */
 function toStringSetting(
   value: unknown,
   settingName: string,
@@ -58,6 +60,7 @@ function toStringSetting(
   return source;
 }
 
+/** Converts values to port. */
 function toPort(value: string | undefined): number {
   const source = (value ?? "3000").trim();
   const parsed = Number(source);
@@ -69,6 +72,7 @@ function toPort(value: string | undefined): number {
   return parsed;
 }
 
+/** Converts values to endpoint settings. */
 function toEndpointSettings(value: unknown): {
   endpointExportName: string;
   endpointModulePath: string;
@@ -89,6 +93,7 @@ function toEndpointSettings(value: unknown): {
   };
 }
 
+/** Converts values to listener poll ms. */
 function toListenerPollMs(value: number | undefined): number {
   const resolved = value ?? 250;
   if (!Number.isInteger(resolved) || resolved <= 0) {
@@ -98,6 +103,7 @@ function toListenerPollMs(value: number | undefined): number {
   return resolved;
 }
 
+/** Handles start sqs listeners. */
 function startSqsListeners(
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
   sqs: SqsClient,
@@ -109,7 +115,7 @@ function startSqsListeners(
   }
 
   let isPolling = false;
-  const poll = async (): Promise<void> => {
+  /** Handles poll. */ const poll = async (): Promise<void> => {
     if (isPolling) {
       return;
     }
@@ -139,6 +145,7 @@ function startSqsListeners(
   log(`babbstack sqs listener polling started for ${listeners.length} listener(s) at ${pollMs}ms`);
 }
 
+/** Runs dev app from settings. @example `await runDevAppFromSettings(input)` */
 export async function runDevAppFromSettings(
   settingsFilePath: string,
   options: RunDevAppFromSettingsOptions = {},

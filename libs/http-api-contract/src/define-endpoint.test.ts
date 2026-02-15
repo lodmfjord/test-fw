@@ -1,3 +1,4 @@
+/** @fileoverview Tests define endpoint. @module libs/http-api-contract/src/define-endpoint.test */
 import { describe, expect, it } from "bun:test";
 import { createDynamoDatabase } from "@babbstack/dynamodb";
 import { defineEndpoint } from "./define-endpoint";

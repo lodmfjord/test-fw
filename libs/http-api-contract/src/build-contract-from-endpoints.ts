@@ -1,3 +1,4 @@
+/** @fileoverview Implements build contract from endpoints. @module libs/http-api-contract/src/build-contract-from-endpoints */
 import { buildContract } from "./build-contract";
 import type { Schema } from "@babbstack/schema";
 import type {
@@ -9,10 +10,12 @@ import type {
   OpenApiPathItem,
 } from "./types";
 
+/** Converts values to open api method. */
 function toOpenApiMethod(method: string): keyof OpenApiPathItem {
   return method.toLowerCase() as keyof OpenApiPathItem;
 }
 
+/** Converts values to parameters. */
 function toParameters(
   location: OpenApiParameter["in"],
   validator: Schema<unknown> | undefined,
@@ -35,6 +38,7 @@ function toParameters(
   }));
 }
 
+/** Converts values to open api responses. */
 function toOpenApiResponses(
   responseByStatusCode: Record<string, Schema<unknown>>,
 ): OpenApiOperation["responses"] {
@@ -58,6 +62,7 @@ function toOpenApiResponses(
   );
 }
 
+/** Converts values to open api document. */
 function toOpenApiDocument(input: BuildContractFromEndpointsInput): OpenApiDocument {
   const paths: Record<string, OpenApiPathItem> = {};
 
@@ -112,6 +117,7 @@ function toOpenApiDocument(input: BuildContractFromEndpointsInput): OpenApiDocum
   };
 }
 
+/** Handles with options operations. */
 function withOptionsOperations(
   contractOpenApi: OpenApiDocument,
   openApiWithSchemas: OpenApiDocument,
@@ -142,6 +148,7 @@ function withOptionsOperations(
   };
 }
 
+/** Handles build contract from endpoints. @example `buildContractFromEndpoints(input)` */
 export function buildContractFromEndpoints(input: BuildContractFromEndpointsInput): Contract {
   const baseContract = buildContract({
     apiName: input.apiName,

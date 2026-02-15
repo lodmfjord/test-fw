@@ -1,3 +1,4 @@
+/** @fileoverview Tests create aws s3. @module libs/s3/src/create-aws-s3.test */
 import { describe, expect, it } from "bun:test";
 import { createAwsS3 } from "./create-aws-s3";
 

@@ -1,3 +1,4 @@
+/** @fileoverview Implements render lambda env bootstrap source. @module libs/http-api-contract/src/render-lambda-env-bootstrap-source */
 import { toSecretDefinition } from "./to-secret-definition";
 import type { EndpointRuntimeDefinition } from "./types";
 
@@ -7,6 +8,7 @@ type SecretVariableDefinition = {
   parameterName: string;
 };
 
+/** Converts values to env config. */
 function toEnvConfig(endpoint: EndpointRuntimeDefinition): {
   plain: Record<string, string>;
   secret: SecretVariableDefinition[];
@@ -31,6 +33,7 @@ function toEnvConfig(endpoint: EndpointRuntimeDefinition): {
   return { plain, secret };
 }
 
+/** Handles render lambda env bootstrap source. @example `renderLambdaEnvBootstrapSource(input)` */
 export function renderLambdaEnvBootstrapSource(endpoint: EndpointRuntimeDefinition): string {
   const envConfig = toEnvConfig(endpoint);
 
@@ -38,6 +41,7 @@ export function renderLambdaEnvBootstrapSource(endpoint: EndpointRuntimeDefiniti
 const endpointSecretEnv = ${JSON.stringify(envConfig.secret)};
 let endpointEnvReadyPromise;
 
+/** Handles load ssm parameter. */
 async function loadSsmParameter(parameterName) {
   const v3ModuleName = "@aws-sdk/client-ssm";
   try {
@@ -77,6 +81,7 @@ async function loadSsmParameter(parameterName) {
   throw new Error("Missing AWS SDK for SSM secret loading");
 }
 
+/** Handles initialize endpoint env. */
 async function initializeEndpointEnv() {
   if (typeof process === "undefined" || !process.env) {
     return;
@@ -110,6 +115,7 @@ async function initializeEndpointEnv() {
   }
 }
 
+/** Handles ensure endpoint env loaded. */
 async function ensureEndpointEnvLoaded() {
   if (!endpointEnvReadyPromise) {
     endpointEnvReadyPromise = initializeEndpointEnv();

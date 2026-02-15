@@ -1,3 +1,4 @@
+/** @fileoverview Tests db. @module apps/test-app/src/db.test */
 import { describe, expect, it } from "bun:test";
 import { pointDatabase, titleDatabase } from "./db";
 

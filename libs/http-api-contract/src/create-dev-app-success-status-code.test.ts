@@ -1,3 +1,4 @@
+/** @fileoverview Tests create dev app success status code. @module libs/http-api-contract/src/create-dev-app-success-status-code.test */
 import { describe, expect, it } from "bun:test";
 import { createDevApp } from "./create-dev-app";
 import { defineEndpoint } from "./define-endpoint";

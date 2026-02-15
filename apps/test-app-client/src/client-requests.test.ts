@@ -1,3 +1,4 @@
+/** @fileoverview Tests client requests. @module apps/test-app-client/src/client-requests.test */
 import { afterEach, describe, expect, it } from "bun:test";
 import { createClient } from "@babbstack/client";
 import type { endpoints as testAppEndpoints } from "../../test-app/src/endpoints";
@@ -12,7 +13,7 @@ afterEach(() => {
   globalThis.fetch = originalFetch;
 });
 
-function _assertTypedRequestInputOutput(): void {
+/** Handles assert typed request input output. */ function _assertTypedRequestInputOutput(): void {
   const client = createClient<TestAppEndpoints>(baseUrl);
 
   const lastUpdateRequest = client.request.GET["last-update"]({});

@@ -1,6 +1,8 @@
+/** @fileoverview Implements initialize endpoint env. @module libs/http-api-contract/src/initialize-endpoint-env */
 import { toSecretDefinition } from "./to-secret-definition";
 import type { EndpointRuntimeDefinition } from "./types";
 
+/** Handles initialize endpoint env. @example `initializeEndpointEnv(input)` */
 export function initializeEndpointEnv(endpoints: ReadonlyArray<EndpointRuntimeDefinition>): void {
   if (typeof process === "undefined" || !process.env) {
     return;

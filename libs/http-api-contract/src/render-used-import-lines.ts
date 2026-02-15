@@ -1,3 +1,4 @@
+/** @fileoverview Implements render used import lines. @module libs/http-api-contract/src/render-used-import-lines */
 import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { extname, resolve } from "node:path";
@@ -17,18 +18,22 @@ type ImportDescriptor = {
 
 const LOCAL_SOURCE_EXTENSIONS = [".ts", ".tsx", ".mts", ".cts", ".js", ".mjs", ".cjs"];
 
+/** Handles escape reg exp. */
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/** Checks whether local import path. */
 function isLocalImportPath(value: string): boolean {
   return value.startsWith("./") || value.startsWith("../");
 }
 
+/** Checks whether name used. */
 function isNameUsed(handlerSource: string, name: string): boolean {
   return new RegExp(`\\b${escapeRegExp(name)}\\b`, "m").test(handlerSource);
 }
 
+/** Converts values to resolved local module path. */
 function toResolvedLocalModulePath(
   importerPath: string,
   moduleSpecifier: string,
@@ -51,6 +56,7 @@ function toResolvedLocalModulePath(
   return undefined;
 }
 
+/** Handles resolve import specifier. */
 function resolveImportSpecifier(moduleSpecifier: string, importerPath: string): string {
   if (isLocalImportPath(moduleSpecifier)) {
     return (
@@ -67,6 +73,7 @@ function resolveImportSpecifier(moduleSpecifier: string, importerPath: string): 
   }
 }
 
+/** Converts values to import descriptor. */
 function toImportDescriptor(
   statement: ts.ImportDeclaration,
   sourcePath: string,
@@ -126,6 +133,7 @@ function toImportDescriptor(
   return descriptor;
 }
 
+/** Converts values to imports for source. */
 function toImportsForSource(sourcePath: string, moduleSource: string): ImportDescriptor[] {
   const sourceFile = ts.createSourceFile(
     sourcePath,
@@ -150,6 +158,7 @@ function toImportsForSource(sourcePath: string, moduleSource: string): ImportDes
   return imports;
 }
 
+/** Converts values to module imports. */
 function toModuleImports(endpointModulePath: string, moduleSource: string): ImportDescriptor[] {
   const visited = new Set<string>();
   const queue: Array<{ path: string; source: string }> = [
@@ -189,6 +198,7 @@ function toModuleImports(endpointModulePath: string, moduleSource: string): Impo
   return imports;
 }
 
+/** Converts values to import lines. */
 function toImportLines(handlerSource: string, imports: ImportDescriptor[]): string[] {
   const lines: string[] = [];
   const seen = new Set<string>();
@@ -250,6 +260,7 @@ function toImportLines(handlerSource: string, imports: ImportDescriptor[]): stri
   return lines;
 }
 
+/** Handles render used import lines. @example `renderUsedImportLines(input)` */
 export function renderUsedImportLines(
   endpointModulePath: string,
   endpointModuleSource: string,

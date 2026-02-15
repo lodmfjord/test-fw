@@ -1,3 +1,4 @@
+/** @fileoverview Implements define head. @module libs/http-api-contract/src/define-head */
 import { defineEndpoint } from "./define-endpoint";
 import type {
   EndpointContextInput,
@@ -33,7 +34,7 @@ type HeadEndpointDefinition<
   path: TPath;
 };
 
-export function defineHead<
+/** @example `defineHead(input)` */ export function defineHead<
   TParams,
   TQuery,
   THeaders,

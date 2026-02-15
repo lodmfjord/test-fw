@@ -1,3 +1,4 @@
+/** @fileoverview Implements to step function endpoint output. @module libs/http-api-contract/src/to-step-function-endpoint-output */
 import { executeStepFunctionDefinition } from "./execute-step-function-definition";
 import type { EndpointRuntimeDefinition } from "./types";
 import type { EndpointHandlerOutput } from "./types";
@@ -17,11 +18,13 @@ type StepFunctionEndpointExecutionOptions = {
   taskHandlers?: Record<string, StepFunctionTaskHandler>;
 };
 
+/** Converts values to local execution arn. */
 function toLocalExecutionArn(routeId: string): string {
   const timestamp = Date.now();
   return `arn:aws:states:local:000000000000:execution:${routeId}:${timestamp}`;
 }
 
+/** Converts values to step function endpoint output. @example `await toStepFunctionEndpointOutput(input)` */
 export async function toStepFunctionEndpointOutput(
   endpoint: EndpointRuntimeDefinition,
   input: StepFunctionEndpointInput,

@@ -1,8 +1,10 @@
+/** @fileoverview Implements to http request parts. @module libs/http-api-contract/src/to-http-request-parts */
 type HttpRequestParts = {
   headers: Record<string, string>;
   query: Record<string, string>;
 };
 
+/** Converts values to query. */
 function toQuery(url: URL): Record<string, string> {
   const query: Record<string, string> = {};
 
@@ -13,6 +15,7 @@ function toQuery(url: URL): Record<string, string> {
   return query;
 }
 
+/** Converts values to headers. */
 function toHeaders(headers: Headers): Record<string, string> {
   const result: Record<string, string> = {};
 
@@ -23,6 +26,7 @@ function toHeaders(headers: Headers): Record<string, string> {
   return result;
 }
 
+/** Converts values to http request parts. @example `toHttpRequestParts(input)` */
 export function toHttpRequestParts(url: URL, headers: Headers): HttpRequestParts {
   return {
     headers: toHeaders(headers),

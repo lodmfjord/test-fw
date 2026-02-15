@@ -1,3 +1,4 @@
+/** @fileoverview Implements create memory s3. @module libs/s3/src/create-memory-s3 */
 import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -14,6 +15,7 @@ import type {
   S3RemoveInput,
 } from "./types";
 
+/** Creates memory s3. @example `createMemoryS3(input)` */
 export function createMemoryS3(input: CreateMemoryS3Input = {}): S3Client {
   const rootDir = resolve(input.rootDir ?? join(tmpdir(), "simple-api-s3"));
   const baseUrl = memoryS3Helpers.toBaseUrl(input.baseUrl);
@@ -22,7 +24,7 @@ export function createMemoryS3(input: CreateMemoryS3Input = {}): S3Client {
 
   logger(`[simple-api:s3] local s3 root: ${rootDir}`);
 
-  const ensureRootDir = async (): Promise<void> => {
+  /** Handles ensure root dir. */ const ensureRootDir = async (): Promise<void> => {
     if (!rootReadyPromise) {
       rootReadyPromise = mkdir(rootDir, { recursive: true }).then(() => undefined);
     }
@@ -30,7 +32,7 @@ export function createMemoryS3(input: CreateMemoryS3Input = {}): S3Client {
     await rootReadyPromise;
   };
 
-  const put = async (putInput: S3PutInput): Promise<S3ObjectSummary> => {
+  /** Handles put. */ const put = async (putInput: S3PutInput): Promise<S3ObjectSummary> => {
     const bucketName = memoryS3Helpers.toNonEmptyTrimmed(putInput.bucketName, "bucketName");
     const key = memoryS3Helpers.toNonEmptyTrimmed(putInput.key, "key");
     const contentType = memoryS3Helpers.toContentType(putInput.contentType);
@@ -62,7 +64,7 @@ export function createMemoryS3(input: CreateMemoryS3Input = {}): S3Client {
     };
   };
 
-  const get = async (getInput: S3GetInput): Promise<S3Object | undefined> => {
+  /** Handles get. */ const get = async (getInput: S3GetInput): Promise<S3Object | undefined> => {
     const bucketName = memoryS3Helpers.toNonEmptyTrimmed(getInput.bucketName, "bucketName");
     const key = memoryS3Helpers.toNonEmptyTrimmed(getInput.key, "key");
     const bodyPath = memoryS3Helpers.toObjectBodyPath(rootDir, bucketName, key);
@@ -87,7 +89,7 @@ export function createMemoryS3(input: CreateMemoryS3Input = {}): S3Client {
     };
   };
 
-  const list = async (listInput: S3ListInput): Promise<S3ObjectSummary[]> => {
+  /** Handles list. */ const list = async (listInput: S3ListInput): Promise<S3ObjectSummary[]> => {
     const bucketName = memoryS3Helpers.toNonEmptyTrimmed(listInput.bucketName, "bucketName");
     const prefix = listInput.prefix ?? "";
     await ensureRootDir();
@@ -133,7 +135,7 @@ export function createMemoryS3(input: CreateMemoryS3Input = {}): S3Client {
       .sort((left, right) => left.key.localeCompare(right.key));
   };
 
-  const remove = async (removeInput: S3RemoveInput): Promise<void> => {
+  /** Handles remove. */ const remove = async (removeInput: S3RemoveInput): Promise<void> => {
     const bucketName = memoryS3Helpers.toNonEmptyTrimmed(removeInput.bucketName, "bucketName");
     const key = memoryS3Helpers.toNonEmptyTrimmed(removeInput.key, "key");
     const bodyPath = memoryS3Helpers.toObjectBodyPath(rootDir, bucketName, key);
@@ -143,7 +145,9 @@ export function createMemoryS3(input: CreateMemoryS3Input = {}): S3Client {
     await Promise.all([rm(bodyPath, { force: true }), rm(metaPath, { force: true })]);
   };
 
-  const createSecureLink = async (secureLinkInput: S3CreateSecureLinkInput): Promise<string> => {
+  /** Creates secure link. */ const createSecureLink = async (
+    secureLinkInput: S3CreateSecureLinkInput,
+  ): Promise<string> => {
     const bucketName = memoryS3Helpers.toNonEmptyTrimmed(secureLinkInput.bucketName, "bucketName");
     const key = memoryS3Helpers.toNonEmptyTrimmed(secureLinkInput.key, "key");
     const contentType = secureLinkInput.contentType

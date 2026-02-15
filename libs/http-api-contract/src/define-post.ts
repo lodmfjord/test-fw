@@ -1,3 +1,4 @@
+/** @fileoverview Implements define post. @module libs/http-api-contract/src/define-post */
 import { defineEndpoint } from "./define-endpoint";
 import type {
   EndpointContextInput,
@@ -33,7 +34,7 @@ type PostEndpointDefinition<
   path: TPath;
 };
 
-export function definePost<
+/** @example `definePost(input)` */ export function definePost<
   TParams,
   TQuery,
   THeaders,

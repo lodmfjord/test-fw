@@ -1,3 +1,4 @@
+/** @fileoverview Implements smoke test deployed api. @module apps/test-app/src/smoke-test-deployed-api */
 type SmokeTestResult = {
   failed: number;
   passed: number;
@@ -23,7 +24,7 @@ type EndpointExpectation = {
   validate: (payload: unknown) => void;
 };
 
-function toBaseUrl(value: string): string {
+/** Converts values to base url. */ function toBaseUrl(value: string): string {
   const source = value.trim();
   if (source.length === 0) {
     throw new Error("Base URL argument is required.");
@@ -32,7 +33,10 @@ function toBaseUrl(value: string): string {
   return source.replace(/\/+$/g, "");
 }
 
-function assertObject(value: unknown, message: string): Record<string, unknown> {
+/** Handles assert object. */ function assertObject(
+  value: unknown,
+  message: string,
+): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new Error(message);
   }
@@ -40,7 +44,7 @@ function assertObject(value: unknown, message: string): Record<string, unknown> 
   return value as Record<string, unknown>;
 }
 
-function toEndpointExpectations(): EndpointExpectation[] {
+/** Converts values to endpoint expectations. */ function toEndpointExpectations(): EndpointExpectation[] {
   return [
     {
       expectedStatusCode: 200,
@@ -100,7 +104,7 @@ function toEndpointExpectations(): EndpointExpectation[] {
   ];
 }
 
-async function executeEndpoint(
+/** Handles execute endpoint. */ async function executeEndpoint(
   endpoint: EndpointExpectation,
   baseUrl: string,
   fetchImpl: DeployedFetch,
@@ -133,7 +137,7 @@ async function executeEndpoint(
   endpoint.validate(await response.text());
 }
 
-export async function runSmokeTestDeployedApi(
+/** Runs smoke test deployed api. @example `await runSmokeTestDeployedApi(input)` */ export async function runSmokeTestDeployedApi(
   baseUrl: string,
   options?: DeployedSmokeTestOptions,
 ): Promise<SmokeTestResult> {

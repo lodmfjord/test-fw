@@ -1,8 +1,10 @@
+/** @fileoverview Implements define endpoint helpers. @module libs/http-api-contract/src/define-endpoint-helpers */
 import type { Schema } from "@babbstack/schema";
 import type { EndpointRuntimeContext } from "./endpoint-context-types";
 import type { RouteExecution } from "./route-execution-types";
 import type { EndpointAccess, EndpointContextInput, EndpointDbAccess } from "./types";
 
+/** Converts values to handler id. */
 function toHandlerId(routeId: string, providedHandlerId: string | undefined): string {
   const base = providedHandlerId ? providedHandlerId.trim() : `${routeId}_handler`;
   const normalized = base.replace(/[^a-zA-Z0-9_]/g, "_").replace(/_+/g, "_");
@@ -14,6 +16,7 @@ function toHandlerId(routeId: string, providedHandlerId: string | undefined): st
   return normalized;
 }
 
+/** Converts values to default success status code. */
 function toDefaultSuccessStatusCode(method: string, execution: RouteExecution): number {
   if (method === "OPTIONS") {
     return 204;
@@ -26,6 +29,7 @@ function toDefaultSuccessStatusCode(method: string, execution: RouteExecution): 
   return 200;
 }
 
+/** Converts values to success status code. */
 function toSuccessStatusCode(
   value: number | undefined,
   method: string,
@@ -39,6 +43,7 @@ function toSuccessStatusCode(
   return resolved;
 }
 
+/** Converts values to response by status code. */
 function toResponseByStatusCode(
   successStatusCode: number,
   successResponse: Schema<unknown>,
@@ -67,6 +72,7 @@ function toResponseByStatusCode(
   return responseByStatusCode;
 }
 
+/** Converts values to endpoint access. */
 function toEndpointAccess(
   inputAccess: EndpointAccess<EndpointDbAccess> | undefined,
 ): { db: EndpointDbAccess } | undefined {
@@ -83,6 +89,7 @@ function toEndpointAccess(
   };
 }
 
+/** Converts values to endpoint context. */
 function toEndpointContext(
   inputContext: EndpointContextInput | undefined,
 ): EndpointRuntimeContext | undefined {

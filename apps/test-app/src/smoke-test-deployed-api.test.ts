@@ -1,3 +1,4 @@
+/** @fileoverview Tests smoke test deployed api. @module apps/test-app/src/smoke-test-deployed-api.test */
 import { describe, expect, it } from "bun:test";
 import { runSmokeTestDeployedApi } from "./smoke-test-deployed-api";
 
@@ -6,7 +7,10 @@ describe("runSmokeTestDeployedApi", () => {
     const calls: string[] = [];
     const baseUrl = "https://example.execute-api.eu-west-1.amazonaws.com/";
 
-    const fetchImpl = async (input: string | URL | Request, init?: RequestInit) => {
+    /** Handles fetch impl. */ const fetchImpl = async (
+      input: string | URL | Request,
+      init?: RequestInit,
+    ) => {
       const request = new Request(input, init);
       const url = new URL(request.url);
       const bodyText = await request.text();

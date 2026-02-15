@@ -1,3 +1,4 @@
+/** @fileoverview Implements create aws sqs. @module libs/sqs/src/create-aws-sqs */
 import {
   DeleteMessageCommand,
   GetQueueUrlCommand,
@@ -16,10 +17,12 @@ import type {
   SqsSendInput,
 } from "./types";
 
+/** Converts values to message body. */
 function toMessageBody(message: SqsMessage): string {
   return JSON.stringify(message);
 }
 
+/** Converts values to parsed body. */
 function toParsedBody(body: string | undefined): SqsMessage {
   if (!body) {
     return {};
@@ -39,11 +42,12 @@ function toParsedBody(body: string | undefined): SqsMessage {
   return parsed as SqsMessage;
 }
 
+/** Creates default operations. */
 async function createDefaultOperations(): Promise<AwsSqsOperations> {
   const client = new SQSClient({});
   const queueUrlByName = new Map<string, string>();
 
-  const getQueueUrl = async (queueName: string): Promise<string> => {
+  /** Handles get queue url. */ const getQueueUrl = async (queueName: string): Promise<string> => {
     const existing = queueUrlByName.get(queueName);
     if (existing) {
       return existing;
@@ -103,6 +107,7 @@ async function createDefaultOperations(): Promise<AwsSqsOperations> {
   };
 }
 
+/** Creates aws sqs. @example `createAwsSqs(input)` */
 export function createAwsSqs(input: CreateAwsSqsInput = {}): SqsClient {
   const operationsPromise = input.operations
     ? Promise.resolve(input.operations)

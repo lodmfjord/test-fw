@@ -1,7 +1,9 @@
+/** @fileoverview Implements to routes with global cors options. @module libs/http-api-contract/src/to-routes-with-global-cors-options */
 import type { GlobalCors } from "./cors-types";
 import { defineRoute } from "./define-route";
 import type { RouteDefinition } from "./types";
 
+/** Converts values to route copy. */
 function toRouteCopy(route: RouteDefinition): RouteDefinition {
   return {
     ...route,
@@ -10,6 +12,7 @@ function toRouteCopy(route: RouteDefinition): RouteDefinition {
   };
 }
 
+/** Converts values to routes with global cors options. @example `toRoutesWithGlobalCorsOptions(input)` */
 export function toRoutesWithGlobalCorsOptions(
   routes: ReadonlyArray<RouteDefinition>,
   cors: GlobalCors | undefined,

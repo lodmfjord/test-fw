@@ -1,6 +1,8 @@
+/** @fileoverview Implements to normalized global cors. @module libs/http-api-contract/src/to-normalized-global-cors */
 import type { GlobalCors } from "./cors-types";
 import type { BuildContractInput } from "./types";
 
+/** Converts values to normalized global cors. @example `toNormalizedGlobalCors(input)` */
 export function toNormalizedGlobalCors(input: BuildContractInput["cors"]): GlobalCors | undefined {
   if (!input) {
     return undefined;
@@ -17,7 +19,7 @@ export function toNormalizedGlobalCors(input: BuildContractInput["cors"]): Globa
     }
   }
 
-  const toNormalizedList = (
+  /** Converts values to normalized list. */ const toNormalizedList = (
     values: string[] | undefined,
     settingName: "allowHeaders" | "exposeHeaders",
   ): string[] | undefined => {

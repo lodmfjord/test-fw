@@ -1,3 +1,4 @@
+/** @fileoverview Tests create sqs queue. @module libs/sqs/src/create-sqs-queue.test */
 import { describe, expect, it } from "bun:test";
 import { createSqsQueue } from "./create-sqs-queue";
 import type { SqsClient } from "./types";

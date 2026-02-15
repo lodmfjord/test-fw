@@ -1,7 +1,9 @@
+/** @fileoverview Implements create runtime s3. @module libs/s3/src/create-runtime-s3 */
 import { createAwsS3 } from "./create-aws-s3";
 import { createMemoryS3 } from "./create-memory-s3";
 import type { CreateRuntimeS3Input, S3Client } from "./types";
 
+/** Handles detect lambda runtime. */
 function detectLambdaRuntime(): boolean {
   if (typeof process === "undefined" || !process.env) {
     return false;
@@ -10,13 +12,14 @@ function detectLambdaRuntime(): boolean {
   return Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME ?? process.env.LAMBDA_TASK_ROOT);
 }
 
+/** Creates runtime s3. @example `createRuntimeS3(input)` */
 export function createRuntimeS3(input: CreateRuntimeS3Input = {}): S3Client {
   const createAwsRuntimeS3 = input.createAwsS3 ?? (() => createAwsS3());
   const createMemoryRuntimeS3 = input.createMemoryS3 ?? createMemoryS3;
   const isLambdaRuntime = input.isLambdaRuntime ?? detectLambdaRuntime();
   let s3Promise: Promise<S3Client> | undefined;
 
-  const getS3 = async (): Promise<S3Client> => {
+  /** Handles get s3. */ const getS3 = async (): Promise<S3Client> => {
     if (!s3Promise) {
       s3Promise = Promise.resolve(isLambdaRuntime ? createAwsRuntimeS3() : createMemoryRuntimeS3());
     }

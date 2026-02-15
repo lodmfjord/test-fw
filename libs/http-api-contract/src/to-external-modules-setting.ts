@@ -1,4 +1,7 @@
-export function toExternalModulesSetting(value: unknown): string[] | undefined {
+/** @fileoverview Implements to external modules setting. @module libs/http-api-contract/src/to-external-modules-setting */
+/** @example `toExternalModulesSetting(input)` */ export function toExternalModulesSetting(
+  value: unknown,
+): string[] | undefined {
   if (value === undefined) {
     return undefined;
   }

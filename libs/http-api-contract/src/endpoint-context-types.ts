@@ -1,3 +1,4 @@
+/** @fileoverview Implements endpoint context types. @module libs/http-api-contract/src/endpoint-context-types */
 import type {
   DynamoDatabase,
   DynamoDatabaseRuntimeConfig,

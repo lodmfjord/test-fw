@@ -1,3 +1,4 @@
+/** @fileoverview Tests package exports consistency. @module tools/constraints/package-exports-consistency.test */
 import { describe, expect, it } from "bun:test";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -19,7 +20,9 @@ const EXPECTED_EXPORTS = {
   types: "./dist/index.d.ts",
 };
 
-async function readLibraryPackagePaths(): Promise<string[]> {
+/** Handles read library package paths. */ async function readLibraryPackagePaths(): Promise<
+  string[]
+> {
   const librariesDirectory = join(import.meta.dir, "..", "..", "libs");
   const entries = await readdir(librariesDirectory, { withFileTypes: true });
 

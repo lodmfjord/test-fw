@@ -1,3 +1,4 @@
+/** @fileoverview Implements to listener target. @module libs/sqs/src/to-listener-target */
 import {
   parseStepFunctionDefinition,
   toStepFunctionDefinitionJson,
@@ -10,18 +11,21 @@ import type {
   SqsStepFunctionWorkflowType,
 } from "./listener-target-types";
 
+/** Converts values to workflow type. */
 function toWorkflowType(
   value: SqsStepFunctionWorkflowType | undefined,
 ): SqsStepFunctionWorkflowType {
   return value ?? "EXPRESS";
 }
 
+/** Converts values to invocation type. */
 function toInvocationType(
   value: SqsStepFunctionInvocationType | undefined,
 ): SqsStepFunctionInvocationType {
   return value ?? "async";
 }
 
+/** Converts values to step function target. */
 function toStepFunctionTarget(
   target: SqsListenerTargetInput,
 ): SqsListenerStepFunctionTarget | undefined {
@@ -53,6 +57,7 @@ function toStepFunctionTarget(
   };
 }
 
+/** Converts values to listener target. @example `toListenerTarget(input)` */
 export function toListenerTarget(target: SqsListenerTargetInput | undefined): SqsListenerTarget {
   if (!target || target.kind === "lambda") {
     return {

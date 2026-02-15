@@ -1,3 +1,5 @@
+/** @fileoverview Implements parse jsonc. @module libs/http-api-contract/src/parse-jsonc */
+/** Handles strip json comments. */
 function stripJsonComments(source: string): string {
   let output = "";
   let index = 0;
@@ -55,6 +57,7 @@ function stripJsonComments(source: string): string {
   return output;
 }
 
+/** Handles strip trailing commas. */
 function stripTrailingCommas(source: string): string {
   let output = "";
   let inString = false;
@@ -98,6 +101,7 @@ function stripTrailingCommas(source: string): string {
   return output;
 }
 
+/** Handles parse jsonc. @example `parseJsonc(input)` */
 export function parseJsonc(source: string): unknown {
   const withoutComments = stripJsonComments(source);
   const withoutTrailingCommas = stripTrailingCommas(withoutComments);

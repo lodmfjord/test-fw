@@ -1,3 +1,4 @@
+/** @fileoverview Implements to generate contracts cli command. @module libs/http-api-contract/src/to-generate-contracts-cli-command */
 const DEFAULT_SETTINGS_FILE_PATH = "babb.settings.json";
 
 type GenerateContractsCliCommand = {
@@ -5,6 +6,7 @@ type GenerateContractsCliCommand = {
   settingsFilePath: string;
 };
 
+/** Converts values to settings file path. */
 function toSettingsFilePath(argv: string[]): string {
   const settingsFlagIndex = argv.indexOf("--settings");
   if (settingsFlagIndex >= 0) {
@@ -24,6 +26,7 @@ function toSettingsFilePath(argv: string[]): string {
   return DEFAULT_SETTINGS_FILE_PATH;
 }
 
+/** Converts values to generate contracts cli command. @example `toGenerateContractsCliCommand(input)` */
 export function toGenerateContractsCliCommand(argv: string[]): GenerateContractsCliCommand {
   const command = argv[0];
   if (command === "init") {

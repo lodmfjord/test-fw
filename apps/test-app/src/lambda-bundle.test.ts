@@ -1,3 +1,4 @@
+/** @fileoverview Tests lambda bundle. @module apps/test-app/src/lambda-bundle.test */
 import { mkdtemp, readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -20,7 +21,7 @@ type LambdaLikeResponse = {
   statusCode: number;
 };
 
-function getHandlerFromSource(
+/** Gets handler from source. */ function getHandlerFromSource(
   source: string,
 ): (event: LambdaLikeEvent) => Promise<LambdaLikeResponse> {
   const sourceWithoutZodImport = source.replace(

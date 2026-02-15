@@ -1,3 +1,4 @@
+/** @fileoverview Implements define endpoint. @module libs/http-api-contract/src/define-endpoint */
 import { defineEndpointHelpers } from "./define-endpoint-helpers";
 import { defineRoute } from "./define-route";
 import { registerDefinedEndpoint } from "./register-defined-endpoint";
@@ -9,7 +10,7 @@ import type {
   EndpointInput,
 } from "./types";
 
-export function defineEndpoint<
+/** @example `defineEndpoint(input)` */ export function defineEndpoint<
   TParams,
   TQuery,
   THeaders,

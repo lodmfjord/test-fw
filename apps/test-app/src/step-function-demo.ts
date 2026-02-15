@@ -1,3 +1,4 @@
+/** @fileoverview Implements step function demo. @module apps/test-app/src/step-function-demo */
 import { createSqsQueue } from "@babbstack/sqs";
 import { definePost, defineStepFunction } from "@babbstack/http-api-contract";
 import { schema } from "@babbstack/schema";

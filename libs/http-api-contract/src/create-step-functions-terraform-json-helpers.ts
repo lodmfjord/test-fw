@@ -1,3 +1,4 @@
+/** @fileoverview Implements create step functions terraform json helpers. @module libs/http-api-contract/src/create-step-functions-terraform-json-helpers */
 type TerraformCollections = {
   iamRolePolicies: Record<string, unknown>;
   iamRoles: Record<string, unknown>;
@@ -7,10 +8,12 @@ type TerraformCollections = {
   stateMachines: Record<string, unknown>;
 };
 
+/** Converts values to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
+/** Converts values to route state machine role policy. */
 function toRouteStateMachineRolePolicy(): string {
   return JSON.stringify({
     Statement: [
@@ -26,6 +29,7 @@ function toRouteStateMachineRolePolicy(): string {
   });
 }
 
+/** Converts values to api gateway role policy. */
 function toApiGatewayRolePolicy(): string {
   return JSON.stringify({
     Statement: [
@@ -41,6 +45,7 @@ function toApiGatewayRolePolicy(): string {
   });
 }
 
+/** Converts values to pipe role policy. */
 function toPipeRolePolicy(): string {
   return JSON.stringify({
     Statement: [
@@ -56,12 +61,14 @@ function toPipeRolePolicy(): string {
   });
 }
 
+/** Converts values to unmanaged sqs queue arn. */
 function toUnmanagedSqsQueueArn(queueNameExpression: string): string {
   const awsRegion = "$" + "{var.aws_region}";
   const accountId = "$" + "{data.aws_caller_identity.current.account_id}";
   return `arn:aws:sqs:${awsRegion}:${accountId}:${queueNameExpression}`;
 }
 
+/** Creates collections. */
 function createCollections(): TerraformCollections {
   return {
     iamRolePolicies: {},
@@ -73,6 +80,7 @@ function createCollections(): TerraformCollections {
   };
 }
 
+/** Handles append endpoint state machine resources. */
 function appendEndpointStateMachineResources(collections: TerraformCollections): void {
   collections.iamRoles.step_function_route = {
     assume_role_policy: toRouteStateMachineRolePolicy(),
@@ -88,6 +96,7 @@ function appendEndpointStateMachineResources(collections: TerraformCollections):
   };
 }
 
+/** Handles append sqs listener state machine resources. */
 function appendSqsListenerStateMachineResources(
   collections: TerraformCollections,
   usesManagedSqsQueues: boolean,
@@ -153,6 +162,7 @@ function appendSqsListenerStateMachineResources(
   };
 }
 
+/** Handles append api gateway resources. */
 function appendApiGatewayResources(collections: TerraformCollections): void {
   collections.iamRoles.apigateway_step_function_route = {
     assume_role_policy: toApiGatewayRolePolicy(),
@@ -189,6 +199,7 @@ function appendApiGatewayResources(collections: TerraformCollections): void {
   };
 }
 
+/** Converts values to resource block. */
 function toResourceBlock(collections: TerraformCollections): Record<string, unknown> {
   return {
     ...(Object.keys(collections.iamRoles).length > 0
@@ -224,6 +235,7 @@ function toResourceBlock(collections: TerraformCollections): Record<string, unkn
   };
 }
 
+/** Converts values to variable block. */
 function toVariableBlock(): Record<string, unknown> {
   return {
     apigateway_step_function_policy_name_prefix: { default: "", type: "string" },

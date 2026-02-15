@@ -1,3 +1,4 @@
+/** @fileoverview Implements types. @module libs/dynamodb/src/types */
 export type DynamoDbKey = Record<string, unknown>;
 
 export type DynamoDbItem = Record<string, unknown>;

@@ -1,7 +1,9 @@
+/** @fileoverview Implements create runtime sqs. @module libs/sqs/src/create-runtime-sqs */
 import { createAwsSqs } from "./create-aws-sqs";
 import { createMemorySqs } from "./create-memory-sqs";
 import type { CreateRuntimeSqsInput, SqsClient } from "./types";
 
+/** Handles detect lambda runtime. */
 function detectLambdaRuntime(): boolean {
   if (typeof process === "undefined" || !process.env) {
     return false;
@@ -10,13 +12,14 @@ function detectLambdaRuntime(): boolean {
   return Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME ?? process.env.LAMBDA_TASK_ROOT);
 }
 
+/** Creates runtime sqs. @example `createRuntimeSqs(input)` */
 export function createRuntimeSqs(input: CreateRuntimeSqsInput = {}): SqsClient {
   const createAwsRuntimeSqs = input.createAwsSqs ?? (() => createAwsSqs());
   const createMemoryRuntimeSqs = input.createMemorySqs ?? createMemorySqs;
   const isLambdaRuntime = input.isLambdaRuntime ?? detectLambdaRuntime();
   let sqsPromise: Promise<SqsClient> | undefined;
 
-  const getSqs = async (): Promise<SqsClient> => {
+  /** Handles get sqs. */ const getSqs = async (): Promise<SqsClient> => {
     if (!sqsPromise) {
       sqsPromise = Promise.resolve(
         isLambdaRuntime ? createAwsRuntimeSqs() : createMemoryRuntimeSqs(),

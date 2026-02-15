@@ -1,3 +1,4 @@
+/** @fileoverview Implements create aws dynamo db. @module libs/dynamodb/src/create-aws-dynamo-db */
 import {
   DeleteItemCommand,
   DynamoDBClient,
@@ -10,10 +11,12 @@ import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import type { NativeAttributeValue } from "@aws-sdk/util-dynamodb";
 import type { AwsDynamoDbOperations, CreateAwsDynamoDbInput, DynamoDbClient } from "./types";
 
+/** Converts values to marshall record. */
 function toMarshallRecord(input: Record<string, unknown>): Record<string, NativeAttributeValue> {
   return input as Record<string, NativeAttributeValue>;
 }
 
+/** Creates default operations. */
 async function createDefaultOperations(): Promise<AwsDynamoDbOperations> {
   const client = new DynamoDBClient({});
 
@@ -92,6 +95,7 @@ async function createDefaultOperations(): Promise<AwsDynamoDbOperations> {
   };
 }
 
+/** Creates aws dynamo db. @example `createAwsDynamoDb(input)` */
 export function createAwsDynamoDb(input: CreateAwsDynamoDbInput = {}): DynamoDbClient {
   const operationsPromise = input.operations
     ? Promise.resolve(input.operations)

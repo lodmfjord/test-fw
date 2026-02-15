@@ -1,3 +1,4 @@
+/** @fileoverview Implements last update endpoints. @module apps/test-app/src/last-update-endpoints */
 import { createSqsQueue } from "@babbstack/sqs";
 import { createEnv, createSecret, defineGet } from "@babbstack/http-api-contract";
 import { schema } from "@babbstack/schema";

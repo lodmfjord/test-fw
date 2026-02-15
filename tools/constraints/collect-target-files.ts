@@ -1,3 +1,4 @@
+/** @fileoverview Implements collect target files. @module tools/constraints/collect-target-files */
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -11,7 +12,9 @@ const IGNORED_DIRECTORIES = new Set([
   "node_modules",
 ]);
 
-async function walkDirectory(directoryPath: string): Promise<string[]> {
+/** Handles walk directory. */ async function walkDirectory(
+  directoryPath: string,
+): Promise<string[]> {
   const entries = await readdir(directoryPath, { withFileTypes: true });
   const files: string[] = [];
 
@@ -34,7 +37,9 @@ async function walkDirectory(directoryPath: string): Promise<string[]> {
   return files;
 }
 
-export async function collectTargetFiles(rootDirectories: string[]): Promise<string[]> {
+/** Handles collect target files. @example `await collectTargetFiles(input)` */ export async function collectTargetFiles(
+  rootDirectories: string[],
+): Promise<string[]> {
   const allFiles: string[] = [];
 
   for (const rootDirectory of rootDirectories) {

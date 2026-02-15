@@ -38,6 +38,22 @@
 - Constraints are enforced by `bun run check:constraints`.
 - Full validation command: `bun run check` (tests + constraints).
 
+## Documentation Standards
+
+- Every code file must start with a short file-level JSDoc header describing what the file does.
+- Use a header block like:
+  ```ts
+  /**
+   * @fileoverview Utilities for date formatting and parsing used across the app.
+   * @module utils/date
+   * @description
+   * Provides stable helpers for parsing ISO strings, formatting dates for UI,
+   * and handling timezone-safe comparisons.
+   */
+  ```
+- Every function must have JSDoc.
+- Every exported function JSDoc must include at least one `@example`.
+
 ## Package Export Policy
 
 - All libraries in `libs/*` must export from `dist`, not from `src`.

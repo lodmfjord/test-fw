@@ -1,3 +1,4 @@
+/** @fileoverview Tests execute lambda js observability. @module libs/http-api-contract/src/execute-lambda-js-observability.test */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -28,6 +29,7 @@ type LoggedEntry = {
   [key: string]: unknown;
 };
 
+/** Gets handler from source. */
 function getHandlerFromSource(
   source: string,
 ): (event: LambdaLikeEvent) => Promise<LambdaLikeResponse> {
@@ -51,6 +53,7 @@ function getHandlerFromSource(
   return factory(runtimeRequire);
 }
 
+/** Converts values to event log. */
 function toEventLog(loggedEntries: LoggedEntry[], event: string): LoggedEntry | undefined {
   return loggedEntries.find((entry) => entry.event === event);
 }

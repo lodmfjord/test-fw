@@ -1,12 +1,13 @@
+/** @fileoverview Implements count exported functions. @module tools/constraints/count-exported-functions */
 import * as ts from "typescript";
 
 type FunctionBindingMap = Map<string, string>;
 
-function toBindingId(node: ts.Node): string {
+/** Converts values to binding id. */ function toBindingId(node: ts.Node): string {
   return `${node.pos}:${node.end}`;
 }
 
-function hasModifier(
+/** Checks whether has modifier. */ function hasModifier(
   node: ts.Node & {
     modifiers?: ts.NodeArray<ts.ModifierLike>;
   },
@@ -15,7 +16,9 @@ function hasModifier(
   return node.modifiers?.some((modifier) => modifier.kind === kind) ?? false;
 }
 
-function unwrapExpression(expression: ts.Expression): ts.Expression {
+/** Handles unwrap expression. */ function unwrapExpression(
+  expression: ts.Expression,
+): ts.Expression {
   if (ts.isParenthesizedExpression(expression)) {
     return unwrapExpression(expression.expression);
   }
@@ -23,7 +26,7 @@ function unwrapExpression(expression: ts.Expression): ts.Expression {
   return expression;
 }
 
-function toBoundFunctionExpression(
+/** Converts values to bound function expression. */ function toBoundFunctionExpression(
   expression: ts.Expression | undefined,
 ): ts.FunctionExpression | ts.ArrowFunction | undefined {
   if (!expression) {
@@ -38,7 +41,9 @@ function toBoundFunctionExpression(
   return undefined;
 }
 
-function toFunctionBindingMap(sourceFile: ts.SourceFile): FunctionBindingMap {
+/** Converts values to function binding map. */ function toFunctionBindingMap(
+  sourceFile: ts.SourceFile,
+): FunctionBindingMap {
   const bindings: FunctionBindingMap = new Map();
   const aliases: Array<{ aliasName: string; sourceName: string }> = [];
 
@@ -94,7 +99,7 @@ function toFunctionBindingMap(sourceFile: ts.SourceFile): FunctionBindingMap {
   return bindings;
 }
 
-function collectNamedExportedFunctions(
+/** Handles collect named exported functions. */ function collectNamedExportedFunctions(
   sourceFile: ts.SourceFile,
   bindings: FunctionBindingMap,
   exportedBindingIds: Set<string>,
@@ -178,7 +183,9 @@ function collectNamedExportedFunctions(
   }
 }
 
-export function countExportedFunctions(source: string): number {
+/** Handles count exported functions. @example `countExportedFunctions(input)` */ export function countExportedFunctions(
+  source: string,
+): number {
   const sourceFile = ts.createSourceFile(
     "source.ts",
     source,

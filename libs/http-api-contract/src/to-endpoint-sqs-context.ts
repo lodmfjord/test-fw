@@ -1,6 +1,8 @@
+/** @fileoverview Implements to endpoint sqs context. @module libs/http-api-contract/src/to-endpoint-sqs-context */
 import type { SqsClient, SqsMessage } from "@babbstack/sqs";
 import type { EndpointRuntimeDefinition } from "./types";
 
+/** Converts values to endpoint sqs context. @example `toEndpointSqsContext(input)` */
 export function toEndpointSqsContext(
   sqs: SqsClient,
   endpoint: EndpointRuntimeDefinition,

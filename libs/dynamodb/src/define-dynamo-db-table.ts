@@ -1,3 +1,4 @@
+/** @fileoverview Implements define dynamo db table. @module libs/dynamodb/src/define-dynamo-db-table */
 import type { DynamoDbItem, DynamoDbTableDefinition } from "./types";
 
 type DefineDynamoDbTableInput<
@@ -8,7 +9,7 @@ type DefineDynamoDbTableInput<
   tableName: string;
 };
 
-export function defineDynamoDbTable<
+/** @example `defineDynamoDbTable(input)` */ export function defineDynamoDbTable<
   TItem extends DynamoDbItem,
   TKeyField extends keyof TItem & string,
 >(input: DefineDynamoDbTableInput<TItem, TKeyField>): DynamoDbTableDefinition<TItem, TKeyField> {

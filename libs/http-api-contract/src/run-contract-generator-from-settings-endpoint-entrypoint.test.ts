@@ -1,3 +1,4 @@
+/** @fileoverview Tests run contract generator from settings endpoint entrypoint. @module libs/http-api-contract/src/run-contract-generator-from-settings-endpoint-entrypoint.test */
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

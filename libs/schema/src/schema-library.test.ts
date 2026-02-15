@@ -1,3 +1,4 @@
+/** @fileoverview Tests schema library. @module libs/schema/src/schema-library.test */
 import { describe, expect, it } from "bun:test";
 import { schema } from "./index";
 

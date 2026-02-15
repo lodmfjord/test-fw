@@ -1,3 +1,4 @@
+/** @fileoverview Implements to step function endpoints. @module libs/http-api-contract/src/to-step-function-endpoints */
 import type { EndpointRuntimeDefinition } from "./types";
 
 type StepFunctionEndpointConfig = {
@@ -11,6 +12,7 @@ type StepFunctionEndpointConfig = {
   workflow_type: "STANDARD" | "EXPRESS";
 };
 
+/** Converts values to integration subtype. */
 function toIntegrationSubtype(
   invocationType: "sync" | "async",
 ): StepFunctionEndpointConfig["integration_subtype"] {
@@ -21,6 +23,7 @@ function toIntegrationSubtype(
   return "StepFunctions-StartExecution";
 }
 
+/** Converts values to start action. */
 function toStartAction(
   invocationType: "sync" | "async",
 ): StepFunctionEndpointConfig["start_action"] {
@@ -31,6 +34,7 @@ function toStartAction(
   return "states:StartExecution";
 }
 
+/** Converts values to step function endpoints. @example `toStepFunctionEndpoints(input)` */
 export function toStepFunctionEndpoints(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
 ): Record<string, StepFunctionEndpointConfig> {

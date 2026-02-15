@@ -1,3 +1,4 @@
+/** @fileoverview Implements index. @module libs/sqs/src/index */
 export { createAwsSqs } from "./create-aws-sqs";
 export { createMemorySqs } from "./create-memory-sqs";
 export { createRuntimeSqs } from "./create-runtime-sqs";

@@ -1,3 +1,4 @@
+/** @fileoverview Implements render terraform files. @module libs/http-api-contract/src/render-terraform-files */
 import type { TerraformResourceSelection } from "./contract-generator-types";
 import { createApiGatewayTerraformJson } from "./create-api-gateway-terraform-json";
 import { createApiGatewayLambdaBindingsTerraformJson } from "./create-api-gateway-lambda-bindings-terraform-json";
@@ -12,6 +13,7 @@ import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import type { EndpointRuntimeDefinition } from "./types";
 import type { Contract } from "./types";
 
+/** Handles render terraform files. @example `renderTerraformFiles(input)` */
 export function renderTerraformFiles(
   contract: Contract,
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

@@ -1,3 +1,4 @@
+/** @fileoverview Tests create secret. @module libs/http-api-contract/src/create-secret.test */
 import { describe, expect, it } from "bun:test";
 import { createSecret } from "./create-secret";
 

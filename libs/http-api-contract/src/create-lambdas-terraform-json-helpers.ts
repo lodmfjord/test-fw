@@ -1,3 +1,4 @@
+/** @fileoverview Implements create lambdas terraform json helpers. @module libs/http-api-contract/src/create-lambdas-terraform-json-helpers */
 import type { Contract } from "./types";
 import { toLambdaFunctions } from "./to-lambda-functions";
 
@@ -24,10 +25,12 @@ export type LambdasTerraformContext = {
   usesManagedSqsQueues: boolean;
 };
 
+/** Converts values to terraform reference. */
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
+/** Converts values to route config. */
 function toRouteConfig(context: LambdasTerraformContext): Record<string, unknown> {
   return {
     architectures: [toTerraformReference("each.value.architecture")],
@@ -68,6 +71,7 @@ function toRouteConfig(context: LambdasTerraformContext): Record<string, unknown
   };
 }
 
+/** Converts values to sqs listener config. */
 function toSqsListenerConfig(context: LambdasTerraformContext): Record<string, unknown> {
   return {
     architectures: ["arm64"],
@@ -90,6 +94,7 @@ function toSqsListenerConfig(context: LambdasTerraformContext): Record<string, u
   };
 }
 
+/** Converts values to iam role policies. */
 function toIamRolePolicies(context: LambdasTerraformContext): Record<string, unknown> {
   return {
     ...(context.hasRouteDynamodbAccess
@@ -137,6 +142,7 @@ function toIamRolePolicies(context: LambdasTerraformContext): Record<string, unk
   };
 }
 
+/** Converts values to locals. */
 function toLocals(contract: Contract, context: LambdasTerraformContext): Record<string, unknown> {
   return {
     lambda_functions: toLambdaFunctions(contract),

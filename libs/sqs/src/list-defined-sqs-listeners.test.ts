@@ -1,3 +1,4 @@
+/** @fileoverview Tests list defined sqs listeners. @module libs/sqs/src/list-defined-sqs-listeners.test */
 import { describe, expect, it } from "bun:test";
 import { createSqsQueue } from "./create-sqs-queue";
 import { listDefinedSqsListeners } from "./list-defined-sqs-listeners";

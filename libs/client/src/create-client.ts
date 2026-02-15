@@ -1,3 +1,4 @@
+/** @fileoverview Implements create client. @module libs/client/src/create-client */
 import type {
   ClientRequestApi,
   ClientEndpointResponse,
@@ -11,6 +12,7 @@ type QueryValue = string | number | boolean | null | undefined | Date;
 type QueryRecord = Record<string, QueryValue | QueryValue[]>;
 const HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"] as const;
 
+/** Converts values to base url. */
 function toBaseUrl(baseUrl: string): string {
   const normalized = baseUrl.trim();
   if (normalized.length === 0) {
@@ -20,6 +22,7 @@ function toBaseUrl(baseUrl: string): string {
   return normalized.endsWith("/") ? normalized.slice(0, -1) : normalized;
 }
 
+/** Converts values to resolved path. */
 function toResolvedPath(
   pathTemplate: string,
   params: Record<string, string | number | boolean | undefined>,
@@ -35,6 +38,7 @@ function toResolvedPath(
   });
 }
 
+/** Converts values to path key. */
 function toPathKey(pathKey: string): string {
   const trimmed = pathKey.trim();
   if (trimmed.length === 0) {
@@ -45,6 +49,7 @@ function toPathKey(pathKey: string): string {
   return withLeadingSlash.replace(/\/+/g, "/");
 }
 
+/** Handles append query. */
 function appendQuery(searchParams: URLSearchParams, query: QueryRecord | undefined): void {
   if (!query || typeof query !== "object") {
     return;
@@ -69,6 +74,7 @@ function appendQuery(searchParams: URLSearchParams, query: QueryRecord | undefin
   }
 }
 
+/** Converts values to string headers. */
 function toStringHeaders(headers: unknown): Record<string, string> {
   if (!headers || typeof headers !== "object" || Array.isArray(headers)) {
     return {};
@@ -85,11 +91,13 @@ function toStringHeaders(headers: unknown): Record<string, string> {
   return normalized;
 }
 
+/** Checks whether has header. */
 function hasHeader(headers: Record<string, string>, expectedName: string): boolean {
   const normalizedExpectedName = expectedName.toLowerCase();
   return Object.keys(headers).some((name) => name.toLowerCase() === normalizedExpectedName);
 }
 
+/** Converts values to request body. */
 function toRequestBody(body: unknown, headers: Record<string, string>): BodyInit | undefined {
   if (body === undefined) {
     return undefined;
@@ -113,6 +121,7 @@ function toRequestBody(body: unknown, headers: Record<string, string>): BodyInit
   return JSON.stringify(body);
 }
 
+/** Converts values to response data. */
 async function toResponseData(response: Response): Promise<unknown> {
   const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
   if (contentType.includes("/json") || contentType.includes("+json")) {
@@ -126,6 +135,7 @@ async function toResponseData(response: Response): Promise<unknown> {
   return (await response.text()) as unknown;
 }
 
+/** Converts values to response headers. */
 function toResponseHeaders(headers: Headers): Record<string, string> {
   const normalized: Record<string, string> = {};
   for (const [name, value] of headers.entries()) {
@@ -134,6 +144,7 @@ function toResponseHeaders(headers: Headers): Record<string, string> {
   return normalized;
 }
 
+/** Converts values to endpoint list. */
 function toEndpointList(
   endpoints: unknown,
 ): Array<{ method: string; path: string; routeId: string }> {
@@ -175,25 +186,24 @@ function toEndpointList(
   return [];
 }
 
-export function createClient<TEndpoints>(
+/** Creates client. @example `createClient(input)` */ export function createClient<TEndpoints>(
   baseUrl: string,
   endpoints: TEndpoints,
 ): HttpApiClient<TEndpoints, TEndpoints>;
 
-export function createClient<TEndpoints = never>(
-  baseUrl: string,
-  endpoints?: undefined,
-): HttpApiClient<TEndpoints, TEndpoints>;
+/** Creates client. @example `createClient(input)` */ export function createClient<
+  TEndpoints = never,
+>(baseUrl: string, endpoints?: undefined): HttpApiClient<TEndpoints, TEndpoints>;
 
-export function createClient<TEndpoints, TRouteEndpoints = unknown>(
-  baseUrl: string,
-  endpoints: TRouteEndpoints,
-): HttpApiClient<TEndpoints, TRouteEndpoints>;
+/** Creates client. @example `createClient(input)` */ export function createClient<
+  TEndpoints,
+  TRouteEndpoints = unknown,
+>(baseUrl: string, endpoints: TRouteEndpoints): HttpApiClient<TEndpoints, TRouteEndpoints>;
 
-export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
-  baseUrl: string,
-  endpoints?: TRouteEndpoints,
-): HttpApiClient<TEndpoints, TRouteEndpoints> {
+/** Creates client. @example `createClient(input)` */ export function createClient<
+  TEndpoints = never,
+  TRouteEndpoints = TEndpoints,
+>(baseUrl: string, endpoints?: TRouteEndpoints): HttpApiClient<TEndpoints, TRouteEndpoints> {
   const normalizedBaseUrl = toBaseUrl(baseUrl);
   const endpointList = toEndpointList(endpoints);
   const endpointByRouteId = new Map<string, { method: string; path: string; routeId: string }>();
@@ -201,7 +211,9 @@ export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
     endpointByRouteId.set(endpoint.routeId, endpoint);
   }
 
-  async function requestCore<TEndpoint extends ClientEndpointUnion<TEndpoints>>(
+  /** Handles request core. */ async function requestCore<
+    TEndpoint extends ClientEndpointUnion<TEndpoints>,
+  >(
     endpoint: TEndpoint,
     input: ClientRequestInput<TEndpoint>,
   ): Promise<ClientResponse<ClientEndpointResponse<TEndpoint>>> {

@@ -1,3 +1,4 @@
+/** @fileoverview Implements create sqs queue. @module libs/sqs/src/create-sqs-queue */
 import { registerDefinedSqsListener } from "./register-defined-sqs-listener";
 import { toListenerTarget } from "./to-listener-target";
 import type {
@@ -18,6 +19,7 @@ type CreateSqsQueueOptions = {
   queueName: string;
 };
 
+/** Converts values to queue name. */
 function toQueueName(options: CreateSqsQueueOptions): string {
   const queueName = options.queueName.trim();
   if (queueName.length === 0) {
@@ -27,6 +29,7 @@ function toQueueName(options: CreateSqsQueueOptions): string {
   return queueName;
 }
 
+/** Converts values to listener id. */
 function toListenerId(queueName: string, providedListenerId: string | undefined): string {
   const source = providedListenerId?.trim() || `${queueName}_listener`;
   const normalized = source.replace(/[^a-zA-Z0-9_]/g, "_").replace(/_+/g, "_");
@@ -37,6 +40,7 @@ function toListenerId(queueName: string, providedListenerId: string | undefined)
   return normalized;
 }
 
+/** Converts values to runtime config. */
 function toRuntimeConfig(queueName: string): SqsQueueRuntimeConfig {
   return {
     kind: "sqs-queue",
@@ -44,7 +48,7 @@ function toRuntimeConfig(queueName: string): SqsQueueRuntimeConfig {
   };
 }
 
-function bindQueue<TMessage extends SqsMessage>(
+/** Converts values to bound sqs queue. */ function bindQueue<TMessage extends SqsMessage>(
   sqs: SqsClient,
   queueName: string,
   parse: (input: unknown) => TMessage,
@@ -61,7 +65,7 @@ function bindQueue<TMessage extends SqsMessage>(
   };
 }
 
-function addQueueListener<TMessage extends SqsMessage>(
+/** Adds queue listener. */ function addQueueListener<TMessage extends SqsMessage>(
   queueName: string,
   runtimeConfig: SqsQueueRuntimeConfig,
   parse: (input: unknown) => TMessage,
@@ -102,10 +106,9 @@ function addQueueListener<TMessage extends SqsMessage>(
   return listener;
 }
 
-export function createSqsQueue<TMessage extends SqsMessage>(
-  parser: Parser<TMessage>,
-  options: CreateSqsQueueOptions,
-): SqsQueue<TMessage> {
+/** Creates sqs queue. @example `createSqsQueue(input)` */ export function createSqsQueue<
+  TMessage extends SqsMessage,
+>(parser: Parser<TMessage>, options: CreateSqsQueueOptions): SqsQueue<TMessage> {
   const queueName = toQueueName(options);
   const runtimeConfig = toRuntimeConfig(queueName);
 

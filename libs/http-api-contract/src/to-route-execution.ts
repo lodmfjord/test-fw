@@ -1,3 +1,4 @@
+/** @fileoverview Implements to route execution. @module libs/http-api-contract/src/to-route-execution */
 import {
   parseStepFunctionDefinition,
   toStepFunctionDefinitionJson,
@@ -10,16 +11,19 @@ import type {
   StepFunctionWorkflowType,
 } from "./route-execution-types";
 
+/** Converts values to workflow type. */
 function toWorkflowType(value: StepFunctionWorkflowType | undefined): StepFunctionWorkflowType {
   return value ?? "EXPRESS";
 }
 
+/** Converts values to invocation type. */
 function toInvocationType(
   value: StepFunctionInvocationType | undefined,
 ): StepFunctionInvocationType {
   return value ?? "sync";
 }
 
+/** Converts values to step function execution. */
 function toStepFunctionExecution(
   input: RouteExecutionInput,
 ): RouteStepFunctionExecution | undefined {
@@ -51,6 +55,7 @@ function toStepFunctionExecution(
   };
 }
 
+/** Converts values to route execution. @example `toRouteExecution(input)` */
 export function toRouteExecution(input: RouteExecutionInput | undefined): RouteExecution {
   if (!input || input.kind === "lambda") {
     return {

@@ -1,3 +1,4 @@
+/** @fileoverview Implements to terraform settings. @module libs/http-api-contract/src/to-terraform-settings */
 import type {
   TerraformGeneratorSettings,
   TerraformResourceSelection,
@@ -10,6 +11,7 @@ type ToStringSetting = (
   options: { defaultValue?: string; required: boolean },
 ) => string;
 
+/** Converts values to boolean setting. */
 function toBooleanSetting(value: unknown, settingName: string): boolean {
   if (typeof value === "boolean") {
     return value;
@@ -18,6 +20,7 @@ function toBooleanSetting(value: unknown, settingName: string): boolean {
   throw new Error(`Setting "${settingName}" must be a boolean`);
 }
 
+/** Converts values to terraform resources. */
 function toTerraformResources(value: unknown): TerraformResourceSelection {
   if (value === undefined) {
     return {
@@ -55,6 +58,7 @@ function toTerraformResources(value: unknown): TerraformResourceSelection {
   };
 }
 
+/** Converts values to terraform state. */
 function toTerraformState(
   value: unknown,
   toStringSetting: ToStringSetting,
@@ -91,6 +95,7 @@ function toTerraformState(
   };
 }
 
+/** Converts values to terraform settings. @example `toTerraformSettings(input)` */
 export function toTerraformSettings(
   value: unknown,
   toStringSetting: ToStringSetting,

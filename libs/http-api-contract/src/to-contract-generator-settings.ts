@@ -1,7 +1,9 @@
+/** @fileoverview Implements to contract generator settings. @module libs/http-api-contract/src/to-contract-generator-settings */
 import type { ContractGeneratorSettings } from "./contract-generator-types";
 import { toExternalModulesSetting } from "./to-external-modules-setting";
 import { toTerraformSettings } from "./to-terraform-settings";
 
+/** Converts values to string setting. */
 function toStringSetting(
   value: unknown,
   settingName: string,
@@ -31,6 +33,7 @@ function toStringSetting(
   return source;
 }
 
+/** Converts values to contract generator settings. @example `toContractGeneratorSettings(input)` */
 export function toContractGeneratorSettings(value: unknown): ContractGeneratorSettings {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new Error("Settings JSON must be an object");

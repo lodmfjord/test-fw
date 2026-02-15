@@ -1,3 +1,4 @@
+/** @fileoverview Implements test databases. @module apps/test-app/src/test-databases */
 import { createTypedDynamoDb, defineDynamoDbTable, type DynamoDbClient } from "@babbstack/dynamodb";
 
 type TestDbOneItem = {
@@ -22,7 +23,9 @@ const testDbTwoTable = defineDynamoDbTable<TestDbTwoItem, "id">({
   tableName: "test-db-two",
 });
 
-export function createTestDatabases(db: DynamoDbClient) {
+/** Creates test databases. @example `createTestDatabases(input)` */ export function createTestDatabases(
+  db: DynamoDbClient,
+) {
   return createTypedDynamoDb(db, {
     testDbOne: testDbOneTable,
     testDbTwo: testDbTwoTable,

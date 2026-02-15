@@ -1,7 +1,9 @@
+/** @fileoverview Implements create runtime dynamo db. @module libs/dynamodb/src/create-runtime-dynamo-db */
 import { createAwsDynamoDb } from "./create-aws-dynamo-db";
 import { createMemoryDynamoDb } from "./create-memory-dynamo-db";
 import type { CreateRuntimeDynamoDbInput, DynamoDbClient } from "./types";
 
+/** Handles detect lambda runtime. */
 function detectLambdaRuntime(): boolean {
   if (typeof process === "undefined" || !process.env) {
     return false;
@@ -10,13 +12,14 @@ function detectLambdaRuntime(): boolean {
   return Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME ?? process.env.LAMBDA_TASK_ROOT);
 }
 
+/** Creates runtime dynamo db. @example `createRuntimeDynamoDb(input)` */
 export function createRuntimeDynamoDb(input: CreateRuntimeDynamoDbInput = {}): DynamoDbClient {
   const createAwsDb = input.createAwsDb ?? (() => createAwsDynamoDb());
   const createMemoryDb = input.createMemoryDb ?? createMemoryDynamoDb;
   const isLambdaRuntime = input.isLambdaRuntime ?? detectLambdaRuntime();
   let dbPromise: Promise<DynamoDbClient> | undefined;
 
-  const getDb = async (): Promise<DynamoDbClient> => {
+  /** Handles get db. */ const getDb = async (): Promise<DynamoDbClient> => {
     if (!dbPromise) {
       dbPromise = Promise.resolve(isLambdaRuntime ? createAwsDb() : createMemoryDb());
     }

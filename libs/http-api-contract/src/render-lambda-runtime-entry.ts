@@ -1,9 +1,11 @@
+/** @fileoverview Implements render lambda runtime entry. @module libs/http-api-contract/src/render-lambda-runtime-entry */
 import { renderLambdaEnvBootstrapSource } from "./render-lambda-env-bootstrap-source";
 import { renderLambdaRuntimeSourceBlocks } from "./render-lambda-runtime-source-blocks";
 import { renderUsedImportLines } from "./render-used-import-lines";
 import { resolveRuntimeModuleSpecifier } from "./resolve-runtime-module-specifier";
 import type { EndpointRuntimeDefinition } from "./types";
 
+/** Handles render lambda runtime source. */
 function renderLambdaRuntimeSource(
   endpoint: EndpointRuntimeDefinition,
   importLines: string[],
@@ -206,6 +208,7 @@ export async function handler(event) {
 `;
 }
 
+/** Handles render lambda runtime entry source. @example `renderLambdaRuntimeEntrySource(input)` */
 export function renderLambdaRuntimeEntrySource(
   endpointModulePath: string,
   endpointModuleSource: string,

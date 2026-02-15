@@ -1,3 +1,4 @@
+/** @fileoverview Tests create memory sqs. @module libs/sqs/src/create-memory-sqs.test */
 import { describe, expect, it } from "bun:test";
 import { createMemorySqs } from "./create-memory-sqs";
 

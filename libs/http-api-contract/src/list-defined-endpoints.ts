@@ -1,6 +1,8 @@
+/** @fileoverview Implements list defined endpoints. @module libs/http-api-contract/src/list-defined-endpoints */
 import { endpointRegistry } from "./endpoint-registry-store";
 import type { EndpointRuntimeDefinition } from "./types";
 
+/** Handles list defined endpoints. @example `listDefinedEndpoints(input)` */
 export function listDefinedEndpoints(): EndpointRuntimeDefinition[] {
   return endpointRegistry.map((endpoint) => ({
     ...endpoint,

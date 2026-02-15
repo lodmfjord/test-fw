@@ -1,7 +1,9 @@
+/** @fileoverview Tests create runtime sqs. @module libs/sqs/src/create-runtime-sqs.test */
 import { describe, expect, it } from "bun:test";
 import type { SqsClient } from "./types";
 import { createRuntimeSqs } from "./create-runtime-sqs";
 
+/** Creates named sqs. */
 function createNamedSqs(name: string): SqsClient {
   return {
     async receive() {

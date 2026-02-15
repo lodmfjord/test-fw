@@ -1,3 +1,4 @@
+/** @fileoverview Implements schema types. @module libs/schema/src/schema-types */
 import type { ZodType } from "zod";
 
 export type JsonSchemaType = "array" | "boolean" | "number" | "object" | "string";

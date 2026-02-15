@@ -1,3 +1,4 @@
+/** @fileoverview Tests create dynamo database. @module libs/dynamodb/src/create-dynamo-database.test */
 import { describe, expect, it } from "bun:test";
 import { createMemoryDynamoDb } from "./create-memory-dynamo-db";
 import { createDynamoDatabase } from "./create-dynamo-database";
@@ -7,6 +8,7 @@ type PointItem = {
   points: number;
 };
 
+/** Handles point definition. */
 function pointDefinition() {
   return {
     parse(input: unknown): PointItem {

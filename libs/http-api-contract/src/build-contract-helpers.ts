@@ -1,3 +1,4 @@
+/** @fileoverview Implements build contract helpers. @module libs/http-api-contract/src/build-contract-helpers */
 import { assertUniqueRouteIds } from "./assert-unique-route-ids";
 import type { EnvSchema } from "./env-schema-types";
 import type {
@@ -8,6 +9,7 @@ import type {
   RoutesManifest,
 } from "./types";
 
+/** Handles validate duplicate routes. */
 function validateDuplicateRoutes(routes: RouteDefinition[]): void {
   const seen = new Set<string>();
 
@@ -23,6 +25,7 @@ function validateDuplicateRoutes(routes: RouteDefinition[]): void {
   assertUniqueRouteIds(routes);
 }
 
+/** Converts values to routes manifest. */
 function toRoutesManifest(input: BuildContractInput): RoutesManifest {
   return {
     apiName: input.apiName,
@@ -32,6 +35,7 @@ function toRoutesManifest(input: BuildContractInput): RoutesManifest {
   };
 }
 
+/** Converts values to lambdas manifest. */
 function toLambdasManifest(input: BuildContractInput): LambdasManifest {
   const lambdaRoutes = input.routes.filter((route) => route.execution?.kind !== "step-function");
 
@@ -54,6 +58,7 @@ function toLambdasManifest(input: BuildContractInput): LambdasManifest {
   };
 }
 
+/** Converts values to deploy contract. */
 function toDeployContract(input: BuildContractInput): DeployContract {
   return {
     apiGateway: {
@@ -77,6 +82,7 @@ function toDeployContract(input: BuildContractInput): DeployContract {
   };
 }
 
+/** Converts values to env schema. */
 function toEnvSchema(input: BuildContractInput): EnvSchema {
   const env = input.env ?? [];
 

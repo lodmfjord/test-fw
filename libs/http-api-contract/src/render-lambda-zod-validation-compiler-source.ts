@@ -1,4 +1,6 @@
+/** @fileoverview Implements render lambda zod validation compiler source. @module libs/http-api-contract/src/render-lambda-zod-validation-compiler-source */
 const ZOD_VALIDATION_COMPILER_SOURCE = `
+/** Converts values to string zod schema. */
 function toStringZodSchema(schema) {
   let validator = simpleApiZod.string();
   if (typeof schema.minLength === "number") {
@@ -22,6 +24,7 @@ function toStringZodSchema(schema) {
   return validator;
 }
 
+/** Converts values to number zod schema. */
 function toNumberZodSchema(schema, integer) {
   let validator = integer ? simpleApiZod.number().int() : simpleApiZod.number();
   if (typeof schema.minimum === "number") {
@@ -42,6 +45,7 @@ function toNumberZodSchema(schema, integer) {
   return validator;
 }
 
+/** Converts values to enum zod schema. */
 function toEnumZodSchema(values) {
   const literalSchemas = values.map((value) => simpleApiZod.literal(value));
   if (literalSchemas.length === 0) {
@@ -53,6 +57,7 @@ function toEnumZodSchema(values) {
   return simpleApiZod.union(literalSchemas);
 }
 
+/** Converts values to any of zod schema. */
 function toAnyOfZodSchema(options, rootSchema, nodeCache) {
   const validators = options.map((option) => toNodeZodSchema(option, rootSchema, nodeCache));
   if (validators.length === 0) {
@@ -64,6 +69,7 @@ function toAnyOfZodSchema(options, rootSchema, nodeCache) {
   return simpleApiZod.union(validators);
 }
 
+/** Converts values to one of zod schema. */
 function toOneOfZodSchema(options, rootSchema, nodeCache) {
   const validators = options.map((option) => toNodeZodSchema(option, rootSchema, nodeCache));
   if (validators.length === 0) {
@@ -92,6 +98,7 @@ function toOneOfZodSchema(options, rootSchema, nodeCache) {
   });
 }
 
+/** Converts values to array zod schema. */
 function toArrayZodSchema(schema, rootSchema, nodeCache) {
   const itemSchema = isSchemaObject(schema.items) ? schema.items : {};
   let validator = simpleApiZod.array(toNodeZodSchema(itemSchema, rootSchema, nodeCache));
@@ -104,6 +111,7 @@ function toArrayZodSchema(schema, rootSchema, nodeCache) {
   return validator;
 }
 
+/** Converts values to object zod schema. */
 function toObjectZodSchema(schema, rootSchema, nodeCache) {
   const properties = isSchemaObject(schema.properties) ? schema.properties : {};
   const requiredSet = new Set(
@@ -130,6 +138,7 @@ function toObjectZodSchema(schema, rootSchema, nodeCache) {
   return validator;
 }
 
+/** Converts values to typed zod schema. */
 function toTypedZodSchema(schema, rootSchema, nodeCache) {
   const schemaType = schema.type;
 
@@ -171,6 +180,7 @@ function toTypedZodSchema(schema, rootSchema, nodeCache) {
   return simpleApiZod.unknown();
 }
 
+/** Converts values to node zod schema. */
 function toNodeZodSchema(schema, rootSchema, nodeCache) {
   if (!isSchemaObject(schema)) {
     return simpleApiZod.unknown();
@@ -212,6 +222,7 @@ function toNodeZodSchema(schema, rootSchema, nodeCache) {
   return builtValidator;
 }
 
+/** Converts values to root zod schema. */
 function toRootZodSchema(schema) {
   if (!isSchemaObject(schema)) {
     return simpleApiZod.unknown();
@@ -225,6 +236,7 @@ function toRootZodSchema(schema) {
   return validator;
 }
 
+/** Handles parse by schema. */
 function parseBySchema(schema, value, path) {
   if (!isSchemaObject(schema)) {
     return value;
@@ -252,6 +264,7 @@ function parseBySchema(schema, value, path) {
 }
 `;
 
+/** Converts values to zod validation compiler source. @example `toZodValidationCompilerSource(input)` */
 export function toZodValidationCompilerSource(): string {
   return ZOD_VALIDATION_COMPILER_SOURCE;
 }

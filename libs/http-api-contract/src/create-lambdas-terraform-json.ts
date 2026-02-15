@@ -1,3 +1,4 @@
+/** @fileoverview Implements create lambdas terraform json. @module libs/http-api-contract/src/create-lambdas-terraform-json */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import { createLambdasTerraformJsonHelpers } from "./create-lambdas-terraform-json-helpers";
 import { createLambdasTerraformJsonResourceHelpers } from "./create-lambdas-terraform-json-resource-helpers";
@@ -9,6 +10,7 @@ import type { Contract, EndpointRuntimeDefinition } from "./types";
 
 type TerraformJson = Record<string, unknown>;
 
+/** Creates lambdas terraform json. @example `createLambdasTerraformJson(input)` */
 export function createLambdasTerraformJson(
   contract: Contract,
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

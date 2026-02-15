@@ -1,3 +1,4 @@
+/** @fileoverview Implements to step function sqs listeners. @module libs/http-api-contract/src/to-step-function-sqs-listeners */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 
 type StepFunctionSqsListenerConfig = {
@@ -12,10 +13,12 @@ type StepFunctionSqsListenerConfig = {
   workflow_type: "STANDARD" | "EXPRESS";
 };
 
+/** Converts values to queue key. */
 function toQueueKey(queueName: string): string {
   return queueName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
+/** Converts values to pipe invocation type. */
 function toPipeInvocationType(
   invocationType: "sync" | "async",
 ): StepFunctionSqsListenerConfig["pipe_invocation_type"] {
@@ -26,6 +29,7 @@ function toPipeInvocationType(
   return "FIRE_AND_FORGET";
 }
 
+/** Converts values to start action. */
 function toStartAction(
   invocationType: "sync" | "async",
 ): StepFunctionSqsListenerConfig["start_action"] {
@@ -36,6 +40,7 @@ function toStartAction(
   return "states:StartExecution";
 }
 
+/** Converts values to step function sqs listeners. @example `toStepFunctionSqsListeners(input)` */
 export function toStepFunctionSqsListeners(
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
 ): Record<string, StepFunctionSqsListenerConfig> {

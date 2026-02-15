@@ -1,3 +1,4 @@
+/** @fileoverview Tests write contract files. @module libs/http-api-contract/src/write-contract-files.test */
 import { mkdtemp, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";

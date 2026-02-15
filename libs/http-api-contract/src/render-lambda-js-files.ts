@@ -1,8 +1,10 @@
+/** @fileoverview Implements render lambda js files. @module libs/http-api-contract/src/render-lambda-js-files */
 import { assertUniqueRouteIds } from "./assert-unique-route-ids";
 import { renderLambdaEnvBootstrapSource } from "./render-lambda-env-bootstrap-source";
 import { renderLambdaRuntimeSourceBlocks } from "./render-lambda-runtime-source-blocks";
 import type { EndpointRuntimeDefinition, LambdaJsGenerationOptions } from "./types";
 
+/** Handles render endpoint lookup. */
 function renderEndpointLookup(routeId: string, method: string, variableName: string): string {
   return `const ${variableName} = listDefinedEndpoints().find((item) => {
       return item.routeId === "${routeId}" && item.method === "${method}";
@@ -10,6 +12,7 @@ function renderEndpointLookup(routeId: string, method: string, variableName: str
 `;
 }
 
+/** Handles render file. */
 function renderFile(
   endpoint: EndpointRuntimeDefinition,
   options: LambdaJsGenerationOptions,
@@ -59,6 +62,7 @@ const endpointSuccessStatusCode = ${JSON.stringify(endpoint.successStatusCode)};
 ${endpointDatabaseContextLine}
 ${endpointSqsContextLine}
 
+/** Handles load endpoint. */
 async function loadEndpoint() {
   if (!endpointPromise) {
     endpointPromise = (async () => {
@@ -124,6 +128,7 @@ export async function handler(event) {
 `;
 }
 
+/** Handles render lambda js files. @example `renderLambdaJsFiles(input)` */
 export function renderLambdaJsFiles(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   options: LambdaJsGenerationOptions,

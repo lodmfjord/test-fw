@@ -1,3 +1,4 @@
+/** @fileoverview Implements index. @module libs/dynamodb/src/index */
 export { createAwsDynamoDb } from "./create-aws-dynamo-db";
 export { createDynamoDatabase } from "./create-dynamo-database";
 export { createMemoryDynamoDb } from "./create-memory-dynamo-db";

@@ -1,3 +1,4 @@
+/** @fileoverview Implements index. @module libs/step-functions/src/index */
 export { defineStepFunction } from "./define-step-function";
 export { executeStepFunctionDefinition } from "./execute-step-function-definition";
 export { registerStepFunctionTaskHandler } from "./register-step-function-task-handler";

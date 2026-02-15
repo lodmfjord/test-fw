@@ -1,3 +1,4 @@
+/** @fileoverview Implements index. @module libs/http-api-contract/src/index */
 export { buildContract } from "./build-contract";
 export { buildContractFromEndpoints } from "./build-contract-from-endpoints";
 export { createDevApp } from "./create-dev-app";

@@ -1,7 +1,9 @@
+/** @fileoverview Tests create runtime dynamo db. @module libs/dynamodb/src/create-runtime-dynamo-db.test */
 import { describe, expect, it } from "bun:test";
 import type { DynamoDbClient } from "./types";
 import { createRuntimeDynamoDb } from "./create-runtime-dynamo-db";
 
+/** Creates named db. */
 function createNamedDb(name: string): DynamoDbClient {
   return {
     async read() {

@@ -1,3 +1,4 @@
+/** @fileoverview Tests write lambda layer artifacts. @module libs/http-api-contract/src/write-lambda-layer-artifacts.test */
 import { execFile } from "node:child_process";
 import { mkdtemp, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";

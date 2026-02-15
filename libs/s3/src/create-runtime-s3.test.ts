@@ -1,7 +1,9 @@
+/** @fileoverview Tests create runtime s3. @module libs/s3/src/create-runtime-s3.test */
 import { describe, expect, it } from "bun:test";
 import type { S3Client } from "./types";
 import { createRuntimeS3 } from "./create-runtime-s3";
 
+/** Creates named s3. */
 function createNamedS3(name: string): S3Client {
   return {
     async createSecureLink() {

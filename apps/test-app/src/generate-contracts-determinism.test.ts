@@ -1,10 +1,13 @@
+/** @fileoverview Tests generate contracts determinism. @module apps/test-app/src/generate-contracts-determinism.test */
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { expect, test } from "bun:test";
 
 const APP_DIRECTORY = dirname(import.meta.dir);
 
-async function readJsonFile(pathFromAppDirectory: string): Promise<unknown> {
+/** Handles read json file. */ async function readJsonFile(
+  pathFromAppDirectory: string,
+): Promise<unknown> {
   const source = await readFile(join(APP_DIRECTORY, pathFromAppDirectory), "utf8");
   return JSON.parse(source) as unknown;
 }

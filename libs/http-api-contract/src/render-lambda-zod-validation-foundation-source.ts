@@ -1,3 +1,4 @@
+/** @fileoverview Implements render lambda zod validation foundation source. @module libs/http-api-contract/src/render-lambda-zod-validation-foundation-source */
 const ZOD_VALIDATION_FOUNDATION_SOURCE = `
 const rootValidatorCache = new WeakMap();
 const SUPPORTED_SCHEMA_KEYS = new Set([
@@ -35,10 +36,12 @@ const SUPPORTED_SCHEMA_KEYS = new Set([
   "writeOnly"
 ]);
 
+/** Checks whether schema object. */
 function isSchemaObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
+/** Converts values to path. */
 function toPath(parentPath, key) {
   if (!key || key.length === 0) {
     return parentPath;
@@ -51,6 +54,7 @@ function toPath(parentPath, key) {
   return parentPath + "." + key;
 }
 
+/** Converts values to issue path. */
 function toIssuePath(path) {
   if (!Array.isArray(path) || path.length === 0) {
     return undefined;
@@ -59,6 +63,7 @@ function toIssuePath(path) {
   return path.map((segment) => String(segment)).join(".");
 }
 
+/** Converts values to issue message. */
 function toIssueMessage(issue) {
   if (issue?.code === "invalid_type") {
     return "expected " + String(issue.expected);
@@ -67,15 +72,18 @@ function toIssueMessage(issue) {
   return issue?.message ?? "invalid value";
 }
 
+/** Handles fail. */
 function fail(path, message) {
   const scope = path && path.length > 0 ? path : "value";
   throw new Error(scope + ": " + message);
 }
 
+/** Handles decode json pointer token. */
 function decodeJsonPointerToken(token) {
   return token.replace(/~1/g, "/").replace(/~0/g, "~");
 }
 
+/** Handles assert supported schema keywords. */
 function assertSupportedSchemaKeywords(schema) {
   for (const key of Object.keys(schema)) {
     if (SUPPORTED_SCHEMA_KEYS.has(key) || key.startsWith("x-")) {
@@ -86,6 +94,7 @@ function assertSupportedSchemaKeywords(schema) {
   }
 }
 
+/** Handles resolve ref. */
 function resolveRef(rootSchema, ref) {
   if (ref === "#") {
     return rootSchema;
@@ -119,6 +128,7 @@ function resolveRef(rootSchema, ref) {
   return current;
 }
 
+/** Handles with common modifiers. */
 function withCommonModifiers(validator, schema) {
   let next = validator;
 
@@ -135,6 +145,7 @@ function withCommonModifiers(validator, schema) {
 }
 `;
 
+/** Converts values to zod validation foundation source. @example `toZodValidationFoundationSource(input)` */
 export function toZodValidationFoundationSource(): string {
   return ZOD_VALIDATION_FOUNDATION_SOURCE;
 }

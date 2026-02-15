@@ -1,4 +1,6 @@
+/** @fileoverview Implements render lambda observability source. @module libs/http-api-contract/src/render-lambda-observability-source */
 const LAMBDA_OBSERVABILITY_SUPPORT_SOURCE = `
+/** Converts values to header value. */
 function toHeaderValue(headers, name) {
   if (!headers || typeof headers !== "object") {
     return undefined;
@@ -15,6 +17,7 @@ function toHeaderValue(headers, name) {
   return undefined;
 }
 
+/** Converts values to generated request id. */
 function toGeneratedRequestId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
@@ -23,6 +26,7 @@ function toGeneratedRequestId() {
   return "req-" + String(Date.now());
 }
 
+/** Converts values to request id. */
 function toRequestId(event) {
   const headerRequestId = toHeaderValue(event?.headers, "x-request-id");
   if (headerRequestId) {
@@ -39,10 +43,12 @@ function toRequestId(event) {
   return toGeneratedRequestId();
 }
 
+/** Converts values to trace id. */
 function toTraceId(event) {
   return toHeaderValue(event?.headers, "x-amzn-trace-id") ?? toHeaderValue(event?.headers, "x-trace-id");
 }
 
+/** Converts values to error metadata. */
 function toErrorMetadata(error) {
   if (error instanceof Error) {
     return {
@@ -58,6 +64,7 @@ function toErrorMetadata(error) {
   };
 }
 
+/** Converts values to base log fields. */
 function toBaseLogFields(context) {
   return {
     ...(context.awsRequestId ? { awsRequestId: context.awsRequestId } : {}),
@@ -69,6 +76,7 @@ function toBaseLogFields(context) {
   };
 }
 
+/** Handles emit structured log. */
 function emitStructuredLog(level, eventName, context, details) {
   const payload = {
     ...toBaseLogFields(context),
@@ -93,6 +101,7 @@ function emitStructuredLog(level, eventName, context, details) {
   console.log(payload);
 }
 
+/** Creates invocation log context. */
 function createInvocationLogContext(event, routeId, method, path) {
   return {
     awsRequestId: typeof event?.requestContext?.requestId === "string"
@@ -107,14 +116,17 @@ function createInvocationLogContext(event, routeId, method, path) {
   };
 }
 
+/** Converts values to duration ms. */
 function toDurationMs(context) {
   return Math.max(0, Date.now() - context.startTimeMs);
 }
 
+/** Handles log invocation start. */
 function logInvocationStart(context) {
   emitStructuredLog("info", "lambda.invocation.start", context);
 }
 
+/** Handles log invocation complete. */
 function logInvocationComplete(context, statusCode) {
   emitStructuredLog("info", "lambda.invocation.complete", context, {
     durationMs: toDurationMs(context),
@@ -122,6 +134,7 @@ function logInvocationComplete(context, statusCode) {
   });
 }
 
+/** Handles log input validation failure. */
 function logInputValidationFailure(context, error) {
   emitStructuredLog("warn", "lambda.validation.input_failed", context, {
     ...toErrorMetadata(error),
@@ -129,6 +142,7 @@ function logInputValidationFailure(context, error) {
   });
 }
 
+/** Handles log handler failure. */
 function logHandlerFailure(context, error) {
   emitStructuredLog("error", "lambda.handler.failed", context, {
     ...toErrorMetadata(error),
@@ -136,6 +150,7 @@ function logHandlerFailure(context, error) {
   });
 }
 
+/** Handles log output validation failure. */
 function logOutputValidationFailure(context, error) {
   emitStructuredLog("error", "lambda.validation.output_failed", context, {
     ...toErrorMetadata(error),
@@ -144,6 +159,7 @@ function logOutputValidationFailure(context, error) {
 }
 `;
 
+/** Converts values to lambda observability support source. @example `toLambdaObservabilitySupportSource(input)` */
 export function toLambdaObservabilitySupportSource(): string {
   return LAMBDA_OBSERVABILITY_SUPPORT_SOURCE;
 }

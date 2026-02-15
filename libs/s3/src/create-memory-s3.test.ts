@@ -1,3 +1,4 @@
+/** @fileoverview Tests create memory s3. @module libs/s3/src/create-memory-s3.test */
 import { describe, expect, it } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";

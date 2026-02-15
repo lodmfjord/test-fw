@@ -1,7 +1,9 @@
+/** @fileoverview Implements s3 aws normalizers. @module libs/s3/src/s3-aws-normalizers */
 import type { S3ObjectSummary, S3PutInput } from "./types";
 
 const DEFAULT_CONTENT_TYPE = "application/octet-stream";
 
+/** Converts values to bucket name. */
 function toBucketName(bucketName: string): string {
   const normalized = bucketName.trim();
   if (normalized.length === 0) {
@@ -11,6 +13,7 @@ function toBucketName(bucketName: string): string {
   return normalized;
 }
 
+/** Converts values to object key. */
 function toObjectKey(key: string): string {
   const normalized = key.trim();
   if (normalized.length === 0) {
@@ -20,6 +23,7 @@ function toObjectKey(key: string): string {
   return normalized;
 }
 
+/** Converts values to content type. */
 function toContentType(contentType: string | undefined): string {
   if (contentType === undefined) {
     return DEFAULT_CONTENT_TYPE;
@@ -33,6 +37,7 @@ function toContentType(contentType: string | undefined): string {
   return normalized;
 }
 
+/** Converts values to expires in seconds. */
 function toExpiresInSeconds(expiresInSeconds: number | undefined): number {
   if (expiresInSeconds === undefined) {
     return 900;
@@ -45,10 +50,12 @@ function toExpiresInSeconds(expiresInSeconds: number | undefined): number {
   return expiresInSeconds;
 }
 
+/** Converts values to put body. */
 function toPutBody(body: S3PutInput["body"]): Uint8Array | string {
   return typeof body === "string" ? body : new Uint8Array(body);
 }
 
+/** Converts values to body bytes. */
 async function toBodyBytes(body: unknown): Promise<Uint8Array> {
   if (body === undefined || body === null) {
     return new Uint8Array();
@@ -97,6 +104,7 @@ async function toBodyBytes(body: unknown): Promise<Uint8Array> {
   throw new Error("Unsupported S3 object body type");
 }
 
+/** Converts values to summary. */
 function toSummary(input: {
   bucketName: string;
   contentType?: string;

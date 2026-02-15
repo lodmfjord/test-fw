@@ -102,6 +102,7 @@ bun run check
 - `bun run format:check`
 - `bun run fix`
 - `bun run check:constraints`
+- `bun run check:fast`
 - `bun run check`
 
 ## Constraints
@@ -111,7 +112,15 @@ bun run check
 - Each source file may export at most one function.
 - Export counting is AST-based and includes `export { fn }` / `export default fn` forms for local functions.
 - Each source file must be 300 lines or fewer.
+- Each source file must begin with a file-level JSDoc header.
+- Function declarations and function-valued variable declarations must have JSDoc.
+- Exported function declarations and exported function-valued variable declarations must include `@example` in JSDoc.
+- `libs/*` sources cannot import from `apps/*`.
+- `apps/*` sources can only import from other apps using type-only imports.
+- `export * from ...` is disallowed. Use explicit named exports.
+- Deep cross-package `src` imports are disallowed. Import from package entrypoints instead.
 - `bun run check:constraints` enforces constraints for `apps/`, `libs/`, and `tools/`.
+- `bun run check` is fail-fast: constraints run first before format/lint/typecheck/tests.
 
 ## Documentation Rule
 

@@ -1,8 +1,10 @@
 #!/usr/bin/env bun
+/** @fileoverview Implements dev bin. @module libs/http-api-contract/src/dev-bin */
 import { runDevAppFromSettings } from "./run-dev-app-from-settings";
 
 const DEFAULT_SETTINGS_FILE_PATH = "babb.settings.json";
 
+/** Converts values to settings file path. */
 function toSettingsFilePath(argv: string[]): string {
   const settingsFlagIndex = argv.indexOf("--settings");
   if (settingsFlagIndex >= 0) {

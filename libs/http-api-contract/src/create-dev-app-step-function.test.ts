@@ -1,3 +1,4 @@
+/** @fileoverview Tests create dev app step function. @module libs/http-api-contract/src/create-dev-app-step-function.test */
 import { describe, expect, it } from "bun:test";
 import { schema } from "@babbstack/schema";
 import { createDevApp } from "./create-dev-app";

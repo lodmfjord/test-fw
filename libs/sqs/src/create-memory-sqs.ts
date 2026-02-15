@@ -1,3 +1,4 @@
+/** @fileoverview Implements create memory sqs. @module libs/sqs/src/create-memory-sqs */
 import type {
   SqsClient,
   SqsMessage,
@@ -11,6 +12,7 @@ type StoredMessage = {
   receiptHandle: string;
 };
 
+/** Converts values to queue name. */
 function toQueueName(queueName: string): string {
   const normalized = queueName.trim();
   if (normalized.length === 0) {
@@ -20,6 +22,7 @@ function toQueueName(queueName: string): string {
   return normalized;
 }
 
+/** Converts values to max messages. */
 function toMaxMessages(input: SqsReceiveInput): number {
   const value = input.maxMessages ?? 10;
   if (!Number.isInteger(value) || value <= 0) {
@@ -29,10 +32,12 @@ function toMaxMessages(input: SqsReceiveInput): number {
   return value;
 }
 
+/** Handles clone message. */
 function cloneMessage(message: SqsMessage): SqsMessage {
   return structuredClone(message);
 }
 
+/** Converts values to stored message. */
 function toStoredMessage(input: SqsSendInput, receiptHandle: string): StoredMessage {
   return {
     message: cloneMessage(input.message),
@@ -40,6 +45,7 @@ function toStoredMessage(input: SqsSendInput, receiptHandle: string): StoredMess
   };
 }
 
+/** Converts values to received message. */
 function toReceivedMessage(message: StoredMessage): SqsReceivedMessage {
   return {
     message: cloneMessage(message.message),
@@ -47,6 +53,7 @@ function toReceivedMessage(message: StoredMessage): SqsReceivedMessage {
   };
 }
 
+/** Creates memory sqs. @example `createMemorySqs(input)` */
 export function createMemorySqs(): SqsClient {
   const store = new Map<string, StoredMessage[]>();
   let receiptIndex = 0;

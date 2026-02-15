@@ -1,3 +1,4 @@
+/** @fileoverview Implements to endpoint database context. @module libs/http-api-contract/src/to-endpoint-database-context */
 import { createDynamoDatabase, type DynamoDbClient } from "@babbstack/dynamodb";
 import type { EndpointRuntimeDefinition } from "./types";
 
@@ -8,6 +9,7 @@ type EndpointDatabaseContext = {
   db: EndpointDb;
 };
 
+/** Converts values to db for endpoint. */
 function toDbForEndpoint(db: DynamoDbClient, endpoint: EndpointRuntimeDefinition): EndpointDb {
   if (endpoint.access?.db === "read") {
     return {
@@ -18,6 +20,7 @@ function toDbForEndpoint(db: DynamoDbClient, endpoint: EndpointRuntimeDefinition
   return db;
 }
 
+/** Converts values to database for endpoint. */
 function toDatabaseForEndpoint(
   db: DynamoDbClient,
   endpoint: EndpointRuntimeDefinition,
@@ -43,6 +46,7 @@ function toDatabaseForEndpoint(
   return database.bind(scopedDb as EndpointDb);
 }
 
+/** Converts values to endpoint database context. @example `toEndpointDatabaseContext(input)` */
 export function toEndpointDatabaseContext(
   db: DynamoDbClient,
   endpoint: EndpointRuntimeDefinition,

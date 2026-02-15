@@ -1,11 +1,14 @@
+/** @fileoverview Implements render lambda runtime source blocks. @module libs/http-api-contract/src/render-lambda-runtime-source-blocks */
 import { toLambdaObservabilitySupportSource } from "./render-lambda-observability-source";
 import { toZodValidationSupportSource } from "./render-lambda-zod-validation-source";
 
 const RESPONSE_AND_HANDLER_HELPERS_SOURCE = `
+/** Checks whether buffer value. */
 function isBufferValue(payload) {
   return typeof Buffer !== "undefined" && Buffer.isBuffer(payload);
 }
 
+/** Converts values to response body. */
 function toResponseBody(payload, contentType) {
   if (isBufferValue(payload)) {
     return {
@@ -28,6 +31,7 @@ function toResponseBody(payload, contentType) {
   };
 }
 
+/** Converts values to response. */
 function toResponse(statusCode, payload, contentType, headers) {
   const resolvedContentType = contentType ?? (isBufferValue(payload) ? "application/octet-stream" : "application/json");
   const responseBody = toResponseBody(payload, resolvedContentType);
@@ -42,6 +46,7 @@ function toResponse(statusCode, payload, contentType, headers) {
   };
 }
 
+/** Handles parse json body. */
 function parseJsonBody(event) {
   const rawBody = typeof event?.body === "string" ? event.body : "";
   if (rawBody.trim().length === 0) {
@@ -55,6 +60,7 @@ function parseJsonBody(event) {
   }
 }
 
+/** Converts values to handler output. */
 function toHandlerOutput(output, defaultStatusCode) {
   if (!output || typeof output !== "object" || !("value" in output)) {
     throw new Error("Handler output must include value");
@@ -90,6 +96,7 @@ function toHandlerOutput(output, defaultStatusCode) {
 `;
 
 const DB_ACCESS_SUPPORT_SOURCE = `
+/** Converts values to db for access. */
 function toDbForAccess(client, access) {
   if (access === "read") {
     return {
@@ -102,6 +109,7 @@ function toDbForAccess(client, access) {
 `;
 
 const DATABASE_CONTEXT_HELPER_SOURCE = `
+/** Converts values to database for context. */
 function toDatabaseForContext(client, config) {
   if (!config) {
     return undefined;
@@ -128,6 +136,7 @@ function toDatabaseForContext(client, config) {
 `;
 
 const SQS_CONTEXT_HELPER_SOURCE = `
+/** Converts values to sqs for context. */
 function toSqsForContext(client, config) {
   if (!config) {
     return undefined;

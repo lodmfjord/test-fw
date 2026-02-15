@@ -1,6 +1,8 @@
+/** @fileoverview Implements create aws s3. @module libs/s3/src/create-aws-s3 */
 import { createDefaultAwsS3Operations } from "./create-default-aws-s3-operations";
 import type { CreateAwsS3Input, S3Client } from "./types";
 
+/** Creates aws s3. @example `createAwsS3(input)` */
 export function createAwsS3(input: CreateAwsS3Input = {}): S3Client {
   const operationsPromise = input.operations
     ? Promise.resolve(input.operations)
