@@ -111,7 +111,7 @@ bun run check
 - File names must use kebab-case.
 - Each source file may export at most one function.
 - Export counting is AST-based and includes `export { fn }` / `export default fn` forms for local functions.
-- Each source file must be 300 lines or fewer.
+- Each source and test file must be 220 lines or fewer.
 - Each source file must begin with a file-level JSDoc header.
 - File-level JSDoc headers must include `@fileoverview`, must use multiline format, and must not include `@module`.
 - Function declarations and function-valued variable declarations must have JSDoc.

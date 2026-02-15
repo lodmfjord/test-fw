@@ -67,11 +67,11 @@ export function two(input: string) {
   });
 
   it("reports too many lines", () => {
-    const source = `/**\n * @fileoverview Too many lines.\n */\n${makeLineBlock(300)}`;
+    const source = `/**\n * @fileoverview Too many lines.\n */\n${makeLineBlock(220)}`;
     const errors = validateFileConstraints("too-many-lines.ts", source);
     expect(
       errors.some(
-        (error) => error.includes("too-many-lines.ts: has") && error.includes("lines (max 300)."),
+        (error) => error.includes("too-many-lines.ts: has") && error.includes("lines (max 220)."),
       ),
     ).toBe(true);
   });

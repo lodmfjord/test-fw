@@ -8,7 +8,7 @@ import { findModuleConstraintsErrors } from "./find-module-constraints-errors";
 import { isWithinLineLimit } from "./is-within-line-limit";
 
 const MAX_EXPORTED_FUNCTIONS = 1;
-const MAX_LINES = 300;
+const MAX_LINES = 220;
 const KEBAB_CASE_FILE_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.[a-z0-9]+(?:-[a-z0-9]+)*)*$/;
 
 /** Checks whether file name is kebab-case. */

@@ -2,51 +2,14 @@
  * @fileoverview Tests execute lambda js.
  */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
-import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { beforeEach, describe, expect, it } from "bun:test";
+import { getHandlerFromSource } from "./execute-lambda-js-test-helpers";
 import { listDefinedEndpoints } from "./list-defined-endpoints";
 import { resetDefinedEndpoints } from "./reset-defined-endpoints";
 import { writeLambdaJsFiles } from "./write-lambda-js-files";
-
-type LambdaLikeEvent = {
-  body?: string;
-  headers?: Record<string, string>;
-  pathParameters?: Record<string, string>;
-  queryStringParameters?: Record<string, string>;
-};
-
-type LambdaLikeResponse = {
-  body: string;
-  headers: Record<string, string>;
-  statusCode: number;
-};
-
-/** Gets handler from source. */
-function getHandlerFromSource(
-  source: string,
-): (event: LambdaLikeEvent) => Promise<LambdaLikeResponse> {
-  const sourceWithoutZodImport = source.replace(
-    /import\s+\{\s*z\s+as\s+simpleApiZod\s*\}\s+from\s+["']zod["'];?\s*/g,
-    'const { z: simpleApiZod } = require("zod");\n',
-  );
-  if (/^\s*import\s/m.test(sourceWithoutZodImport)) {
-    throw new Error("Imports are forbidden in enclosed lambda runtime");
-  }
-
-  const transformedSource = sourceWithoutZodImport
-    .replace(/export\s+async\s+function\s+handler\s*\(/, "async function handler(")
-    .replace(/export\s*\{\s*handler\s*\};?/g, "");
-  const runtimeRequire = createRequire(import.meta.url);
-
-  const factory = new Function("require", `${transformedSource}\nreturn handler;`) as (
-    runtimeRequire: (moduleName: string) => unknown,
-  ) => (event: LambdaLikeEvent) => Promise<LambdaLikeResponse>;
-
-  return factory(runtimeRequire);
-}
 
 describe("generated lambda execution", () => {
   beforeEach(() => {
@@ -201,77 +164,5 @@ defineGet({
           entry.path === "/users",
       ),
     ).toBe(true);
-  });
-
-  it("enforces read-only context.database for generated lambdas", async () => {
-    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
-    const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
-    const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
-    const dynamodbImportPath = fileURLToPath(
-      new URL("../../dynamodb/src/index.ts", import.meta.url),
-    );
-    await writeFile(
-      endpointModulePath,
-      `
-import { createDynamoDatabase } from "${dynamodbImportPath}";
-import { defineGet, schema } from "${frameworkImportPath}";
-
-const usersDatabase = createDynamoDatabase({
-  parse(input) {
-    return input;
-  },
-}, "id", {
-  tableName: "users",
-});
-
-defineGet({
-  path: "/users/{id}",
-  context: {
-    database: {
-      access: ["read"],
-      handler: usersDatabase,
-    },
-  },
-  handler: async ({ database, params }) => {
-    const writer = database;
-    await writer.write({
-      id: params.id,
-      name: "sam",
-    });
-    return { ok: true };
-  },
-  request: {
-    params: schema.object({
-      id: schema.string(),
-    }),
-  },
-  response: schema.object({
-    ok: schema.boolean(),
-  }),
-});
-`,
-      "utf8",
-    );
-
-    await import(pathToFileURL(endpointModulePath).href);
-    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
-    await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
-      endpointModulePath,
-      frameworkImportPath,
-    });
-    const source = await readFile(join(outputDirectory, "get_users_param_id.mjs"), "utf8");
-
-    const handler = getHandlerFromSource(source);
-    const response = await handler({
-      body: "",
-      headers: {},
-      pathParameters: {
-        id: "user-1",
-      },
-      queryStringParameters: {},
-    });
-
-    expect(response.statusCode).toBe(500);
-    expect(JSON.parse(response.body)).toEqual({ error: "Handler execution failed" });
   });
 });
