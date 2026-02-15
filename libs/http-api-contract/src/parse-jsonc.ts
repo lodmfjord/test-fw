@@ -1,6 +1,70 @@
 /**
  * @fileoverview Implements parse jsonc.
  */
+/** Converts values to string-state transition. */
+function toStringState(
+  character: string | undefined,
+  source: { inString: boolean; isEscaped: boolean },
+): { inString: boolean; isEscaped: boolean } {
+  if (character === undefined) {
+    return source;
+  }
+
+  if (source.isEscaped) {
+    return {
+      inString: source.inString,
+      isEscaped: false,
+    };
+  }
+
+  if (character === "\\") {
+    return {
+      inString: source.inString,
+      isEscaped: true,
+    };
+  }
+
+  if (character === '"') {
+    return {
+      inString: false,
+      isEscaped: false,
+    };
+  }
+
+  return source;
+}
+
+/** Converts values to line-comment end index. */
+function toLineCommentEndIndex(source: string, index: number): number | undefined {
+  if (source[index] !== "/" || source[index + 1] !== "/") {
+    return undefined;
+  }
+
+  let commentIndex = index + 2;
+  while (commentIndex < source.length && source[commentIndex] !== "\n") {
+    commentIndex += 1;
+  }
+
+  return commentIndex;
+}
+
+/** Converts values to block-comment end index. */
+function toBlockCommentEndIndex(source: string, index: number): number | undefined {
+  if (source[index] !== "/" || source[index + 1] !== "*") {
+    return undefined;
+  }
+
+  let commentIndex = index + 2;
+  while (commentIndex + 1 < source.length) {
+    if (source[commentIndex] === "*" && source[commentIndex + 1] === "/") {
+      return commentIndex + 2;
+    }
+    commentIndex += 1;
+  }
+
+  return commentIndex;
+}
+
 /** Handles strip json comments. */
 function stripJsonComments(source: string): string {
   let output = "";
@@ -10,17 +74,15 @@ function stripJsonComments(source: string): string {
 
   while (index < source.length) {
     const character = source[index];
-    const nextCharacter = index + 1 < source.length ? source[index + 1] : "";
 
     if (inString) {
       output += character;
-      if (isEscaped) {
-        isEscaped = false;
-      } else if (character === "\\") {
-        isEscaped = true;
-      } else if (character === '"') {
-        inString = false;
-      }
+      const nextState = toStringState(character, {
+        inString,
+        isEscaped,
+      });
+      inString = nextState.inString;
+      isEscaped = nextState.isEscaped;
       index += 1;
       continue;
     }
@@ -32,23 +94,15 @@ function stripJsonComments(source: string): string {
       continue;
     }
 
-    if (character === "/" && nextCharacter === "/") {
-      index += 2;
-      while (index < source.length && source[index] !== "\n") {
-        index += 1;
-      }
+    const lineCommentEndIndex = toLineCommentEndIndex(source, index);
+    if (lineCommentEndIndex !== undefined) {
+      index = lineCommentEndIndex;
       continue;
     }
 
-    if (character === "/" && nextCharacter === "*") {
-      index += 2;
-      while (index + 1 < source.length) {
-        if (source[index] === "*" && source[index + 1] === "/") {
-          index += 2;
-          break;
-        }
-        index += 1;
-      }
+    const blockCommentEndIndex = toBlockCommentEndIndex(source, index);
+    if (blockCommentEndIndex !== undefined) {
+      index = blockCommentEndIndex;
       continue;
     }
 

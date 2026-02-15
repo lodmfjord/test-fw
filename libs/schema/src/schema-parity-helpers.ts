@@ -8,6 +8,61 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
+/** Handles append values to queue. */
+function appendValuesToQueue(queue: unknown[], source: Record<string, unknown>): void {
+  for (const value of Object.values(source)) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        queue.push(item);
+      }
+      continue;
+    }
+
+    queue.push(value);
+  }
+}
+
+/** Converts values to zod definition. */
+function toZodDefinition(node: Record<string, unknown>): Record<string, unknown> | undefined {
+  if (isRecord(node._def)) {
+    return node._def;
+  }
+
+  if (isRecord(node.def)) {
+    return node.def;
+  }
+
+  return undefined;
+}
+
+/** Converts values to unsupported construct from type. */
+function toUnsupportedConstructFromType(definitionType: unknown): string | undefined {
+  if (definitionType === "pipe" || definitionType === "transform") {
+    return "transforms/preprocess operations";
+  }
+
+  return undefined;
+}
+
+/** Converts values to unsupported construct from checks. */
+function toUnsupportedConstructFromChecks(checks: unknown[], queue: unknown[]): string | undefined {
+  for (const check of checks) {
+    if (isRecord(check) && isRecord(check.def) && check.def.type === "custom") {
+      return "custom refinements";
+    }
+
+    if (isRecord(check) && isRecord(check._def) && check._def.type === "custom") {
+      return "custom refinements";
+    }
+
+    if (isRecord(check)) {
+      queue.push(check);
+    }
+  }
+
+  return undefined;
+}
+
 /** Converts values to unsupported zod construct. */
 function toUnsupportedZodConstruct(zodSchema: ZodType<unknown>): string | undefined {
   const queue: unknown[] = [zodSchema];
@@ -20,53 +75,24 @@ function toUnsupportedZodConstruct(zodSchema: ZodType<unknown>): string | undefi
     }
     visited.add(next);
 
-    let definition: Record<string, unknown> | undefined;
-    if (isRecord(next._def)) {
-      definition = next._def;
-    } else if (isRecord(next.def)) {
-      definition = next.def;
-    }
+    const definition = toZodDefinition(next);
     if (!definition) {
-      for (const value of Object.values(next)) {
-        if (Array.isArray(value)) {
-          for (const item of value) {
-            queue.push(item);
-          }
-          continue;
-        }
-        queue.push(value);
-      }
+      appendValuesToQueue(queue, next);
       continue;
     }
 
-    const definitionType = definition.type;
-    if (definitionType === "pipe" || definitionType === "transform") {
-      return "transforms/preprocess operations";
+    const unsupportedConstructFromType = toUnsupportedConstructFromType(definition.type);
+    if (unsupportedConstructFromType) {
+      return unsupportedConstructFromType;
     }
 
     const checks = Array.isArray(definition.checks) ? definition.checks : [];
-    for (const check of checks) {
-      if (isRecord(check) && isRecord(check.def) && check.def.type === "custom") {
-        return "custom refinements";
-      }
-      if (isRecord(check) && isRecord(check._def) && check._def.type === "custom") {
-        return "custom refinements";
-      }
-      if (isRecord(check)) {
-        queue.push(check);
-      }
+    const unsupportedConstructFromChecks = toUnsupportedConstructFromChecks(checks, queue);
+    if (unsupportedConstructFromChecks) {
+      return unsupportedConstructFromChecks;
     }
 
-    for (const value of Object.values(definition)) {
-      if (Array.isArray(value)) {
-        for (const item of value) {
-          queue.push(item);
-        }
-        continue;
-      }
-
-      queue.push(value);
-    }
+    appendValuesToQueue(queue, definition);
   }
 
   return undefined;

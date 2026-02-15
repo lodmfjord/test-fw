@@ -34,7 +34,9 @@
 ## File Constraints
 
 - Every source file may export at most one function.
-- Every source file must be at most 300 lines.
+- Maximum line length is 220 characters.
+- Each top-level function in non-test `src` files must be at most 160 lines.
+- Each top-level function in non-test `src` files must have cognitive complexity at most 30.
 - Nested ternary operations are not allowed.
 - Constraints are enforced by `bun run check:constraints`.
 - Full validation command: `bun run check` (tests + constraints).

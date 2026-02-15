@@ -6,6 +6,7 @@ import { countExportedFunctions } from "./count-exported-functions";
 import { findDocumentationConstraintsErrors } from "./find-documentation-constraints-errors";
 import { findModuleConstraintsErrors } from "./find-module-constraints-errors";
 import { findNestedTernaryErrors } from "./find-nested-ternary-errors";
+import { findSrcFunctionDensityErrors } from "./find-src-function-density-errors";
 import { isWithinLineLimit } from "./is-within-line-limit";
 
 const MAX_EXPORTED_FUNCTIONS = 1;
@@ -31,6 +32,7 @@ export function validateFileConstraints(filePath: string, source: string): strin
     ...findDocumentationConstraintsErrors(filePath, source),
     ...findModuleConstraintsErrors(filePath, source),
     ...findNestedTernaryErrors(filePath, source),
+    ...findSrcFunctionDensityErrors(filePath, source),
   ];
   const exportCount = countExportedFunctions(source);
   const lineCount = source.split(/\r?\n/).length;

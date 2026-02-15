@@ -141,4 +141,27 @@ export function nested(input: number) {
       true,
     );
   });
+
+  it("reports src function density violations", () => {
+    const source = `
+/**
+ * @fileoverview File.
+ */
+/**
+ * Handles run.
+ * @param input - Input value.
+ * @example
+ * run(input)
+ */
+export function run(input: string): string {
+${makeLineBlock(200)}
+  return input;
+}
+`;
+    const errors = validateFileConstraints("libs/sample/src/too-long.ts", source);
+
+    expect(
+      errors.includes('libs/sample/src/too-long.ts:11: function "run" has 203 lines (max 160).'),
+    ).toBe(true);
+  });
 });

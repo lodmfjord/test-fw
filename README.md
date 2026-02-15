@@ -107,6 +107,8 @@ bun run check
 - `bun run check`
 - `bun run create:app -- <app-name>`
 
+Lint commands treat warnings as failing diagnostics (`--error-on-warnings`), so all warnings must be fixed for `lint`, `check:fast`, and `check` to pass.
+
 ## Constraints
 
 - Strict TDD: test first, minimal implementation, then refactor.
@@ -114,6 +116,8 @@ bun run check
 - Each source file may export at most one function.
 - Export counting is AST-based and includes `export { fn }` / `export default fn` forms for local functions.
 - Each source and test file must be 220 lines or fewer.
+- Each top-level function in non-test `src` files must be 160 lines or fewer.
+- Each top-level function in non-test `src` files must keep cognitive complexity at 30 or lower.
 - Each source file must begin with a file-level JSDoc header.
 - File-level JSDoc headers must include `@fileoverview`, must use multiline format, and must not include `@module`.
 - Function declarations and function-valued variable declarations must have JSDoc.
