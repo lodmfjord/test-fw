@@ -1,5 +1,6 @@
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { resolve } from "node:path";
+import { extname, resolve } from "node:path";
 import * as ts from "typescript";
 
 type ImportDescriptor = {
@@ -11,7 +12,10 @@ type ImportDescriptor = {
   }>;
   namespaceImport?: string;
   sideEffectOnly: boolean;
+  sourcePath: string;
 };
+
+const LOCAL_SOURCE_EXTENSIONS = [".ts", ".tsx", ".mts", ".cts", ".js", ".mjs", ".cjs"];
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -25,20 +29,48 @@ function isNameUsed(handlerSource: string, name: string): boolean {
   return new RegExp(`\\b${escapeRegExp(name)}\\b`, "m").test(handlerSource);
 }
 
-function resolveImportSpecifier(moduleSpecifier: string, endpointModulePath: string): string {
+function toResolvedLocalModulePath(
+  importerPath: string,
+  moduleSpecifier: string,
+): string | undefined {
+  const basePath = resolve(importerPath, "..", moduleSpecifier);
+  const hasKnownExtension = LOCAL_SOURCE_EXTENSIONS.includes(extname(basePath));
+  const candidates = hasKnownExtension
+    ? [basePath]
+    : [
+        ...LOCAL_SOURCE_EXTENSIONS.map((extension) => `${basePath}${extension}`),
+        ...LOCAL_SOURCE_EXTENSIONS.map((extension) => resolve(basePath, `index${extension}`)),
+      ];
+
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  return undefined;
+}
+
+function resolveImportSpecifier(moduleSpecifier: string, importerPath: string): string {
   if (isLocalImportPath(moduleSpecifier)) {
-    return resolve(endpointModulePath, "..", moduleSpecifier);
+    return (
+      toResolvedLocalModulePath(importerPath, moduleSpecifier) ??
+      resolve(importerPath, "..", moduleSpecifier)
+    );
   }
 
   try {
-    const requireFromEndpoint = createRequire(endpointModulePath);
+    const requireFromEndpoint = createRequire(importerPath);
     return requireFromEndpoint.resolve(moduleSpecifier);
   } catch {
     return moduleSpecifier;
   }
 }
 
-function toImportDescriptor(statement: ts.ImportDeclaration): ImportDescriptor | null {
+function toImportDescriptor(
+  statement: ts.ImportDeclaration,
+  sourcePath: string,
+): ImportDescriptor | null {
   const moduleSpecifierNode = statement.moduleSpecifier;
   if (!ts.isStringLiteral(moduleSpecifierNode)) {
     return null;
@@ -55,6 +87,7 @@ function toImportDescriptor(statement: ts.ImportDeclaration): ImportDescriptor |
       moduleSpecifier,
       namedImports: [],
       sideEffectOnly: true,
+      sourcePath,
     };
   }
 
@@ -67,6 +100,7 @@ function toImportDescriptor(statement: ts.ImportDeclaration): ImportDescriptor |
     moduleSpecifier,
     namedImports: [],
     sideEffectOnly: false,
+    sourcePath,
   };
   const bindings = clause.namedBindings;
   if (!bindings) {
@@ -92,9 +126,9 @@ function toImportDescriptor(statement: ts.ImportDeclaration): ImportDescriptor |
   return descriptor;
 }
 
-function toModuleImports(endpointModulePath: string, moduleSource: string): ImportDescriptor[] {
+function toImportsForSource(sourcePath: string, moduleSource: string): ImportDescriptor[] {
   const sourceFile = ts.createSourceFile(
-    endpointModulePath,
+    sourcePath,
     moduleSource,
     ts.ScriptTarget.ESNext,
     true,
@@ -107,7 +141,7 @@ function toModuleImports(endpointModulePath: string, moduleSource: string): Impo
       continue;
     }
 
-    const descriptor = toImportDescriptor(statement);
+    const descriptor = toImportDescriptor(statement, sourcePath);
     if (descriptor) {
       imports.push(descriptor);
     }
@@ -116,17 +150,57 @@ function toModuleImports(endpointModulePath: string, moduleSource: string): Impo
   return imports;
 }
 
-function toImportLines(
-  endpointModulePath: string,
-  handlerSource: string,
-  imports: ImportDescriptor[],
-): string[] {
+function toModuleImports(endpointModulePath: string, moduleSource: string): ImportDescriptor[] {
+  const visited = new Set<string>();
+  const queue: Array<{ path: string; source: string }> = [
+    { path: endpointModulePath, source: moduleSource },
+  ];
+  const imports: ImportDescriptor[] = [];
+
+  while (queue.length > 0) {
+    const next = queue.shift();
+    if (!next || visited.has(next.path)) {
+      continue;
+    }
+
+    visited.add(next.path);
+    const moduleImports = toImportsForSource(next.path, next.source);
+    imports.push(...moduleImports);
+
+    for (const descriptor of moduleImports) {
+      if (!isLocalImportPath(descriptor.moduleSpecifier)) {
+        continue;
+      }
+
+      const resolvedPath = toResolvedLocalModulePath(next.path, descriptor.moduleSpecifier);
+      if (!resolvedPath || visited.has(resolvedPath)) {
+        continue;
+      }
+
+      try {
+        queue.push({
+          path: resolvedPath,
+          source: readFileSync(resolvedPath, "utf8"),
+        });
+      } catch {}
+    }
+  }
+
+  return imports;
+}
+
+function toImportLines(handlerSource: string, imports: ImportDescriptor[]): string[] {
   const lines: string[] = [];
+  const seen = new Set<string>();
 
   for (const item of imports) {
     if (item.sideEffectOnly) {
-      const specifier = resolveImportSpecifier(item.moduleSpecifier, endpointModulePath);
-      lines.push(`import ${JSON.stringify(specifier)};`);
+      const specifier = resolveImportSpecifier(item.moduleSpecifier, item.sourcePath);
+      const line = `import ${JSON.stringify(specifier)};`;
+      if (!seen.has(line)) {
+        seen.add(line);
+        lines.push(line);
+      }
       continue;
     }
 
@@ -165,8 +239,12 @@ function toImportLines(
       );
     }
 
-    const specifier = resolveImportSpecifier(item.moduleSpecifier, endpointModulePath);
-    lines.push(`import ${parts.join(", ")} from ${JSON.stringify(specifier)};`);
+    const specifier = resolveImportSpecifier(item.moduleSpecifier, item.sourcePath);
+    const line = `import ${parts.join(", ")} from ${JSON.stringify(specifier)};`;
+    if (!seen.has(line)) {
+      seen.add(line);
+      lines.push(line);
+    }
   }
 
   return lines;
@@ -178,5 +256,5 @@ export function renderUsedImportLines(
   handlerSource: string,
 ): string[] {
   const moduleImports = toModuleImports(endpointModulePath, endpointModuleSource);
-  return toImportLines(endpointModulePath, handlerSource, moduleImports);
+  return toImportLines(handlerSource, moduleImports);
 }

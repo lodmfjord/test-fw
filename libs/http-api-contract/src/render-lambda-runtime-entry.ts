@@ -1,4 +1,5 @@
 import { renderLambdaEnvBootstrapSource } from "./render-lambda-env-bootstrap-source";
+import { renderLambdaRuntimeSourceBlocks } from "./render-lambda-runtime-source-blocks";
 import { renderUsedImportLines } from "./render-used-import-lines";
 import { resolveRuntimeModuleSpecifier } from "./resolve-runtime-module-specifier";
 import type { EndpointRuntimeDefinition } from "./types";
@@ -30,17 +31,7 @@ const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};`
     : "";
   const runtimeSqsState = hasRuntimeSqs ? "const sqs = createSimpleApiRuntimeSqs();" : "";
   const dbAccessSupport = hasRuntimeDb
-    ? `
-function toDbForAccess(client, access) {
-  if (access === "read") {
-    return {
-      read: client.read.bind(client)
-    };
-  }
-
-  return client;
-}
-`
+    ? renderLambdaRuntimeSourceBlocks.toDbAccessSupportSource()
     : "";
   const endpointDbLine = hasRuntimeDb
     ? "const endpointDb = toDbForAccess(db, endpointDbAccess);"
@@ -67,146 +58,20 @@ function toDbForAccess(client, access) {
     ? `const endpointSqsContext = ${JSON.stringify(endpoint.context?.sqs ?? null)};\n`
     : "";
   const contextDatabaseHelper = hasContextDatabase
-    ? `
-function toDatabaseForContext(client, config) {
-  if (!config) {
-    return undefined;
-  }
-
-  const tableNamePrefix = typeof process === "undefined" || !process.env
-    ? ""
-    : process.env.SIMPLE_API_DYNAMODB_TABLE_NAME_PREFIX ?? "";
-  const scopedDb = Array.isArray(config.access) && config.access.includes("write")
-    ? client
-    : {
-      read: client.read.bind(client)
-    };
-  const parser = {
-    parse(value) {
-      return value;
-    }
-  };
-  const database = createSimpleApiCreateDynamoDatabase(parser, config.runtime.keyField, {
-    tableName: tableNamePrefix + config.runtime.tableName
-  });
-  return database.bind(scopedDb);
-}
-`
+    ? renderLambdaRuntimeSourceBlocks.toDatabaseContextHelperSource()
     : "";
   const contextSqsHelper = hasContextSqs
-    ? `
-function toSqsForContext(client, config) {
-  if (!config) {
-    return undefined;
-  }
-
-  const queueNamePrefix = typeof process === "undefined" || !process.env
-    ? ""
-    : process.env.SIMPLE_API_SQS_QUEUE_NAME_PREFIX ?? "";
-  const queueName = queueNamePrefix + config.runtime.queueName;
-  return {
-    async send(message) {
-      await client.send({
-        message,
-        queueName
-      });
-      return message;
-    }
-  };
-}
-`
+    ? renderLambdaRuntimeSourceBlocks.toSqsContextHelperSource()
     : "";
+
   return `${prelude}${runtimeDbState}
 ${runtimeSqsState}
 const endpointSuccessStatusCode = ${JSON.stringify(endpoint.successStatusCode)};
 ${endpointDatabaseContextLine}
 ${endpointSqsContextLine}
 const endpointHandler = (${handlerSource});
-function isBufferValue(payload) {
-  return typeof Buffer !== "undefined" && Buffer.isBuffer(payload);
-}
-
-function toResponseBody(payload, contentType) {
-  if (isBufferValue(payload)) {
-    return {
-      body: payload.toString("base64"),
-      isBase64Encoded: true
-    };
-  }
-
-  const normalized = String(contentType).toLowerCase();
-  if (normalized.includes("/json") || normalized.includes("+json")) {
-    return {
-      body: JSON.stringify(payload),
-      isBase64Encoded: false
-    };
-  }
-
-  return {
-    body: typeof payload === "string" ? payload : JSON.stringify(payload),
-    isBase64Encoded: false
-  };
-}
-
-function toResponse(statusCode, payload, contentType, headers) {
-  const resolvedContentType = contentType ?? (isBufferValue(payload) ? "application/octet-stream" : "application/json");
-  const responseBody = toResponseBody(payload, resolvedContentType);
-  return {
-    statusCode,
-    headers: {
-      ...(headers ?? {}),
-      "content-type": resolvedContentType
-    },
-    ...(responseBody.isBase64Encoded ? { isBase64Encoded: true } : {}),
-    body: responseBody.body
-  };
-}
-
-function parseJsonBody(event) {
-  const rawBody = typeof event?.body === "string" ? event.body : "";
-  if (rawBody.trim().length === 0) {
-    return { ok: true, value: undefined };
-  }
-  try {
-    return { ok: true, value: JSON.parse(rawBody) };
-  } catch {
-    return { ok: false, error: toResponse(400, { error: "Invalid JSON body" }) };
-  }
-}
+${renderLambdaRuntimeSourceBlocks.toResponseAndHandlerHelpersSource()}
 ${dbAccessSupport}
-
-function toHandlerOutput(output, defaultStatusCode) {
-  if (!output || typeof output !== "object" || !("value" in output)) {
-    throw new Error("Handler output must include value");
-  }
-
-  const statusCode = output.statusCode === undefined ? defaultStatusCode : output.statusCode;
-  if (!Number.isInteger(statusCode) || statusCode < 100 || statusCode > 599) {
-    throw new Error("Handler output statusCode must be an integer between 100 and 599");
-  }
-  const contentType = output.contentType;
-  if (contentType !== undefined && (typeof contentType !== "string" || contentType.trim().length === 0)) {
-    throw new Error("Handler output contentType must be a non-empty string");
-  }
-  const outputHeaders = output.headers;
-  if (outputHeaders !== undefined && (!outputHeaders || typeof outputHeaders !== "object" || Array.isArray(outputHeaders))) {
-    throw new Error("Handler output headers must be an object with string values");
-  }
-  const headers = {};
-  for (const [key, value] of Object.entries(outputHeaders ?? {})) {
-    if (typeof value !== "string") {
-      throw new Error("Handler output headers must be an object with string values");
-    }
-    headers[key] = value;
-  }
-
-  return {
-    ...(contentType ? { contentType: contentType.trim() } : {}),
-    ...(Object.keys(headers).length > 0 ? { headers } : {}),
-    statusCode,
-    value: output.value
-  };
-}
 ${contextDatabaseHelper}
 ${contextSqsHelper}
 ${envBootstrapSource}
@@ -247,6 +112,7 @@ export async function handler(event) {
 }
 `;
 }
+
 export function renderLambdaRuntimeEntrySource(
   endpointModulePath: string,
   endpointModuleSource: string,
