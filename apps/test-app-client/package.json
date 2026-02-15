@@ -1,0 +1,12 @@
+{
+  "name": "@babbstack/test-app-client",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "test": "bun test src/client-requests.test.ts"
+  },
+  "dependencies": {
+    "@babbstack/client": "workspace:*"
+  }
+}

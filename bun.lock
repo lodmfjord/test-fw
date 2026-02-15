@@ -26,6 +26,19 @@
         "zod": "^4.3.6",
       },
     },
+    "apps/test-app-client": {
+      "name": "@babbstack/test-app-client",
+      "dependencies": {
+        "@babbstack/client": "workspace:*",
+        "@babbstack/http-api-contract": "workspace:*",
+      },
+    },
+    "libs/client": {
+      "name": "@babbstack/client",
+      "dependencies": {
+        "@babbstack/http-api-contract": "workspace:*",
+      },
+    },
     "libs/dynamodb": {
       "name": "@babbstack/dynamodb",
       "dependencies": {
@@ -174,6 +187,8 @@
 
     "@aws/lambda-invoke-store": ["@aws/lambda-invoke-store@0.2.3", "", {}, "sha512-oLvsaPMTBejkkmHhjf09xTgk71mOqyr/409NKhRIL08If7AhVfUsJhVsx386uJaqNd42v9kWamQ9lFbkoC2dYw=="],
 
+    "@babbstack/client": ["@babbstack/client@workspace:libs/client"],
+
     "@babbstack/dynamodb": ["@babbstack/dynamodb@workspace:libs/dynamodb"],
 
     "@babbstack/http-api-contract": ["@babbstack/http-api-contract@workspace:libs/http-api-contract"],
@@ -187,6 +202,8 @@
     "@babbstack/step-functions": ["@babbstack/step-functions@workspace:libs/step-functions"],
 
     "@babbstack/test-app": ["@babbstack/test-app@workspace:apps/test-app"],
+
+    "@babbstack/test-app-client": ["@babbstack/test-app-client@workspace:apps/test-app-client"],
 
     "@biomejs/biome": ["@biomejs/biome@2.3.14", "", { "optionalDependencies": { "@biomejs/cli-darwin-arm64": "2.3.14", "@biomejs/cli-darwin-x64": "2.3.14", "@biomejs/cli-linux-arm64": "2.3.14", "@biomejs/cli-linux-arm64-musl": "2.3.14", "@biomejs/cli-linux-x64": "2.3.14", "@biomejs/cli-linux-x64-musl": "2.3.14", "@biomejs/cli-win32-arm64": "2.3.14", "@biomejs/cli-win32-x64": "2.3.14" }, "bin": { "biome": "bin/biome" } }, "sha512-QMT6QviX0WqXJCaiqVMiBUCr5WRQ1iFSjvOLoTk6auKukJMvnMzWucXpwZB0e8F00/1/BsS9DzcKgWH+CLqVuA=="],
 

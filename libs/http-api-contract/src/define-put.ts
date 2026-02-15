@@ -19,6 +19,20 @@ type WithoutMethod<
   "method"
 >;
 
+type PutEndpointDefinition<
+  TParams,
+  TQuery,
+  THeaders,
+  TBody,
+  TResponse,
+  TDbAccess extends EndpointDbAccess,
+  TContextInput extends EndpointContextInput | undefined,
+  TPath extends string,
+> = EndpointDefinition<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput> & {
+  method: "PUT";
+  path: TPath;
+};
+
 export function definePut<
   TParams,
   TQuery,
@@ -27,11 +41,32 @@ export function definePut<
   TResponse,
   TDbAccess extends EndpointDbAccess = "write",
   TContextInput extends EndpointContextInput | undefined = undefined,
+  TPath extends string = string,
 >(
-  input: WithoutMethod<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput>,
-): EndpointDefinition<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput> {
+  input: WithoutMethod<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput> & {
+    path: TPath;
+  },
+): PutEndpointDefinition<
+  TParams,
+  TQuery,
+  THeaders,
+  TBody,
+  TResponse,
+  TDbAccess,
+  TContextInput,
+  TPath
+> {
   return defineEndpoint({
     ...input,
     method: "PUT",
-  });
+  }) as PutEndpointDefinition<
+    TParams,
+    TQuery,
+    THeaders,
+    TBody,
+    TResponse,
+    TDbAccess,
+    TContextInput,
+    TPath
+  >;
 }

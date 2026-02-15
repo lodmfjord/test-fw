@@ -53,14 +53,19 @@ describe("generated lambda bundle", () => {
     });
 
     expect(fileNames).toEqual([
+      "delete_order_param_id.mjs",
       "get_env_demo.mjs",
       "get_last_update.mjs",
       "get_s3_demo_files_list.mjs",
       "get_s3_demo_files_raw.mjs",
       "get_s3_demo_files.mjs",
       "get_s3_demo_secure_link.mjs",
+      "head_order_param_id.mjs",
+      "options_order.mjs",
+      "patch_order_param_id.mjs",
       "post_s3_demo_files.mjs",
       "post_step_function_events.mjs",
+      "put_order_param_id.mjs",
     ]);
 
     const source = await readFile(join(outputDirectory, "get_last_update.mjs"), "utf8");

@@ -9,6 +9,9 @@ Apps are consumers/showcases of the framework in `libs/`. They should demonstrat
 ## Structure
 
 - `apps/<app-name>/`
+- Current apps:
+  - `apps/test-app`
+  - `apps/test-app-client`
 - Typical contents:
   - `package.json`
   - `tsconfig.json`

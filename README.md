@@ -12,12 +12,14 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
 ## Packages
 
 - `@babbstack/http-api-contract` (`libs/http-api-contract`): endpoint definitions, dev server runtime, contract generation, lambda entry generation.
+- `@babbstack/client` (`libs/client`): type-safe HTTP client for calling endpoint definitions from consumers.
 - `@babbstack/schema` (`libs/schema`): typed schema wrappers used by endpoint request/response contracts.
 - `@babbstack/step-functions` (`libs/step-functions`): Step Functions definition and local execution helpers.
 - `@babbstack/sqs` (`libs/sqs`): runtime SQS adapters, queue definitions, listener registration.
 - `@babbstack/dynamodb` (`libs/dynamodb`): runtime DynamoDB adapters and typed table helpers.
 - `@babbstack/s3` (`libs/s3`): runtime S3 adapters for local and AWS execution.
 - `@babbstack/test-app` (`apps/test-app`): showcase app that exercises the framework end to end.
+- `@babbstack/test-app-client` (`apps/test-app-client`): typed client smoke app using `@babbstack/client` against `test-app` endpoints.
 
 ## Response Status-Code Model
 
@@ -81,6 +83,7 @@ bun run check
 ## Root Scripts
 
 - `bun run dev`
+- `bun run dev:client`
 - `bun run build`
 - `bun run test`
 - `bun run test:watch`

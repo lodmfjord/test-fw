@@ -71,6 +71,11 @@ describe("test-app showcase", () => {
       "get_s3_demo_files_raw",
       "get_s3_demo_files_list",
       "get_s3_demo_secure_link",
+      "put_order_param_id",
+      "patch_order_param_id",
+      "delete_order_param_id",
+      "options_order",
+      "head_order_param_id",
       "post_step_function_events",
     ]);
   });

@@ -19,6 +19,20 @@ type WithoutMethod<
   "method"
 >;
 
+type OptionsEndpointDefinition<
+  TParams,
+  TQuery,
+  THeaders,
+  TBody,
+  TResponse,
+  TDbAccess extends EndpointDbAccess,
+  TContextInput extends EndpointContextInput | undefined,
+  TPath extends string,
+> = EndpointDefinition<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput> & {
+  method: "OPTIONS";
+  path: TPath;
+};
+
 export function defineOptions<
   TParams,
   TQuery,
@@ -27,11 +41,32 @@ export function defineOptions<
   TResponse,
   TDbAccess extends EndpointDbAccess = "write",
   TContextInput extends EndpointContextInput | undefined = undefined,
+  TPath extends string = string,
 >(
-  input: WithoutMethod<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput>,
-): EndpointDefinition<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput> {
+  input: WithoutMethod<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput> & {
+    path: TPath;
+  },
+): OptionsEndpointDefinition<
+  TParams,
+  TQuery,
+  THeaders,
+  TBody,
+  TResponse,
+  TDbAccess,
+  TContextInput,
+  TPath
+> {
   return defineEndpoint({
     ...input,
     method: "OPTIONS",
-  });
+  }) as OptionsEndpointDefinition<
+    TParams,
+    TQuery,
+    THeaders,
+    TBody,
+    TResponse,
+    TDbAccess,
+    TContextInput,
+    TPath
+  >;
 }

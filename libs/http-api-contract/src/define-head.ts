@@ -19,6 +19,20 @@ type WithoutMethod<
   "method"
 >;
 
+type HeadEndpointDefinition<
+  TParams,
+  TQuery,
+  THeaders,
+  TBody,
+  TResponse,
+  TDbAccess extends EndpointDbAccess,
+  TContextInput extends EndpointContextInput | undefined,
+  TPath extends string,
+> = EndpointDefinition<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput> & {
+  method: "HEAD";
+  path: TPath;
+};
+
 export function defineHead<
   TParams,
   TQuery,
@@ -27,11 +41,32 @@ export function defineHead<
   TResponse,
   TDbAccess extends EndpointDbAccess = "write",
   TContextInput extends EndpointContextInput | undefined = undefined,
+  TPath extends string = string,
 >(
-  input: WithoutMethod<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput>,
-): EndpointDefinition<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput> {
+  input: WithoutMethod<TParams, TQuery, THeaders, TBody, TResponse, TDbAccess, TContextInput> & {
+    path: TPath;
+  },
+): HeadEndpointDefinition<
+  TParams,
+  TQuery,
+  THeaders,
+  TBody,
+  TResponse,
+  TDbAccess,
+  TContextInput,
+  TPath
+> {
   return defineEndpoint({
     ...input,
     method: "HEAD",
-  });
+  }) as HeadEndpointDefinition<
+    TParams,
+    TQuery,
+    THeaders,
+    TBody,
+    TResponse,
+    TDbAccess,
+    TContextInput,
+    TPath
+  >;
 }

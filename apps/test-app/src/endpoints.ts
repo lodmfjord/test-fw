@@ -1,4 +1,5 @@
 import { lastUpdateEndpoints, lastUpdateListener } from "./last-update-endpoints";
+import { orderEndpoints } from "./order-endpoints";
 import { s3DemoEndpoints } from "./s3-demo-endpoints";
 import {
   postStepFunctionDemoEndpoint,
@@ -10,6 +11,7 @@ import {
 export const endpoints = [
   lastUpdateEndpoints,
   s3DemoEndpoints,
+  orderEndpoints,
   [
     postStepFunctionDemoEndpoint,
     postStepFunctionEventsEndpoint,

@@ -5,6 +5,7 @@ Shared reusable framework packages live in this folder.
 ## Packages
 
 - `libs/http-api-contract`: endpoint DSL, runtime dev app, contract and lambda generation.
+- `libs/client`: type-safe HTTP client for endpoint definitions.
 - `libs/schema`: schema primitives and JSON Schema export.
 - `libs/step-functions`: Step Functions definition and local execution helpers.
 - `libs/sqs`: SQS clients, queue/listener abstractions, listener runtime wiring.

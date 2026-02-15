@@ -9,6 +9,7 @@ Showcase app for `@babbstack/http-api-contract`. It demonstrates endpoint defini
 - SQS queue/listener wiring.
 - S3 runtime adapter usage.
 - Env + secret definitions included in contract output.
+- Additional REST method coverage via `/order` demo endpoints (`PUT`, `PATCH`, `DELETE`, `OPTIONS`, `HEAD`).
 - Deployed smoke checks for status-code and response-shape drift.
 
 Endpoints are defined in `apps/test-app/src/endpoints.ts` and Step Function demos in `apps/test-app/src/step-function-demo.ts`.
