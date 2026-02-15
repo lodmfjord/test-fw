@@ -34,6 +34,7 @@ describe("toStepFunctionEndpoints", () => {
         definition: "{}",
         integration_subtype: "StepFunctions-StartSyncExecution",
         invocation_type: "sync",
+        lambda_resource_arns: [],
         method: "POST",
         path: "/flow",
         start_action: "states:StartSyncExecution",

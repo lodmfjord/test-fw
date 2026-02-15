@@ -97,6 +97,12 @@ describe("renderTerraformFiles sqs", () => {
 
     const sqsSource = files["sqs.tf.json"] ?? "";
     const lambdaSource = files["lambdas.tf.json"] ?? "";
+    const sqsTerraform = JSON.parse(sqsSource) as {
+      variable?: Record<string, unknown>;
+    };
+    const lambdaTerraform = JSON.parse(lambdaSource) as {
+      variable?: Record<string, unknown>;
+    };
 
     expect(Object.keys(files).sort((left, right) => left.localeCompare(right))).toEqual([
       "lambdas.tf.json",
@@ -105,8 +111,11 @@ describe("renderTerraformFiles sqs", () => {
     ]);
     expect(sqsSource.includes('"aws_sqs_queue"')).toBe(true);
     expect(lambdaSource.includes('"aws_lambda_event_source_mapping"')).toBe(true);
+    expect(lambdaSource.includes('"sqs:GetQueueUrl"')).toBe(true);
     expect(lambdaSource.includes('"sqs:SendMessage"')).toBe(true);
     expect(lambdaSource.includes("sqs:ReceiveMessage")).toBe(true);
     expect(lambdaSource.includes('"SIMPLE_API_SQS_QUEUE_NAME_PREFIX"')).toBe(true);
+    expect(lambdaTerraform.variable?.sqs_queue_name_prefix).toBeDefined();
+    expect(sqsTerraform.variable?.sqs_queue_name_prefix).toBeUndefined();
   });
 });

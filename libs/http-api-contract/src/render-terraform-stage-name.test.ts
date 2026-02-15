@@ -14,7 +14,7 @@ describe("renderTerraformFiles stage naming", () => {
     resetDefinedEndpoints();
   });
 
-  it("keeps stage name as literal $default without prefixing", () => {
+  it("uses stage_name variable directly for stage naming", () => {
     defineGet({
       path: "/health",
       handler: () => ({
@@ -54,8 +54,6 @@ describe("renderTerraformFiles stage naming", () => {
       };
     };
 
-    expect(apiGatewayJson.resource.aws_apigatewayv2_stage.default.name).toBe(
-      `\${var.stage_name == "$default" ? var.stage_name : join("", [local.resource_name_prefix, var.stage_name])}`,
-    );
+    expect(apiGatewayJson.resource.aws_apigatewayv2_stage.default.name).toBe(`\${var.stage_name}`);
   });
 });

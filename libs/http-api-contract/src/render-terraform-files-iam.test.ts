@@ -3,6 +3,7 @@
  */
 import { beforeEach, describe, expect, it } from "bun:test";
 import { createDynamoDatabase } from "@babbstack/dynamodb";
+import { createBucket } from "@babbstack/s3";
 import { schema } from "@babbstack/schema";
 import { buildContractFromEndpoints } from "./build-contract-from-endpoints";
 import { defineGet } from "./define-get";
@@ -35,6 +36,9 @@ describe("renderTerraformFiles iam and dynamodb route access", () => {
       "id",
       { tableName: "orders" },
     );
+    const uploadsBucket = createBucket({
+      name: "uploads-bucket",
+    });
 
     defineGet({
       path: "/users/{id}",
@@ -56,6 +60,30 @@ describe("renderTerraformFiles iam and dynamodb route access", () => {
       },
       response: schema.object({
         id: schema.string(),
+      }),
+    });
+    defineGet({
+      path: "/uploads/{key}",
+      context: {
+        s3: {
+          access: ["read", "list"],
+          handler: uploadsBucket,
+        },
+      },
+      handler: ({ params, s3 }) => ({
+        value: {
+          key: params.key,
+          ok: Boolean(s3),
+        },
+      }),
+      request: {
+        params: schema.object({
+          key: schema.string(),
+        }),
+      },
+      response: schema.object({
+        key: schema.string(),
+        ok: schema.boolean(),
       }),
     });
     definePatch({
@@ -140,6 +168,9 @@ describe("renderTerraformFiles iam and dynamodb route access", () => {
     expect(routeAccess.get_users_param_id?.actions.includes("dynamodb:GetItem")).toBe(true);
     expect(routeAccess.get_users_param_id?.actions.includes("dynamodb:PutItem")).toBe(false);
     expect(routeAccess.patch_orders_param_id?.actions.includes("dynamodb:PutItem")).toBe(true);
+    expect(lambdaSource.includes("lambda_s3_access_by_route")).toBe(true);
+    expect(lambdaSource.includes('"s3:GetObject"')).toBe(true);
+    expect(lambdaSource.includes('"s3:ListBucket"')).toBe(true);
     expect(lambdaSource.includes('"dynamodb:PutItem"')).toBe(true);
     expect(lambdaSource.includes('"dynamodb:GetItem"')).toBe(true);
   });

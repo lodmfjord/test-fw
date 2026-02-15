@@ -16,6 +16,13 @@ function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
+/** Converts to non-empty terraform prefix reference. */
+function toNonEmptyPrefixReference(variableName: string, fallbackPrefix: string): string {
+  return toTerraformReference(
+    `var.${variableName} != "" ? var.${variableName} : "${fallbackPrefix}"`,
+  );
+}
+
 /** Converts to route state machine role policy. */
 function toRouteStateMachineRolePolicy(): string {
   return JSON.stringify({
@@ -110,18 +117,20 @@ function toResourceBlock(collections: TerraformCollections): Record<string, unkn
 /** Converts to variable block. */
 function toVariableBlock(): Record<string, unknown> {
   return {
-    apigateway_step_function_policy_name_prefix: { default: "", type: "string" },
-    apigateway_step_function_role_name_prefix: { default: "", type: "string" },
+    apigateway_step_function_policy_name_prefix: { default: "apigw-", type: "string" },
+    apigateway_step_function_role_name_prefix: { default: "apigw-", type: "string" },
     pipes_name_prefix: { default: "", type: "string" },
-    pipes_step_function_role_name_prefix: { default: "", type: "string" },
-    pipes_step_function_source_policy_name_prefix: { default: "", type: "string" },
-    pipes_step_function_target_policy_name_prefix: { default: "", type: "string" },
+    pipes_step_function_role_name_prefix: { default: "pipes-", type: "string" },
+    pipes_step_function_source_policy_name_prefix: { default: "pipes-src-", type: "string" },
+    pipes_step_function_target_policy_name_prefix: { default: "pipes-tgt-", type: "string" },
+    step_function_lambda_invoke_policy_name_prefix: { default: "sfn-lambda-", type: "string" },
     step_function_state_machine_name_prefix: { default: "", type: "string" },
-    step_function_state_machine_role_name_prefix: { default: "", type: "string" },
+    step_function_state_machine_role_name_prefix: { default: "sfn-", type: "string" },
   };
 }
 
 const createStepFunctionsTerraformJsonCommon = {
+  toNonEmptyPrefixReference,
   toApiGatewayRolePolicy,
   toPipeRolePolicy,
   toResourceBlock,

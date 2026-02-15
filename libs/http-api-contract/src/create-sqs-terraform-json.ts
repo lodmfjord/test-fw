@@ -15,13 +15,15 @@ function toTerraformReference(expression: string): string {
  * Creates sqs terraform json.
  * @param endpoints - Endpoints parameter.
  * @param listeners - Listeners parameter.
+ * @param includeQueuePrefixVariable - Include queue prefix variable parameter.
  * @example
- * createSqsTerraformJson(endpoints, listeners)
+ * createSqsTerraformJson(endpoints, listeners, true)
  * @returns Output value.
  */
 export function createSqsTerraformJson(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
+  includeQueuePrefixVariable = true,
 ): TerraformJson {
   return {
     locals: {
@@ -35,8 +37,12 @@ export function createSqsTerraformJson(
         },
       },
     },
-    variable: {
-      sqs_queue_name_prefix: { default: "", type: "string" },
-    },
+    ...(includeQueuePrefixVariable
+      ? {
+          variable: {
+            sqs_queue_name_prefix: { default: "", type: "string" },
+          },
+        }
+      : {}),
   };
 }

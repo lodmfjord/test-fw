@@ -9,9 +9,11 @@ import type {
   ReadBoundDynamoDatabase,
   WriteBoundDynamoDatabase,
 } from "@babbstack/dynamodb";
+import type { BoundS3Bucket, S3Bucket, S3BucketRuntimeConfig } from "@babbstack/s3";
 import type { BoundSqsQueue, SqsMessage, SqsQueue, SqsQueueRuntimeConfig } from "@babbstack/sqs";
 
 export type EndpointDbAccess = "read" | "write";
+export type EndpointS3Access = "list" | "read" | "remove" | "write";
 
 export type EndpointAccess<TDbAccess extends EndpointDbAccess = EndpointDbAccess> = {
   db: TDbAccess;
@@ -48,8 +50,14 @@ export type EndpointContextSqsInput = {
   handler: SqsQueue<SqsMessage>;
 };
 
+export type EndpointContextS3Input = {
+  access?: ReadonlyArray<EndpointS3Access>;
+  handler: S3Bucket;
+};
+
 export type EndpointContextInput = {
   database?: EndpointContextDatabaseInput;
+  s3?: EndpointContextS3Input;
   sqs?: EndpointContextSqsInput;
 };
 
@@ -75,6 +83,17 @@ type ResolvedEndpointContextSqs<TContextInput extends EndpointContextInput | und
       : undefined
     : undefined;
 
+type ResolvedEndpointContextS3<TContextInput extends EndpointContextInput | undefined> =
+  TContextInput extends {
+    s3: EndpointContextS3Input;
+  }
+    ? TContextInput["s3"] extends EndpointContextS3Input
+      ? TContextInput["s3"]["handler"] extends S3Bucket
+        ? BoundS3Bucket
+        : undefined
+      : undefined
+    : undefined;
+
 export type EndpointRuntimeContextDatabase = {
   access: EndpointDbAccess[];
   runtime: DynamoDatabaseRuntimeConfig<string>;
@@ -84,8 +103,14 @@ export type EndpointRuntimeContextSqs = {
   runtime: SqsQueueRuntimeConfig;
 };
 
+export type EndpointRuntimeContextS3 = {
+  access: EndpointS3Access[];
+  runtime: S3BucketRuntimeConfig;
+};
+
 export type EndpointRuntimeContext = {
   database?: EndpointRuntimeContextDatabase;
+  s3?: EndpointRuntimeContextS3;
   sqs?: EndpointRuntimeContextSqs;
 };
 
@@ -104,5 +129,6 @@ export type EndpointContext<
   params: TParams;
   query: TQuery;
   request: Request;
+  s3: ResolvedEndpointContextS3<TContextInput>;
   sqs: ResolvedEndpointContextSqs<TContextInput>;
 };

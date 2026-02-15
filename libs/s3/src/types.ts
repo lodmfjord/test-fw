@@ -48,12 +48,41 @@ export type S3CreateSecureLinkInput = {
   operation?: S3SecureLinkOperation;
 };
 
+export type S3BucketPutInput = Omit<S3PutInput, "bucketName">;
+
+export type S3BucketGetInput = Omit<S3GetInput, "bucketName">;
+
+export type S3BucketListInput = Omit<S3ListInput, "bucketName">;
+
+export type S3BucketRemoveInput = Omit<S3RemoveInput, "bucketName">;
+
+export type S3BucketCreateSecureLinkInput = Omit<S3CreateSecureLinkInput, "bucketName">;
+
 export type S3Client = {
   createSecureLink(input: S3CreateSecureLinkInput): Promise<string>;
   get(input: S3GetInput): Promise<S3Object | undefined>;
   list(input: S3ListInput): Promise<S3ObjectSummary[]>;
   put(input: S3PutInput): Promise<S3ObjectSummary>;
   remove(input: S3RemoveInput): Promise<void>;
+};
+
+export type S3BucketRuntimeConfig = {
+  bucketName: string;
+  kind: "s3-bucket";
+};
+
+export type BoundS3Bucket = {
+  createSecureLink(input: S3BucketCreateSecureLinkInput): Promise<string>;
+  get(input: S3BucketGetInput): Promise<S3Object | undefined>;
+  list(input: S3BucketListInput): Promise<S3ObjectSummary[]>;
+  put(input: S3BucketPutInput): Promise<S3ObjectSummary>;
+  remove(input: S3BucketRemoveInput): Promise<void>;
+};
+
+export type S3Bucket = BoundS3Bucket & {
+  bind(client: S3Client): BoundS3Bucket;
+  bucketName: string;
+  runtimeConfig: S3BucketRuntimeConfig;
 };
 
 export type AwsS3Operations = {
@@ -81,4 +110,10 @@ export type CreateRuntimeS3Input = {
   createAwsS3?: () => Promise<S3Client> | S3Client;
   createMemoryS3?: () => S3Client;
   isLambdaRuntime?: boolean;
+};
+
+export type CreateBucketInput = {
+  client?: S3Client;
+  createClient?: () => Promise<S3Client> | S3Client;
+  name: string;
 };

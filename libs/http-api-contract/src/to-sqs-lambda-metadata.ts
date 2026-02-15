@@ -9,7 +9,7 @@ type LambdaSqsSendAccess = {
   queue_name: string;
 };
 
-const SQS_SEND_ACTIONS = ["sqs:SendMessage"];
+const SQS_SEND_ACTIONS = ["sqs:GetQueueUrl", "sqs:SendMessage"];
 
 /** Converts to queue key. */
 function toQueueKey(queueName: string): string {

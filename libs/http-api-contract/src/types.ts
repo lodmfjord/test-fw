@@ -6,6 +6,7 @@ export type {
   EndpointContext,
   EndpointContextInput,
   EndpointDbAccess,
+  EndpointS3Access,
 } from "./endpoint-context-types";
 export type {
   BuildContractFromEndpointsInput,

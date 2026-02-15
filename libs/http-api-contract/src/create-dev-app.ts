@@ -3,6 +3,7 @@
  */
 import { createRuntimeDynamoDb } from "@babbstack/dynamodb";
 import { createNoopLogger } from "@babbstack/logger";
+import { createRuntimeS3 } from "@babbstack/s3";
 import { createRuntimeSqs } from "@babbstack/sqs";
 import { findEndpointRuntimeDefinition } from "./find-endpoint-runtime-definition";
 import { initializeEndpointEnv } from "./initialize-endpoint-env";
@@ -14,8 +15,21 @@ import { toRequestCorrelationId } from "./to-request-correlation-id";
 import type { CreateDevAppOptions } from "./types";
 import type { EndpointRuntimeDefinition } from "./types";
 import { toEndpointSqsContext } from "./to-endpoint-sqs-context";
+import { toEndpointS3Context } from "./to-endpoint-s3-context";
 import { toEndpointHandlerOutput } from "./to-endpoint-handler-output";
 import { toStepFunctionEndpointOutput } from "./to-step-function-endpoint-output";
+
+type DevAppHandlerContext = {
+  body: unknown;
+  database: unknown;
+  db: unknown;
+  headers: unknown;
+  params: unknown;
+  query: unknown;
+  request: Request;
+  s3: unknown;
+  sqs: unknown;
+};
 
 /** Runs read json body. */
 async function readJsonBody(request: Request): Promise<unknown> {
@@ -46,6 +60,7 @@ export function createDevApp(
 ): (request: Request) => Promise<Response> {
   const db = options.db ?? createRuntimeDynamoDb();
   const logger = options.logger ?? createNoopLogger();
+  const s3 = options.s3 ?? createRuntimeS3();
   const sqs = options.sqs ?? createRuntimeSqs();
   initializeEndpointEnv(endpoints, logger);
 
@@ -130,17 +145,11 @@ export function createDevApp(
         }
 
         const endpointDatabaseContext = toEndpointDatabaseContext(db, endpoint);
+        const endpointS3 = toEndpointS3Context(s3, endpoint);
         const endpointSqs = toEndpointSqsContext(sqs, endpoint);
-        const handler = endpoint.handler as (context: {
-          body: unknown;
-          database: unknown;
-          db: unknown;
-          headers: unknown;
-          params: unknown;
-          query: unknown;
-          request: Request;
-          sqs: unknown;
-        }) => Promise<unknown> | unknown;
+        const handler = endpoint.handler as (
+          context: DevAppHandlerContext,
+        ) => Promise<unknown> | unknown;
 
         output = await handler({
           body: validatedBody,
@@ -150,6 +159,7 @@ export function createDevApp(
           params: validatedParams,
           query: validatedQuery,
           request,
+          s3: endpointS3,
           sqs: endpointSqs,
         });
       }

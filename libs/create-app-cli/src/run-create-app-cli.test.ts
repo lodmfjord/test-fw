@@ -22,6 +22,7 @@ describe("runCreateAppCli", () => {
     expect(exitCode).toBe(0);
     expect(appPackageJson).toContain('"name": "hello-app"');
     expect(appPackageJson).toContain('"dev": "bun src/app-bin.ts"');
+    expect(appPackageJson).toContain('"@aws-lambda-powertools/logger"');
     expect(appBin).toContain('console.log("Hello world");');
   });
 });

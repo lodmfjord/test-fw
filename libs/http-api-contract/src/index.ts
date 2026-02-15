@@ -37,6 +37,7 @@ export type {
   EndpointDefinition,
   EndpointAccess,
   EndpointDbAccess,
+  EndpointS3Access,
   EndpointHandler,
   EndpointInput,
   EndpointRequest,

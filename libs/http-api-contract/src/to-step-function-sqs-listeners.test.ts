@@ -28,6 +28,7 @@ describe("toStepFunctionSqsListeners", () => {
       batch_size: 10,
       definition: "{}",
       invocation_type: "async",
+      lambda_resource_arns: [],
       pipe_invocation_type: "FIRE_AND_FORGET",
       queue_key: "orders_queue",
       queue_name: "orders-queue",

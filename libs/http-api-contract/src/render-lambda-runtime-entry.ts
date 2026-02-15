@@ -12,6 +12,7 @@ function renderLambdaRuntimeSource(
   endpoint: EndpointRuntimeDefinition,
   importLines: string[],
   runtimeDbImportSpecifier: string,
+  runtimeS3ImportSpecifier: string,
   runtimeSqsImportSpecifier: string,
   handlerSource: string,
 ): string {
@@ -20,16 +21,19 @@ function renderLambdaRuntimeSource(
     handlerSource,
     importLines,
     runtimeDbImportSpecifier,
+    runtimeS3ImportSpecifier,
     runtimeSqsImportSpecifier,
   );
 
   return `${context.prelude}${context.runtimeDbState}
+${context.runtimeS3State}
 ${context.runtimeSqsState}
 const endpointSuccessStatusCode = ${JSON.stringify(endpoint.successStatusCode)};
 const endpointRouteId = ${JSON.stringify(endpoint.routeId)};
 const endpointMethod = ${JSON.stringify(endpoint.method)};
 const endpointPath = ${JSON.stringify(endpoint.path)};
 ${context.endpointDatabaseContextLine}
+${context.endpointS3ContextLine}
 ${context.endpointSqsContextLine}
 const endpointRequestSchemas = ${JSON.stringify(context.endpointRequestSchemas)};
 const endpointResponseByStatusCodeSchemas = ${JSON.stringify(context.endpointResponseByStatusCodeSchemas)};
@@ -40,6 +44,7 @@ ${renderLambdaRuntimeSourceBlocks.toObservabilitySupportSource()}
 ${renderLambdaRuntimeSourceBlocks.toZodValidationSupportSource()}
 ${context.dbAccessSupport}
 ${context.contextDatabaseHelper}
+${context.contextS3Helper}
 ${context.contextSqsHelper}
 ${context.envBootstrapSource}
 
@@ -86,6 +91,7 @@ export async function handler(event) {
 
   ${context.endpointDbLine}
   ${context.endpointDatabaseBinding}
+  ${context.endpointS3Binding}
   ${context.endpointSqsBinding}
 
   let output;
@@ -100,6 +106,7 @@ export async function handler(event) {
       request: {
         rawEvent: event
       },
+      s3: ${context.endpointS3Value},
       sqs: ${context.endpointSqsValue}
     });
   } catch (error) {
@@ -175,6 +182,11 @@ export function renderLambdaRuntimeEntrySource(
     "@babbstack/dynamodb",
     "../../dynamodb/src/index.ts",
   );
+  const runtimeS3ImportSpecifier = resolveRuntimeModuleSpecifier(
+    endpointModulePath,
+    "@babbstack/s3",
+    "../../s3/src/index.ts",
+  );
   const runtimeSqsImportSpecifier = resolveRuntimeModuleSpecifier(
     endpointModulePath,
     "@babbstack/sqs",
@@ -185,6 +197,7 @@ export function renderLambdaRuntimeEntrySource(
     endpoint,
     importLines,
     runtimeDbImportSpecifier,
+    runtimeS3ImportSpecifier,
     runtimeSqsImportSpecifier,
     handlerSource,
   );

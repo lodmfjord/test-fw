@@ -41,6 +41,32 @@ This means async Step Function routes and multi-response routes keep runtime and
 - Endpoint-level `aws` values override matching `lambdaDefaults` values per route.
 - Route lambdas default architecture to `arm64`.
 - Terraform generation only sets lambda `memory_size`, `timeout`, `ephemeral_storage`, and `reserved_concurrent_executions` when those values are configured. When omitted, AWS defaults are left untouched.
+- Route IAM generation now also includes per-route S3 policies when `context.s3` is configured on lambda endpoints.
+- Terraform generation creates managed S3 buckets for `context.s3` usage and injects `SIMPLE_API_S3_BUCKET_NAME_PREFIX` so runtime bucket names align with deployed resources.
+- Route SQS send IAM now includes both `sqs:GetQueueUrl` and `sqs:SendMessage`.
+- Route secret env markers (`createSecret(...)`) generate Terraform `data.aws_ssm_parameter` checks and `ssm:GetParameter` IAM policies; missing parameters fail Terraform early.
+- API Gateway Terraform generation includes:
+  - `output.api_gateway_url` mapped to `${aws_apigatewayv2_api.http_api.api_endpoint}`
+  - `output.api_gateway_url_with_stage` mapped to `${aws_apigatewayv2_stage.default.invoke_url}`
+  - stage resource naming uses `var.stage_name` directly (no resource-name prefixing)
+
+## Endpoint Context S3
+
+- Endpoints can declare `context.s3` with `handler: createBucket(...)` and explicit access mode lists:
+  - `read` (`s3:GetObject`)
+  - `write` (`s3:PutObject`, and signed `put` links)
+  - `list` (`s3:ListBucket`)
+  - `remove` (`s3:DeleteObject`)
+- `createDevApp` and generated Lambda runtime entries enforce those access modes at runtime before delegating to the S3 adapter.
+
+## Step Function IAM Naming
+
+- Generated Step Functions IAM role/policy names use distinct prefixes by default:
+  - `sfn-` for state machine roles
+  - `sfn-lambda-` for lambda invoke policies attached to state machine roles
+  - `apigw-` for API Gateway roles/policies
+  - `pipes-`, `pipes-src-`, `pipes-tgt-` for EventBridge Pipes roles/policies
+- If Terraform variables override those prefixes with empty strings, generation now falls back to the same non-empty defaults to prevent role/policy name collisions.
 
 ## Dev Runtime Observability
 

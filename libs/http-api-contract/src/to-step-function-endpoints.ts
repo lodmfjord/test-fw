@@ -2,11 +2,14 @@
  * @fileoverview Implements to step function endpoints.
  */
 import type { EndpointRuntimeDefinition } from "./types";
+import { toDeployableStepFunctionDefinitionJson } from "./to-deployable-step-function-definition-json";
+import { toStepFunctionLambdaResourceArns } from "./to-step-function-lambda-resource-arns";
 
 type StepFunctionEndpointConfig = {
   definition: string;
   integration_subtype: "StepFunctions-StartExecution" | "StepFunctions-StartSyncExecution";
   invocation_type: "sync" | "async";
+  lambda_resource_arns: string[];
   method: string;
   path: string;
   start_action: "states:StartExecution" | "states:StartSyncExecution";
@@ -57,12 +60,14 @@ export function toStepFunctionEndpoints(
         throw new Error(`Expected step-function execution for route ${endpoint.routeId}`);
       }
 
+      const deployableDefinition = toDeployableStepFunctionDefinitionJson(execution.definitionJson);
       return [
         endpoint.routeId,
         {
-          definition: execution.definitionJson,
+          definition: deployableDefinition,
           integration_subtype: toIntegrationSubtype(execution.invocationType),
           invocation_type: execution.invocationType,
+          lambda_resource_arns: toStepFunctionLambdaResourceArns(deployableDefinition),
           method: endpoint.method,
           path: endpoint.path,
           start_action: toStartAction(execution.invocationType),

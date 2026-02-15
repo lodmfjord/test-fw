@@ -1,19 +1,27 @@
 /**
  * @fileoverview Implements s3 demo endpoints.
  */
-import { createRuntimeS3 } from "@babbstack/s3";
+import { createBucket } from "@babbstack/s3";
 import { defineGet, definePost } from "@babbstack/http-api-contract";
 import { schema } from "@babbstack/schema";
 import { z } from "zod";
 
-const s3 = createRuntimeS3();
+const s3DemoBucket = createBucket({ name: "test-app-s3-demo" });
 
 const putS3DemoFileEndpoint = definePost({
   path: "/s3-demo/files",
-  handler: async ({ body }) => {
+  context: {
+    s3: {
+      access: ["write"],
+      handler: s3DemoBucket,
+    },
+  },
+  handler: async ({ body, s3 }) => {
+    if (!s3) {
+      throw new Error("missing s3 context");
+    }
     const summary = await s3.put({
       body: body.content,
-      bucketName: body.bucketName,
       contentType: body.contentType,
       key: body.key,
     });
@@ -24,7 +32,6 @@ const putS3DemoFileEndpoint = definePost({
   },
   request: {
     body: schema.object({
-      bucketName: schema.string(),
       content: schema.string(),
       contentType: schema.string(),
       key: schema.string(),
@@ -41,9 +48,18 @@ const putS3DemoFileEndpoint = definePost({
 
 const getS3DemoFileEndpoint = defineGet({
   path: "/s3-demo/files",
-  handler: async ({ query }) => {
+  context: {
+    s3: {
+      access: ["read"],
+      handler: s3DemoBucket,
+    },
+  },
+  handler: async ({ query, s3 }) => {
+    if (!s3) {
+      throw new Error("missing s3 context");
+    }
+
     const object = await s3.get({
-      bucketName: query.bucketName,
       key: query.key,
     });
     if (!object) {
@@ -62,7 +78,6 @@ const getS3DemoFileEndpoint = defineGet({
   },
   request: {
     query: schema.object({
-      bucketName: schema.string(),
       key: schema.string(),
     }),
   },
@@ -78,9 +93,18 @@ const getS3DemoFileEndpoint = defineGet({
 
 const getS3DemoRawFileEndpoint = defineGet({
   path: "/s3-demo/files/raw",
-  handler: async ({ query }) => {
+  context: {
+    s3: {
+      access: ["read"],
+      handler: s3DemoBucket,
+    },
+  },
+  handler: async ({ query, s3 }) => {
+    if (!s3) {
+      throw new Error("missing s3 context");
+    }
+
     const object = await s3.get({
-      bucketName: query.bucketName,
       key: query.key,
     });
     if (!object) {
@@ -94,7 +118,6 @@ const getS3DemoRawFileEndpoint = defineGet({
   },
   request: {
     query: schema.object({
-      bucketName: schema.string(),
       key: schema.string(),
     }),
   },
@@ -104,9 +127,18 @@ const getS3DemoRawFileEndpoint = defineGet({
 
 const listS3DemoFilesEndpoint = defineGet({
   path: "/s3-demo/files/list",
-  handler: async ({ query }) => {
+  context: {
+    s3: {
+      access: ["list"],
+      handler: s3DemoBucket,
+    },
+  },
+  handler: async ({ query, s3 }) => {
+    if (!s3) {
+      throw new Error("missing s3 context");
+    }
+
     const items = await s3.list({
-      bucketName: query.bucketName,
       ...(query.prefix ? { prefix: query.prefix } : {}),
     });
 
@@ -118,7 +150,6 @@ const listS3DemoFilesEndpoint = defineGet({
   },
   request: {
     query: schema.object({
-      bucketName: schema.string(),
       prefix: schema.optional(schema.string()),
     }),
   },
@@ -137,9 +168,18 @@ const listS3DemoFilesEndpoint = defineGet({
 
 const getS3DemoSecureLinkEndpoint = defineGet({
   path: "/s3-demo/secure-link",
-  handler: async ({ query }) => {
+  context: {
+    s3: {
+      access: ["read", "write"],
+      handler: s3DemoBucket,
+    },
+  },
+  handler: async ({ query, s3 }) => {
+    if (!s3) {
+      throw new Error("missing s3 context");
+    }
+
     const url = await s3.createSecureLink({
-      bucketName: query.bucketName,
       ...(query.contentType ? { contentType: query.contentType } : {}),
       ...(query.expiresInSeconds
         ? { expiresInSeconds: Number.parseInt(query.expiresInSeconds, 10) }
@@ -157,7 +197,6 @@ const getS3DemoSecureLinkEndpoint = defineGet({
   request: {
     query: schema.fromZod(
       z.object({
-        bucketName: z.string(),
         contentType: z.string().optional(),
         expiresInSeconds: z.string().optional(),
         key: z.string(),

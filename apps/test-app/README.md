@@ -25,10 +25,16 @@ bun test apps/test-app/src/showcase.test.ts
 
 `smoke:deployed` executes `apps/test-app/src/smoke-test-deployed-api.ts` and currently verifies:
 
-- `GET /last-update` returns expected payload and status.
-- `POST /step-function-demo` success response behavior.
-- `POST /step-function-demo` validation failure response behavior.
-- expected status codes per case (including multi-response expectations).
+- all published endpoints in `apps/test-app/src/endpoints.ts`, including:
+- `GET /last-update`, `GET /env-demo`
+- S3 demo routes (`POST`/`GET`/`raw`/`list`/`secure-link`)
+- order demo routes (`PUT`, `PATCH`, `HEAD`, `OPTIONS`, `DELETE`)
+- Step Function routes (`/step-function-demo`, `/step-function-random-branch`, `/step-function-events`)
+- expected status codes and response-shape checks per route.
+- `OPTIONS /order` is validated as `204` to match the endpoint default success status for `OPTIONS`.
+
+S3 demo routes now use a fixed bucket configured via `createBucket({ name: "test-app-s3-demo" })`
+and `context.s3` access declarations, so deployed smoke tests no longer require a bucket-name CLI arg.
 
 `generate:contracts` first runs the workspace `build:libs` script so generation is deterministic from a clean checkout.
 `dev` also runs `build:libs` first so local runtime startup resolves built library exports from `dist`.

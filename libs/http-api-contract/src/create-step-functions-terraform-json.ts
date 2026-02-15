@@ -9,6 +9,15 @@ import { toStepFunctionSqsListeners } from "./to-step-function-sqs-listeners";
 
 type TerraformJson = Record<string, unknown>;
 
+/** Checks whether any definition references caller identity. */
+function hasCallerIdentityReferenceInDefinitions(
+  definitions: Record<string, { definition: string }>,
+): boolean {
+  return Object.values(definitions).some((item) =>
+    item.definition.includes("data.aws_caller_identity.current.account_id"),
+  );
+}
+
 /**
  * Creates step functions terraform json.
  * @param endpoints - Endpoints parameter.
@@ -30,6 +39,10 @@ export function createStepFunctionsTerraformJson(
   const hasEndpointStateMachines = Object.keys(endpointStateMachines).length > 0;
   const hasSqsListenerStateMachines = Object.keys(sqsListenerStateMachines).length > 0;
   const hasUnmanagedSqsReferences = hasSqsListenerStateMachines && !usesManagedSqsQueues;
+  const hasCallerIdentityReferences =
+    hasUnmanagedSqsReferences ||
+    hasCallerIdentityReferenceInDefinitions(endpointStateMachines) ||
+    hasCallerIdentityReferenceInDefinitions(sqsListenerStateMachines);
   const collections = createStepFunctionsTerraformJsonHelpers.createCollections();
 
   if (hasEndpointStateMachines) {
@@ -52,7 +65,7 @@ export function createStepFunctionsTerraformJson(
       step_function_endpoints: endpointStateMachines,
       step_function_sqs_listeners: sqsListenerStateMachines,
     },
-    ...(hasUnmanagedSqsReferences
+    ...(hasCallerIdentityReferences
       ? {
           data: {
             aws_caller_identity: {

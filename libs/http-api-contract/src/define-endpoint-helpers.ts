@@ -4,7 +4,12 @@
 import type { Schema } from "@babbstack/schema";
 import type { EndpointRuntimeContext } from "./endpoint-context-types";
 import type { RouteExecution } from "./route-execution-types";
-import type { EndpointAccess, EndpointContextInput, EndpointDbAccess } from "./types";
+import type {
+  EndpointAccess,
+  EndpointContextInput,
+  EndpointDbAccess,
+  EndpointS3Access,
+} from "./types";
 
 /** Converts to handler id. */
 function toHandlerId(routeId: string, providedHandlerId: string | undefined): string {
@@ -113,6 +118,28 @@ function toEndpointContext(
       database: {
         access: normalizedAccess,
         runtime: inputContext.database.handler.runtimeConfig,
+      },
+    };
+  }
+
+  if (inputContext?.s3) {
+    const rawAccess = inputContext.s3.access ?? ["read", "write", "list", "remove"];
+    const normalizedAccess = [...new Set(rawAccess)] as EndpointS3Access[];
+    if (normalizedAccess.length === 0) {
+      throw new Error("context.s3.access must include at least one entry");
+    }
+
+    for (const value of normalizedAccess) {
+      if (value !== "read" && value !== "write" && value !== "list" && value !== "remove") {
+        throw new Error(`Unsupported context.s3 access: ${String(value)}`);
+      }
+    }
+
+    context = {
+      ...(context ? { ...context } : {}),
+      s3: {
+        access: normalizedAccess,
+        runtime: inputContext.s3.handler.runtimeConfig,
       },
     };
   }

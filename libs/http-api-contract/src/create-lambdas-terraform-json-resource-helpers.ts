@@ -20,6 +20,16 @@ function toResourceBlock(
     : `"arn:aws:sqs:\${var.aws_region}:\${data.aws_caller_identity.current.account_id}:\${each.value.queue_name}"`;
 
   return {
+    ...(context.hasRouteS3Access
+      ? {
+          aws_s3_bucket: {
+            route_s3: {
+              for_each: toTerraformReference("local.lambda_s3_buckets_by_key"),
+              bucket: `${toTerraformReference("local.resource_name_prefix")}${toTerraformReference("var.s3_bucket_name_prefix")}${toTerraformReference("each.value.bucket_name")}`,
+            },
+          },
+        }
+      : {}),
     aws_iam_role: {
       route: {
         assume_role_policy: JSON.stringify({
@@ -125,8 +135,15 @@ function toVariableBlock(context: LambdasTerraformContext): Record<string, unkno
     lambda_execution_role_name_prefix: { default: "", type: "string" },
     lambda_function_name_prefix: { default: "", type: "string" },
     lambda_handler: { default: "index.handler", type: "string" },
+    lambda_s3_policy_name_prefix: { default: "", type: "string" },
+    lambda_ssm_parameter_policy_name_prefix: { default: "", type: "string" },
     lambda_sqs_listener_policy_name_prefix: { default: "", type: "string" },
     lambda_sqs_send_policy_name_prefix: { default: "", type: "string" },
+    ...(context.hasRouteS3Access
+      ? {
+          s3_bucket_name_prefix: { default: "", type: "string" },
+        }
+      : {}),
     ...(context.usesManagedSqsQueues
       ? {
           sqs_queue_name_prefix: { default: "", type: "string" },

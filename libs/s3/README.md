@@ -4,7 +4,7 @@ S3 adapters for local and AWS runtimes.
 
 ## Exports
 
-- clients: `createMemoryS3`, `createAwsS3`, `createRuntimeS3`
+- bucket + clients: `createBucket`, `createMemoryS3`, `createAwsS3`, `createRuntimeS3`
 - types for put/get/list/remove/secure-link operations
 
 ## Runtime Selection
@@ -20,31 +20,32 @@ S3 adapters for local and AWS runtimes.
 
 When neither is provided, memory S3 uses a no-op logger.
 
-## Basic Example
+## Bucket-First Example
 
 ```ts
-import { createRuntimeS3 } from "@babbstack/s3";
+import { createBucket } from "@babbstack/s3";
 
-const s3 = createRuntimeS3();
+const uploads = createBucket({
+  name: "uploads",
+});
 
-await s3.put({
+await uploads.put({
   body: "hello",
-  bucketName: "uploads",
   contentType: "text/plain",
   key: "files/hello.txt",
 });
 
-const file = await s3.get({
-  bucketName: "uploads",
+const file = await uploads.get({
   key: "files/hello.txt",
 });
 
-const secureLink = await s3.createSecureLink({
-  bucketName: "uploads",
+const secureLink = await uploads.createSecureLink({
   key: "files/hello.txt",
   operation: "get",
 });
 ```
+
+`createBucket(...)` defaults to `createRuntimeS3()` internally and keeps `runtimeConfig` metadata (`kind: "s3-bucket"`, `bucketName`) for endpoint-context wiring in `@babbstack/http-api-contract`.
 
 ## Build
 

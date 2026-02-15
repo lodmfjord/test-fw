@@ -26,7 +26,7 @@ describe("toRouteSqsSendAccess", () => {
 
     expect(access).toEqual({
       post_events: {
-        actions: ["sqs:SendMessage"],
+        actions: ["sqs:GetQueueUrl", "sqs:SendMessage"],
         queue_key: "events_queue",
         queue_name: "events-queue",
       },

@@ -5,6 +5,7 @@ import type { DynamoDbClient } from "@babbstack/dynamodb";
 import type { Logger } from "@babbstack/logger";
 import type { Schema } from "@babbstack/schema";
 import type { StepFunctionTaskHandler } from "@babbstack/step-functions";
+import type { S3Client } from "@babbstack/s3";
 import type { SqsClient } from "@babbstack/sqs";
 import type {
   EndpointAccess,
@@ -26,6 +27,7 @@ export type EndpointRequest<TParams, TQuery, THeaders, TBody> = {
 export type CreateDevAppOptions = {
   db?: DynamoDbClient;
   logger?: Logger;
+  s3?: S3Client;
   sqs?: SqsClient;
   stepFunctionTaskHandlers?: Record<string, StepFunctionTaskHandler>;
 };

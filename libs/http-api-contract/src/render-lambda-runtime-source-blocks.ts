@@ -2,6 +2,7 @@
  * @fileoverview Implements render lambda runtime source blocks.
  */
 import { toLambdaObservabilitySupportSource } from "./render-lambda-observability-source";
+import { toS3ContextHelperSource } from "./render-lambda-s3-context-helper-source";
 import { toZodValidationSupportSource } from "./render-lambda-zod-validation-source";
 
 const RESPONSE_AND_HANDLER_HELPERS_SOURCE = `
@@ -178,6 +179,9 @@ const renderLambdaRuntimeSourceBlocks = {
   },
   toSqsContextHelperSource(): string {
     return SQS_CONTEXT_HELPER_SOURCE;
+  },
+  toS3ContextHelperSource(): string {
+    return toS3ContextHelperSource();
   },
 };
 

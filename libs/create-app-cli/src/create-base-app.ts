@@ -29,6 +29,9 @@ export async function createBaseApp(appName: string, repoRoot: string): Promise<
         scripts: {
           dev: "bun src/app-bin.ts",
         },
+        dependencies: {
+          "@aws-lambda-powertools/logger": "^2.31.0",
+        },
       },
       null,
       2,

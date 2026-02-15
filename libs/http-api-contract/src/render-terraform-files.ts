@@ -65,7 +65,9 @@ export function renderTerraformFiles(
   }
 
   if (resources.sqs) {
-    files["sqs.tf.json"] = toTerraformJsonString(createSqsTerraformJson(endpoints, sqsListeners));
+    files["sqs.tf.json"] = toTerraformJsonString(
+      createSqsTerraformJson(endpoints, sqsListeners, !resources.lambdas),
+    );
   }
 
   if (resources.stepFunctions) {

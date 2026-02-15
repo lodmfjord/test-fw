@@ -21,12 +21,18 @@ function renderFile(
 ): string {
   const frameworkImportPath = options.frameworkImportPath ?? "@babbstack/http-api-contract";
   const hasContextDatabase = Boolean(endpoint.context?.database);
+  const hasContextS3 = Boolean(endpoint.context?.s3);
   const hasContextSqs = Boolean(endpoint.context?.sqs);
   const runtimeImportLines = [
     'import { Logger as simpleApiPowertoolsLogger } from "@aws-lambda-powertools/logger";',
     hasContextDatabase
       ? 'import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@babbstack/dynamodb";'
       : 'import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from "@babbstack/dynamodb";',
+    ...(hasContextS3
+      ? [
+          'import { createBucket as createSimpleApiCreateBucket, createRuntimeS3 as createSimpleApiRuntimeS3 } from "@babbstack/s3";',
+        ]
+      : []),
     ...(hasContextSqs
       ? ['import { createRuntimeSqs as createSimpleApiRuntimeSqs } from "@babbstack/sqs";']
       : []),
@@ -37,8 +43,14 @@ function renderFile(
   const endpointSqsContextLine = hasContextSqs
     ? `const endpointSqsContext = ${JSON.stringify(endpoint.context?.sqs ?? null)};\n`
     : "";
+  const endpointS3ContextLine = hasContextS3
+    ? `const endpointS3Context = ${JSON.stringify(endpoint.context?.s3 ?? null)};\n`
+    : "";
   const contextDatabaseSupport = hasContextDatabase
     ? renderLambdaRuntimeSourceBlocks.toDatabaseContextHelperSource()
+    : "";
+  const contextS3Support = hasContextS3
+    ? renderLambdaRuntimeSourceBlocks.toS3ContextHelperSource()
     : "";
   const contextSqsSupport = hasContextSqs
     ? renderLambdaRuntimeSourceBlocks.toSqsContextHelperSource()
@@ -47,6 +59,11 @@ function renderFile(
     ? "const endpointDatabase = toDatabaseForContext(db, endpointDatabaseContext);"
     : "";
   const endpointDatabaseValue = hasContextDatabase ? "endpointDatabase" : "undefined";
+  const endpointS3StateLine = hasContextS3 ? "const s3 = createSimpleApiRuntimeS3();" : "";
+  const endpointS3Binding = hasContextS3
+    ? "const endpointS3 = toS3ForContext(s3, endpointS3Context);"
+    : "";
+  const endpointS3Value = hasContextS3 ? "endpointS3" : "undefined";
   const endpointSqsStateLine = hasContextSqs ? "const sqs = createSimpleApiRuntimeSqs();" : "";
   const endpointSqsBinding = hasContextSqs
     ? "const endpointSqs = toSqsForContext(sqs, endpointSqsContext);"
@@ -62,10 +79,12 @@ const db = createSimpleApiRuntimeDynamoDb();
 const simpleApiLogger = new simpleApiPowertoolsLogger({
   serviceName: "simple-api-generated-lambda"
 });
+${endpointS3StateLine}
 ${endpointSqsStateLine}
 const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};
 const endpointSuccessStatusCode = ${JSON.stringify(endpoint.successStatusCode)};
 ${endpointDatabaseContextLine}
+${endpointS3ContextLine}
 ${endpointSqsContextLine}
 
 /** Handles load endpoint. */
@@ -93,6 +112,7 @@ async function loadEndpoint() {
 ${renderLambdaRuntimeSourceBlocks.toResponseAndHandlerHelpersSource()}
 ${renderLambdaRuntimeSourceBlocks.toDbAccessSupportSource()}
 ${contextDatabaseSupport}
+${contextS3Support}
 ${contextSqsSupport}
 ${envBootstrapSource}
 
@@ -108,6 +128,7 @@ export async function handler(event) {
   const headers = event?.headers ?? {};
   const endpointDb = toDbForAccess(db, endpointDbAccess);
   ${endpointDatabaseBinding}
+  ${endpointS3Binding}
   ${endpointSqsBinding}
 
   try {
@@ -122,6 +143,7 @@ export async function handler(event) {
       request: {
         rawEvent: event
       },
+      s3: ${endpointS3Value},
       sqs: ${endpointSqsValue}
     });
     const handlerOutput = toHandlerOutput(output, endpointSuccessStatusCode);

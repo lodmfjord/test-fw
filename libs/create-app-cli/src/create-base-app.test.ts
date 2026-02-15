@@ -22,6 +22,7 @@ describe("createBaseApp", () => {
 
     expect(packageJson).toContain('"name": "demo-app"');
     expect(packageJson).toContain('"dev": "bun src/app-bin.ts"');
+    expect(packageJson).toContain('"@aws-lambda-powertools/logger"');
     expect(readme).toContain("Minimal generated app");
     expect(appBinSource).toContain('console.log("Hello world");');
   });

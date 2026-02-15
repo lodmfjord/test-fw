@@ -54,9 +54,7 @@ export function createApiGatewayTerraformJson(contract: Contract): TerraformJson
         default: {
           api_id: toTerraformReference("aws_apigatewayv2_api.http_api.id"),
           auto_deploy: true,
-          name: toTerraformReference(
-            'var.stage_name == "$default" ? var.stage_name : join("", [local.resource_name_prefix, var.stage_name])',
-          ),
+          name: toTerraformReference("var.stage_name"),
         },
       },
     },
@@ -65,6 +63,16 @@ export function createApiGatewayTerraformJson(contract: Contract): TerraformJson
       stage_name: {
         default: contract.deployContract.apiGateway.stageName,
         type: "string",
+      },
+    },
+    output: {
+      api_gateway_url: {
+        description: "Base API endpoint URL without stage suffix.",
+        value: toTerraformReference("aws_apigatewayv2_api.http_api.api_endpoint"),
+      },
+      api_gateway_url_with_stage: {
+        description: "Invoke URL for the configured API Gateway stage.",
+        value: toTerraformReference("aws_apigatewayv2_stage.default.invoke_url"),
       },
     },
   };

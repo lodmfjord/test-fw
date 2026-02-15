@@ -39,6 +39,11 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
 - Generated Lambda runtime responses always include `x-request-id` (reusing inbound `x-request-id` when provided).
 - Contract builders (`buildContract`, `buildContractFromEndpoints`) support optional `lambdaDefaults` for `memoryMb`, `timeoutSeconds`, `ephemeralStorageMb`, and `reservedConcurrency`; endpoint-level `aws` options override those defaults per route.
 - Generated Terraform lambda resources always default architecture to `arm64` and only set `memory_size`, `timeout`, `ephemeral_storage`, and `reserved_concurrent_executions` when configured; when unset, AWS provider defaults are used.
+- Endpoint resource contexts include scoped runtime bindings for DynamoDB (`context.database`), SQS (`context.sqs`), and S3 buckets (`context.s3` via `createBucket(...)`) with access-aware IAM generation for lambda routes.
+- Lambda Terraform generation now creates managed S3 buckets for `context.s3` usage and injects `SIMPLE_API_S3_BUCKET_NAME_PREFIX` into lambda environments so runtime bucket resolution matches deployed resource names.
+- Lambda Terraform route SQS send permissions include both `sqs:GetQueueUrl` and `sqs:SendMessage`.
+- Lambda Terraform generation now validates secret env markers (`createSecret(...)`) via `data.aws_ssm_parameter` so missing SSM parameters fail at plan/apply time instead of timing out at runtime.
+- Step Functions Terraform generation now grants `lambda:InvokeFunction` for lambda task resources referenced in deployed state machine definitions.
 - `schema.fromZod(...)` is parity-safe for JSON-schema-representable behavior; custom refinements and transform/preprocess pipelines are rejected.
 
 ## Generated Artifacts
@@ -52,6 +57,10 @@ Contract generation writes outputs that external deploy/infra repos can consume:
 - `dist/contracts/env.schema.json`
 - `dist/lambda-js/*.mjs` (lambda runtime entries)
 - optional Terraform artifacts (`dist/*.tf.json`, `dist/lambda-artifacts`, `dist/layer-artifacts`) when enabled by settings
+- generated `api-gateway.tf.json` includes:
+  - `output.api_gateway_url` pointing to `${aws_apigatewayv2_api.http_api.api_endpoint}`
+  - `output.api_gateway_url_with_stage` pointing to `${aws_apigatewayv2_stage.default.invoke_url}`
+  - stage resource naming from `var.stage_name` without resource-name prefixing
 
 ## Toolchain
 
@@ -79,7 +88,7 @@ bun run --cwd apps/test-app dev
 3. Generate contracts and lambda entries:
 
 ```bash
-bun run --cwd apps/test-app generate:contracts
+bun run generate
 ```
 
 This command runs a full library build first (`build:libs`) so generation works from a clean checkout.
@@ -96,6 +105,7 @@ bun run check
 - `bun run dev:client`
 - `bun run dev:all`
 - `bun run build`
+- `bun run generate`
 - `bun run test`
 - `bun run test:watch`
 - `bun run tdd`

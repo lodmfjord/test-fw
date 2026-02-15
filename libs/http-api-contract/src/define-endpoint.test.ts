@@ -3,6 +3,7 @@
  */
 import { describe, expect, it } from "bun:test";
 import { createDynamoDatabase } from "@babbstack/dynamodb";
+import { createBucket } from "@babbstack/s3";
 import { defineEndpoint } from "./define-endpoint";
 import { schema } from "@babbstack/schema";
 
@@ -100,6 +101,48 @@ describe("defineEndpoint", () => {
         keyField: "id",
         kind: "dynamo-database",
         tableName: "users",
+      },
+    });
+  });
+
+  it("stores endpoint context s3 metadata", () => {
+    const uploadsBucket = createBucket({
+      name: "uploads-bucket",
+    });
+    const endpoint = defineEndpoint({
+      method: "GET",
+      path: "/uploads/{key}",
+      context: {
+        s3: {
+          access: ["read"],
+          handler: uploadsBucket,
+        },
+      },
+      handler: async ({ params, s3 }) => {
+        const object = await s3.get({
+          key: params.key,
+        });
+        return {
+          value: {
+            exists: Boolean(object),
+          },
+        };
+      },
+      request: {
+        params: schema.object({
+          key: schema.string(),
+        }),
+      },
+      response: schema.object({
+        exists: schema.boolean(),
+      }),
+    });
+
+    expect(endpoint.context?.s3).toEqual({
+      access: ["read"],
+      runtime: {
+        bucketName: "uploads-bucket",
+        kind: "s3-bucket",
       },
     });
   });

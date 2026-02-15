@@ -1,36 +1,18 @@
 /**
- * @fileoverview Implements smoke test deployed api.
+ * @fileoverview Runs deployed smoke tests against the full test-app endpoint surface.
  */
 import { createLogger, createNoopLogger } from "@babbstack/logger";
 import type { Logger } from "@babbstack/logger";
+import { toSmokeTestDeployedEndpointExpectations } from "./to-smoke-test-deployed-endpoint-expectations";
+import type {
+  DeployedFetch,
+  DeployedSmokeTestOptions,
+  EndpointExpectation,
+  SmokeTestResult,
+} from "./smoke-test-deployed-api-types";
 
-type SmokeTestResult = {
-  failed: number;
-  passed: number;
-  total: number;
-};
-
-type DeployedFetch = (
-  input: string | URL | Request,
-  init?: RequestInit | undefined,
-) => Promise<Response>;
-
-type DeployedSmokeTestOptions = {
-  fetchImpl?: DeployedFetch;
-  logger?: Logger;
-  log?: (message: string) => void;
-};
-
-type EndpointExpectation = {
-  body?: unknown;
-  method: "GET" | "POST";
-  expectedStatusCode: number;
-  name: string;
-  path: string;
-  validate: (payload: unknown) => void;
-};
-
-/** Converts to base url. */ function toBaseUrl(value: string): string {
+/** Converts to base url. */
+function toBaseUrl(value: string): string {
   const source = value.trim();
   if (source.length === 0) {
     throw new Error("Base URL argument is required.");
@@ -39,78 +21,8 @@ type EndpointExpectation = {
   return source.replace(/\/+$/g, "");
 }
 
-/** Runs assert object. */ function assertObject(
-  value: unknown,
-  message: string,
-): Record<string, unknown> {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(message);
-  }
-
-  return value as Record<string, unknown>;
-}
-
-/** Converts to endpoint expectations. */ function toEndpointExpectations(): EndpointExpectation[] {
-  return [
-    {
-      expectedStatusCode: 200,
-      method: "GET",
-      name: "last-update",
-      path: "/last-update",
-      validate(payload) {
-        const parsed = assertObject(payload, "Expected /last-update response object");
-        if (typeof parsed.time !== "string") {
-          throw new Error(`Expected /last-update time string, received ${String(parsed.time)}`);
-        }
-
-        const normalized = new Date(parsed.time).toISOString();
-        if (normalized !== parsed.time) {
-          throw new Error(`Expected /last-update time ISO string, received ${String(parsed.time)}`);
-        }
-      },
-    },
-    {
-      body: {
-        value: "demo",
-      },
-      expectedStatusCode: 200,
-      method: "POST",
-      name: "step-function-demo-success",
-      path: "/step-function-demo",
-      validate(payload) {
-        const parsed = assertObject(payload, "Expected /step-function-demo response object");
-        if (parsed.ok !== true) {
-          throw new Error(`Expected /step-function-demo ok true, received ${String(parsed.ok)}`);
-        }
-
-        if (parsed.source !== "step-function") {
-          throw new Error(
-            `Expected /step-function-demo source step-function, received ${String(parsed.source)}`,
-          );
-        }
-      },
-    },
-    {
-      body: {
-        value: 1,
-      },
-      expectedStatusCode: 400,
-      method: "POST",
-      name: "step-function-demo-invalid-body",
-      path: "/step-function-demo",
-      validate(payload) {
-        const parsed = assertObject(payload, "Expected /step-function-demo 400 response object");
-        if (typeof parsed.error !== "string") {
-          throw new Error(
-            `Expected /step-function-demo 400 error string, received ${String(parsed.error)}`,
-          );
-        }
-      },
-    },
-  ];
-}
-
-/** Runs execute endpoint. */ async function executeEndpoint(
+/** Runs execute endpoint. */
+async function executeEndpoint(
   endpoint: EndpointExpectation,
   baseUrl: string,
   fetchImpl: DeployedFetch,
@@ -134,13 +46,13 @@ type EndpointExpectation = {
     );
   }
 
-  const contentType = response.headers.get("content-type") ?? "";
-  if (contentType.toLowerCase().includes("/json") || contentType.toLowerCase().includes("+json")) {
-    endpoint.validate(await response.json());
+  const contentType = (response.headers.get("content-type") ?? "").toLowerCase();
+  if (contentType.includes("/json") || contentType.includes("+json")) {
+    endpoint.validate(await response.json(), response);
     return;
   }
 
-  endpoint.validate(await response.text());
+  endpoint.validate(await response.text(), response);
 }
 
 /** Converts to logger. */
@@ -179,14 +91,15 @@ function toLogger(options: DeployedSmokeTestOptions | undefined): Logger {
  * @example
  * await runSmokeTestDeployedApi(baseUrl, options)
  * @returns Output value.
- */ export async function runSmokeTestDeployedApi(
+ */
+export async function runSmokeTestDeployedApi(
   baseUrl: string,
   options?: DeployedSmokeTestOptions,
 ): Promise<SmokeTestResult> {
   const normalizedBaseUrl = toBaseUrl(baseUrl);
   const fetchImpl = options?.fetchImpl ?? fetch;
   const logger = toLogger(options);
-  const endpoints = toEndpointExpectations();
+  const endpoints = toSmokeTestDeployedEndpointExpectations();
   let passed = 0;
 
   for (const endpoint of endpoints) {

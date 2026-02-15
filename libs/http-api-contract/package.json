@@ -23,6 +23,7 @@
     "@babbstack/dynamodb": "workspace:*",
     "@babbstack/logger": "workspace:*",
     "@babbstack/schema": "workspace:*",
+    "@babbstack/s3": "workspace:*",
     "@babbstack/sqs": "workspace:*",
     "@babbstack/step-functions": "workspace:*",
     "esbuild": "^0.27.3",

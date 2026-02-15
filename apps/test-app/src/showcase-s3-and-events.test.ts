@@ -45,7 +45,7 @@ describe("test-app showcase s3 and events", () => {
 
   it("runs local s3 demo endpoints for put, get, list, and secure-link", async () => {
     const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
-    const bucketName = "local-demo-bucket";
+    const bucketName = "test-app-s3-demo";
     const key = `demo/${uniqueId}.txt`;
     const content = `local-file-${uniqueId}`;
     const contentType = "text/plain";
@@ -57,7 +57,6 @@ describe("test-app showcase s3 and events", () => {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          bucketName,
           content,
           contentType,
           key,
@@ -73,10 +72,7 @@ describe("test-app showcase s3 and events", () => {
     });
 
     const getResponse = await testAppFetch(
-      new Request(
-        `http://local/s3-demo/files?bucketName=${encodeURIComponent(bucketName)}&key=${encodeURIComponent(key)}`,
-        { method: "GET" },
-      ),
+      new Request(`http://local/s3-demo/files?key=${encodeURIComponent(key)}`, { method: "GET" }),
     );
     expect(getResponse.status).toBe(200);
     expect((await getResponse.json()) as unknown).toEqual({
@@ -88,20 +84,18 @@ describe("test-app showcase s3 and events", () => {
     });
 
     const rawResponse = await testAppFetch(
-      new Request(
-        `http://local/s3-demo/files/raw?bucketName=${encodeURIComponent(bucketName)}&key=${encodeURIComponent(key)}`,
-        { method: "GET" },
-      ),
+      new Request(`http://local/s3-demo/files/raw?key=${encodeURIComponent(key)}`, {
+        method: "GET",
+      }),
     );
     expect(rawResponse.status).toBe(200);
     expect(rawResponse.headers.get("content-type")).toBe(contentType);
     expect(Buffer.from(await rawResponse.arrayBuffer()).toString("utf8")).toBe(content);
 
     const listResponse = await testAppFetch(
-      new Request(
-        `http://local/s3-demo/files/list?bucketName=${encodeURIComponent(bucketName)}&prefix=${encodeURIComponent("demo/")}`,
-        { method: "GET" },
-      ),
+      new Request(`http://local/s3-demo/files/list?prefix=${encodeURIComponent("demo/")}`, {
+        method: "GET",
+      }),
     );
     expect(listResponse.status).toBe(200);
     const listPayload = (await listResponse.json()) as {
@@ -126,10 +120,9 @@ describe("test-app showcase s3 and events", () => {
     expect((listPayload.items?.length ?? 0) >= 1).toBe(true);
 
     const secureLinkResponse = await testAppFetch(
-      new Request(
-        `http://local/s3-demo/secure-link?bucketName=${encodeURIComponent(bucketName)}&key=${encodeURIComponent(key)}&operation=get`,
-        { method: "GET" },
-      ),
+      new Request(`http://local/s3-demo/secure-link?key=${encodeURIComponent(key)}&operation=get`, {
+        method: "GET",
+      }),
     );
     expect(secureLinkResponse.status).toBe(200);
     const secureLinkPayload = (await secureLinkResponse.json()) as { url?: unknown };

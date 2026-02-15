@@ -2,11 +2,14 @@
  * @fileoverview Implements to step function sqs listeners.
  */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
+import { toDeployableStepFunctionDefinitionJson } from "./to-deployable-step-function-definition-json";
+import { toStepFunctionLambdaResourceArns } from "./to-step-function-lambda-resource-arns";
 
 type StepFunctionSqsListenerConfig = {
   batch_size: number;
   definition: string;
   invocation_type: "sync" | "async";
+  lambda_resource_arns: string[];
   pipe_invocation_type: "REQUEST_RESPONSE" | "FIRE_AND_FORGET";
   queue_key: string;
   queue_name: string;
@@ -63,12 +66,14 @@ export function toStepFunctionSqsListeners(
         throw new Error(`Expected step-function listener target for ${listener.listenerId}`);
       }
 
+      const deployableDefinition = toDeployableStepFunctionDefinitionJson(target.definitionJson);
       return [
         listener.listenerId,
         {
           batch_size: listener.aws?.batchSize ?? 10,
-          definition: target.definitionJson,
+          definition: deployableDefinition,
           invocation_type: target.invocationType,
+          lambda_resource_arns: toStepFunctionLambdaResourceArns(deployableDefinition),
           pipe_invocation_type: toPipeInvocationType(target.invocationType),
           queue_key: toQueueKey(listener.queue.runtime.queueName),
           queue_name: listener.queue.runtime.queueName,
