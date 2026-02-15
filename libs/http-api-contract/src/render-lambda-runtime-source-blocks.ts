@@ -1,3 +1,5 @@
+import { toSchemaValidationSupportSource } from "./render-lambda-schema-validation-source";
+
 const RESPONSE_AND_HANDLER_HELPERS_SOURCE = `
 function isBufferValue(payload) {
   return typeof Buffer !== "undefined" && Buffer.isBuffer(payload);
@@ -155,6 +157,9 @@ export const renderLambdaRuntimeSourceBlocks = {
   },
   toResponseAndHandlerHelpersSource(): string {
     return RESPONSE_AND_HANDLER_HELPERS_SOURCE;
+  },
+  toSchemaValidationSupportSource(): string {
+    return toSchemaValidationSupportSource();
   },
   toSqsContextHelperSource(): string {
     return SQS_CONTEXT_HELPER_SOURCE;

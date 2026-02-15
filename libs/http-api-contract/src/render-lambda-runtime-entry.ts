@@ -63,14 +63,35 @@ const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};`
   const contextSqsHelper = hasContextSqs
     ? renderLambdaRuntimeSourceBlocks.toSqsContextHelperSource()
     : "";
+  const requestSchemas = {
+    ...(endpoint.request.body ? { body: endpoint.request.body.jsonSchema } : { body: null }),
+    ...(endpoint.request.headers
+      ? { headers: endpoint.request.headers.jsonSchema }
+      : { headers: null }),
+    ...(endpoint.request.params
+      ? { params: endpoint.request.params.jsonSchema }
+      : { params: null }),
+    ...(endpoint.request.query ? { query: endpoint.request.query.jsonSchema } : { query: null }),
+  };
+  const responseByStatusCodeSchemas = Object.fromEntries(
+    Object.entries(endpoint.responseByStatusCode).map(([statusCode, schema]) => [
+      statusCode,
+      schema.jsonSchema,
+    ]),
+  );
+  const responseSchema = endpoint.response.jsonSchema;
 
   return `${prelude}${runtimeDbState}
 ${runtimeSqsState}
 const endpointSuccessStatusCode = ${JSON.stringify(endpoint.successStatusCode)};
 ${endpointDatabaseContextLine}
 ${endpointSqsContextLine}
+const endpointRequestSchemas = ${JSON.stringify(requestSchemas)};
+const endpointResponseByStatusCodeSchemas = ${JSON.stringify(responseByStatusCodeSchemas)};
+const endpointResponseSchema = ${JSON.stringify(responseSchema)};
 const endpointHandler = (${handlerSource});
 ${renderLambdaRuntimeSourceBlocks.toResponseAndHandlerHelpersSource()}
+${renderLambdaRuntimeSourceBlocks.toSchemaValidationSupportSource()}
 ${dbAccessSupport}
 ${contextDatabaseHelper}
 ${contextSqsHelper}
@@ -86,28 +107,67 @@ export async function handler(event) {
   const params = event?.pathParameters ?? {};
   const query = event?.queryStringParameters ?? {};
   const headers = event?.headers ?? {};
+  let validatedParams = params;
+  let validatedQuery = query;
+  let validatedHeaders = headers;
+  let validatedBody = bodyResult.value;
+
+  try {
+    validatedParams = parseBySchema(endpointRequestSchemas.params, params, "params");
+    validatedQuery = parseBySchema(endpointRequestSchemas.query, query, "query");
+    validatedHeaders = parseBySchema(endpointRequestSchemas.headers, headers, "headers");
+    validatedBody = parseBySchema(endpointRequestSchemas.body, bodyResult.value, "body");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "input validation failed";
+    return toResponse(400, { error: message });
+  }
+
   ${endpointDbLine}
   ${endpointDatabaseBinding}
   ${endpointSqsBinding}
 
+  let output;
   try {
-    const output = await endpointHandler({
-      body: bodyResult.value,
+    output = await endpointHandler({
+      body: validatedBody,
       database: ${endpointDatabaseValue},
       db: endpointDb,
-      headers,
-      params,
-      query,
+      headers: validatedHeaders,
+      params: validatedParams,
+      query: validatedQuery,
       request: {
         rawEvent: event
       },
       sqs: ${endpointSqsValue}
     });
-    const handlerOutput = toHandlerOutput(output, endpointSuccessStatusCode);
-    return toResponse(handlerOutput.statusCode, handlerOutput.value, handlerOutput.contentType, handlerOutput.headers);
   } catch (error) {
     console.error("Handler execution failed for ${endpoint.method} ${endpoint.path}", error);
     return toResponse(500, { error: "Handler execution failed" });
+  }
+
+  try {
+    const handlerOutput = toHandlerOutput(output, endpointSuccessStatusCode);
+    if (isBufferValue(handlerOutput.value)) {
+      return toResponse(
+        handlerOutput.statusCode,
+        handlerOutput.value,
+        handlerOutput.contentType,
+        handlerOutput.headers
+      );
+    }
+
+    const responseSchema =
+      endpointResponseByStatusCodeSchemas[String(handlerOutput.statusCode)] ?? endpointResponseSchema;
+    const validatedOutput = parseBySchema(responseSchema, handlerOutput.value, "response");
+    return toResponse(
+      handlerOutput.statusCode,
+      validatedOutput,
+      handlerOutput.contentType,
+      handlerOutput.headers
+    );
+  } catch (error) {
+    console.error("Output validation failed for ${endpoint.method} ${endpoint.path}", error);
+    return toResponse(500, { error: "Output validation failed" });
   }
 }
 `;

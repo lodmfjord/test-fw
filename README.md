@@ -30,6 +30,8 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
   - all other routes: `200`
 - Additional responses are declared via `responses` on endpoint definitions.
 - OpenAPI generation includes every entry from `responseByStatusCode`, not just `200`. This keeps contract output aligned with runtime behavior for async and multi-response routes.
+- Generated Lambda runtime entries validate request parts (`params`, `query`, `headers`, `body`) against endpoint schemas and return `400` on input validation failures.
+- Generated Lambda runtime entries validate handler output against the response schema selected by status code and return `500` on output validation failures.
 
 ## Generated Artifacts
 
@@ -84,6 +86,7 @@ bun run check
 
 - `bun run dev`
 - `bun run dev:client`
+- `bun run dev:all`
 - `bun run build`
 - `bun run test`
 - `bun run test:watch`

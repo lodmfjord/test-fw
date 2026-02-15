@@ -23,6 +23,8 @@ Declare typed HTTP endpoints once, then reuse that declaration for:
   - `200` otherwise
 - Additional response schemas can be declared via `responses`.
 - OpenAPI generation includes all declared response status codes from `responseByStatusCode`.
+- Generated Lambda runtime entries validate request schemas (`params`, `query`, `headers`, `body`) and return `400` on input validation failures.
+- Generated Lambda runtime entries validate output schema by resolved status code and return `500` on output validation failures.
 
 This means async Step Function routes and multi-response routes keep runtime and contract status codes aligned.
 

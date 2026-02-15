@@ -21,6 +21,7 @@ From repo root:
 
 ```bash
 bun run dev:client
+bun run dev:all
 ```
 
 ## Example Usage
