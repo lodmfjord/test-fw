@@ -1,14 +1,18 @@
-# `@babbstack/dynamodb`
+# @babbstack/dynamodb
 
-DynamoDB adapters for babbstack endpoint runtimes.
+DynamoDB adapters and typed table helpers for babbstack runtimes.
 
-- `createMemoryDynamoDb()`: in-memory fake DB for local development/tests.
-- `createAwsDynamoDb()`: AWS DynamoDB-backed DB (loads AWS SDK dynamically).
-- `createRuntimeDynamoDb()`: selects AWS in Lambda runtime, memory otherwise.
-- `defineDynamoDbTable()`: define table structure and key fields.
-- `createTypedDynamoDb()`: build type-safe table clients (`get`, `insert`, `update`, `remove`).
+## Exports
 
-## Type-safe table example
+- clients: `createMemoryDynamoDb`, `createAwsDynamoDb`, `createRuntimeDynamoDb`
+- table helpers: `defineDynamoDbTable`, `createTypedDynamoDb`
+- access wrappers: `createDynamoDatabase`
+
+## Runtime Selection
+
+`createRuntimeDynamoDb()` selects AWS-backed DynamoDB in Lambda runtime and memory-backed DynamoDB outside Lambda.
+
+## Type-Safe Table Example
 
 ```ts
 import {
@@ -32,8 +36,14 @@ const db = createTypedDynamoDb(createRuntimeDynamoDb(), {
   users: usersTable,
 });
 
-const user = await db.users.get({ id: "user-1" });
 await db.users.insert({ id: "user-1", name: "sam", role: "user" });
+const user = await db.users.get({ id: "user-1" });
 await db.users.update({ id: "user-1" }, { name: "max" });
 await db.users.remove({ id: "user-1" });
+```
+
+## Build
+
+```bash
+bun run --cwd libs/dynamodb build
 ```

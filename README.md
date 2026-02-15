@@ -1,60 +1,76 @@
 # babbstack
 
-Monorepo for a reusable API framework library.  
-The goal is to define typed HTTP endpoints once and generate deployable contract artifacts for API Gateway HTTP API v2 with one route per Lambda.
+Monorepo for a reusable API framework library. The framework defines typed endpoints once and reuses that source for local dev runtime, Lambda runtime entries, and deploy contracts.
 
-## What This Repository Contains
+## Repository Layout
 
-- `apps/`: runnable apps that consume the framework (currently `apps/test-app`)
-- `libs/`: shared framework libraries
-- `tools/`: internal repository tooling (for example, constraint checks)
-- `docs/`: planning and design notes
+- `apps/`: runnable consumers of the framework.
+- `libs/`: shared framework libraries.
+- `tools/`: repository tooling and checks.
+- `docs/`: design and planning notes.
 
-## Current Packages
+## Packages
 
-- `@babbstack/http-api-contract` (`libs/http-api-contract`)
-  - Defines endpoint APIs (`defineGet`, `definePost`, `definePatch`, etc.)
-  - Builds deploy contracts from endpoint declarations
-  - Runs endpoints in one Bun dev app (`createDevApp`)
-  - Generates one Lambda JS entry file per route (`writeLambdaJsFiles`)
-- `@babbstack/dynamodb` (`libs/dynamodb`)
-  - Runtime DB adapters (in-memory and AWS-backed)
-  - Typed table helpers and runtime-aware DB client selection
-- `@babbstack/sqs` (`libs/sqs`)
-  - Runtime SQS adapters (in-memory and AWS-backed)
-  - Typed queue helpers and listener registration/runtime metadata
-- `@babbstack/schema` (`libs/schema`)
-  - Schema builder + JSON Schema output + runtime parsing wrappers
-- `@babbstack/test-app` (`apps/test-app`)
-  - Showcase consumer app for local development and artifact generation
+- `@babbstack/http-api-contract` (`libs/http-api-contract`): endpoint definitions, dev server runtime, contract generation, lambda entry generation.
+- `@babbstack/schema` (`libs/schema`): typed schema wrappers used by endpoint request/response contracts.
+- `@babbstack/step-functions` (`libs/step-functions`): Step Functions definition and local execution helpers.
+- `@babbstack/sqs` (`libs/sqs`): runtime SQS adapters, queue definitions, listener registration.
+- `@babbstack/dynamodb` (`libs/dynamodb`): runtime DynamoDB adapters and typed table helpers.
+- `@babbstack/s3` (`libs/s3`): runtime S3 adapters for local and AWS execution.
+- `@babbstack/test-app` (`apps/test-app`): showcase app that exercises the framework end to end.
+
+## Response Status-Code Model
+
+- Every endpoint has a `successStatusCode` (must be `200..299`).
+- Defaults:
+  - `OPTIONS`: `204`
+  - async Step Function endpoints: `202`
+  - all other routes: `200`
+- Additional responses are declared via `responses` on endpoint definitions.
+- OpenAPI generation includes every entry from `responseByStatusCode`, not just `200`. This keeps contract output aligned with runtime behavior for async and multi-response routes.
 
 ## Generated Artifacts
 
-Contract generation writes JSON outputs intended for external deploy/infra repos:
+Contract generation writes outputs that external deploy/infra repos can consume:
 
-- `openapi.json`
-- `routes.manifest.json`
-- `lambdas.manifest.json`
-- `deploy.contract.json`
-- `env.schema.json`
+- `dist/contracts/openapi.json`
+- `dist/contracts/routes.manifest.json`
+- `dist/contracts/lambdas.manifest.json`
+- `dist/contracts/deploy.contract.json`
+- `dist/contracts/env.schema.json`
+- `dist/lambda-js/*.mjs` (lambda runtime entries)
+- optional Terraform artifacts (`dist/*.tf.json`, `dist/lambda-artifacts`, `dist/layer-artifacts`) when enabled by settings
 
-The showcase app also generates lambda runtime entries:
+## Development
 
-- `dist/lambda-js/*.mjs` (one file per route)
+1. Install dependencies:
 
-## Development Workflow
+```bash
+bun install
+```
 
-1. Define endpoints (example: `apps/test-app/src/endpoints.ts`).
-2. Run the dev app locally:
-   - `bun run --cwd apps/test-app dev`
-3. Generate contract + lambda outputs:
-   - `bun run --cwd apps/test-app generate:contracts`
-4. Validate repository quality gates:
-   - `bun run check`
+2. Run the showcase app locally:
 
-## Root Commands
+```bash
+bun run --cwd apps/test-app dev
+```
 
-- `bun install`
+3. Generate contracts and lambda entries:
+
+```bash
+bun run --cwd apps/test-app generate:contracts
+```
+
+4. Run full quality gate:
+
+```bash
+bun run check
+```
+
+## Root Scripts
+
+- `bun run dev`
+- `bun run build`
 - `bun run test`
 - `bun run test:watch`
 - `bun run tdd`
@@ -67,11 +83,17 @@ The showcase app also generates lambda runtime entries:
 - `bun run check:constraints`
 - `bun run check`
 
-## Repository Constraints
+## Constraints
 
-- Strict TDD: write a failing test first, implement minimal change, then refactor.
-- Every source file may export at most one function.
-- Every source file must be 300 lines or fewer.
-- File names use kebab-case.
+- Strict TDD: test first, minimal implementation, then refactor.
+- File names must use kebab-case.
+- Each source file may export at most one function.
+- Each source file must be 300 lines or fewer.
+- `bun run check:constraints` enforces constraints for `apps/`, `libs/`, and `tools/`.
 
-`bun run check:constraints` enforces constraints for `apps/`, `libs/`, and `tools/` source files (`.ts`, `.tsx`, `.js`, `.jsx`).
+## Documentation Rule
+
+Documentation is part of the code contract. Any behavior, API, command, or generated-output change must update:
+
+- the root README, and
+- the affected app/library README.

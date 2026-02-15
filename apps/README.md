@@ -1,21 +1,30 @@
-# Apps
+# apps
 
-Place runnable applications in this folder.
+Runnable applications live in this folder.
 
-## Naming
+## Purpose
+
+Apps are consumers/showcases of the framework in `libs/`. They should demonstrate integration behavior, not introduce framework-breaking conventions.
+
+## Structure
 
 - `apps/<app-name>/`
-
-## Minimum app files when you start one later
-
-- `package.json`
-- `tsconfig.json`
-- `src/`
-- `src/index.ts`
-- `src/index.test.ts`
+- Typical contents:
+  - `package.json`
+  - `tsconfig.json`
+  - `README.md`
+  - `src/`
 
 ## Guardrails
 
-- At most one exported function per file.
-- At most 300 lines per file.
-- Tests are required before implementation changes.
+- Follow strict TDD (`bun run tdd`).
+- File names must be kebab-case.
+- At most one exported function per source file.
+- At most 300 lines per source file.
+
+## Documentation
+
+When an app changes behavior, commands, generated outputs, or runtime assumptions, update:
+
+- root `README.md`
+- that app's `README.md`

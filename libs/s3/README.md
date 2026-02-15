@@ -1,12 +1,17 @@
-# `@babbstack/s3`
+# @babbstack/s3
 
-S3 adapters for babbstack runtimes.
+S3 adapters for local and AWS runtimes.
 
-- `createMemoryS3()`: local adapter backed by a tmp directory (logs local folder path).
-- `createAwsS3()`: AWS S3-backed adapter.
-- `createRuntimeS3()`: selects AWS in Lambda runtime, local tmp-backed adapter otherwise.
+## Exports
 
-## Basic example
+- clients: `createMemoryS3`, `createAwsS3`, `createRuntimeS3`
+- types for put/get/list/remove/secure-link operations
+
+## Runtime Selection
+
+`createRuntimeS3()` selects AWS S3 in Lambda runtime and a local memory/tmp-backed adapter outside Lambda.
+
+## Basic Example
 
 ```ts
 import { createRuntimeS3 } from "@babbstack/s3";
@@ -30,4 +35,10 @@ const secureLink = await s3.createSecureLink({
   key: "files/hello.txt",
   operation: "get",
 });
+```
+
+## Build
+
+```bash
+bun run --cwd libs/s3 build
 ```

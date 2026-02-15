@@ -43,3 +43,10 @@
 - Run `bun run check`.
 - Do not hand off changes with failing tests or failing constraints.
 - Ensure formatting, linting, and typecheck pass via the `check` script.
+
+## Documentation Maintenance
+
+- Always update documentation in the same change as code behavior changes.
+- Always update the root README (`/Users/lommi/Projects/simple-api/README.md`) when repository-wide behavior, workflows, scripts, or generated outputs change.
+- Always update the relevant app/package README (for example `apps/<name>/README.md`, `libs/<name>/README.md`) when that app/package API, runtime behavior, or commands change.
+- New apps and libraries must include a README at creation time.

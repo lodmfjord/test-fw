@@ -1,43 +1,43 @@
 # @babbstack/test-app
 
-Simple showcase app that defines schema-first endpoints with `@babbstack/http-api-contract`.
+Showcase app for `@babbstack/http-api-contract`. It demonstrates endpoint definition, local execution, contract generation, S3/SQS integrations, and Step Function targets.
 
-The same endpoint declarations are used for:
-- one Bun app in dev (`bun serve` via `createDevApp`)
-- many Lambda entries in prod (generated manifests/contracts)
+## What It Demonstrates
 
-Endpoints are defined in `/Users/lommi/Projects/simple-api/apps/test-app/src/endpoints.ts`.
-The endpoint entrypoint exports `endpoints` (arrays and nested arrays are supported).
-Step Function demos are defined in `/Users/lommi/Projects/simple-api/apps/test-app/src/step-function-demo.ts`:
-- `POST /step-function-demo` (endpoint target is Step Functions)
-- `POST /step-function-random-branch` (Task + Choice flow with random 1-100 branch)
-- `POST /step-function-events` (sends to an SQS queue whose listener target is Step Functions)
+- Lambda-style endpoints and generated Lambda runtime entries.
+- Step Function-backed endpoints (including async invocation behavior).
+- SQS queue/listener wiring.
+- S3 runtime adapter usage.
+- Env + secret definitions included in contract output.
+- Deployed smoke checks for status-code and response-shape drift.
+
+Endpoints are defined in `apps/test-app/src/endpoints.ts` and Step Function demos in `apps/test-app/src/step-function-demo.ts`.
 
 ## Commands
 
-- `bun test apps/test-app/src/showcase.test.ts`
-- `bun run --cwd apps/test-app dev`
-- `bun run --cwd apps/test-app generate:contracts`
+```bash
+bun run --cwd apps/test-app dev
+bun run --cwd apps/test-app generate:contracts
+bun run --cwd apps/test-app smoke:deployed <base-url>
+bun test apps/test-app/src/showcase.test.ts
+```
+
+`smoke:deployed` executes `apps/test-app/src/smoke-test-deployed-api.ts` and currently verifies:
+
+- `GET /last-update` returns expected payload and status.
+- `POST /step-function-demo` success response behavior.
+- `POST /step-function-demo` validation failure response behavior.
+- expected status codes per case (including multi-response expectations).
+
+## Generated Outputs
 
 `generate:contracts` writes:
-- `dist/contracts/*.json`
-- `dist/lambda-js/*.mjs`
-- `dist/*.tf.json` (when enabled in settings; always split by concern)
-- `dist/lambda-artifacts/*.zip` and `dist/lambda-artifacts/source-code-hashes.json`
-- `dist/layer-artifacts/*.zip` and `dist/layer-artifacts/source-code-hashes.json` (when layers are used)
 
-Usage notes:
-- `dist/contracts/*.json` is contract output for external consumers (OpenAPI/manifests).
-- Terraform deploys use `dist/*.tf.json` plus `dist/lambda-artifacts` and `dist/layer-artifacts`.
-- Generated Lambda and Layer resources use `source_code_hash` from the `source-code-hashes.json` files so unchanged source does not trigger unnecessary redeploys.
+- `apps/test-app/dist/contracts/*.json`
+- `apps/test-app/dist/lambda-js/*.mjs`
+- optional Terraform outputs when enabled by settings:
+  - `apps/test-app/dist/*.tf.json`
+  - `apps/test-app/dist/lambda-artifacts/*.zip`
+  - `apps/test-app/dist/layer-artifacts/*.zip`
 
 Generation settings live in `apps/test-app/babb.settings.json`.
-Terraform settings support:
-- top-level `appName` (optional; defaults to contract api name)
-- top-level `prefix` (optional name prefix segment)
-- `terraform.region` (for example `eu-west-1`)
-- workspace-based environments via `terraform.workspace` in generated names
-- auto-generated Terraform S3 backend state config (or disable backend with `terraform.state.enabled: false`)
-- optional `terraform.state` override (`bucket`, `keyPrefix`, optional `lockTableName`)
-- lambda layers are auto-generated only for routes that import `externalModules`; identical package sets reuse one layer zip in `dist/layer-artifacts/*.zip`
-- each `externalModules` package must be installed in this app (`apps/test-app/package.json`) so generated layer zips use your pinned versions
