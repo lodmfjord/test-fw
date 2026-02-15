@@ -15,6 +15,10 @@ function toResourceBlock(
   routeConfig: Record<string, unknown>,
   sqsListenerConfig: Record<string, unknown>,
 ): Record<string, unknown> {
+  const sqsEventSourceArnExpression = context.usesManagedSqsQueues
+    ? "aws_sqs_queue.queue[each.value.queue_key].arn"
+    : `"arn:aws:sqs:\${var.aws_region}:\${data.aws_caller_identity.current.account_id}:\${each.value.queue_name}"`;
+
   return {
     aws_iam_role: {
       route: {
@@ -88,11 +92,7 @@ function toResourceBlock(
           aws_lambda_event_source_mapping: {
             sqs_listener: {
               batch_size: toTerraformReference("each.value.batch_size"),
-              event_source_arn: toTerraformReference(
-                context.usesManagedSqsQueues
-                  ? "aws_sqs_queue.queue[each.value.queue_key].arn"
-                  : `"arn:aws:sqs:\${var.aws_region}:\${data.aws_caller_identity.current.account_id}:\${each.value.queue_name}"`,
-              ),
+              event_source_arn: toTerraformReference(sqsEventSourceArnExpression),
               for_each: toTerraformReference("local.sqs_listeners_by_id"),
               function_name: toTerraformReference("aws_lambda_function.sqs_listener[each.key].arn"),
             },

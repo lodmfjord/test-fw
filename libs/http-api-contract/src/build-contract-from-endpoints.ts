@@ -133,14 +133,11 @@ function withOptionsOperations(
   for (const path of allPaths) {
     const contractPathItem = contractOpenApi.paths[path] ?? {};
     const schemaPathItem = openApiWithSchemas.paths[path] ?? {};
+    const optionsFromContract = schemaPathItem.options ? undefined : contractPathItem.options;
 
     paths[path] = {
       ...schemaPathItem,
-      ...(schemaPathItem.options
-        ? {}
-        : contractPathItem.options
-          ? { options: contractPathItem.options }
-          : {}),
+      ...(optionsFromContract ? { options: optionsFromContract } : {}),
     };
   }
 

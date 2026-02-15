@@ -48,11 +48,14 @@ export function toLambdaRuntimeSourceContext(
   const usesHandlerSqsContext = /\bsqs\b/.test(handlerSource);
   const hasContextSqs = Boolean(endpoint.context?.sqs);
   const hasRuntimeSqs = hasContextSqs || usesHandlerSqsContext;
-  const runtimeDbImport = hasRuntimeDb
-    ? hasContextDatabase
-      ? `import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from ${JSON.stringify(runtimeDbImportSpecifier)};`
-      : `import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from ${JSON.stringify(runtimeDbImportSpecifier)};`
-    : "";
+  let runtimeDbImport = "";
+  if (hasRuntimeDb) {
+    if (hasContextDatabase) {
+      runtimeDbImport = `import { createDynamoDatabase as createSimpleApiCreateDynamoDatabase, createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from ${JSON.stringify(runtimeDbImportSpecifier)};`;
+    } else {
+      runtimeDbImport = `import { createRuntimeDynamoDb as createSimpleApiRuntimeDynamoDb } from ${JSON.stringify(runtimeDbImportSpecifier)};`;
+    }
+  }
   const runtimeSqsImport = hasRuntimeSqs
     ? `import { createRuntimeSqs as createSimpleApiRuntimeSqs } from ${JSON.stringify(runtimeSqsImportSpecifier)};`
     : "";

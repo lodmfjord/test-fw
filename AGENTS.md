@@ -35,6 +35,7 @@
 
 - Every source file may export at most one function.
 - Every source file must be at most 300 lines.
+- Nested ternary operations are not allowed.
 - Constraints are enforced by `bun run check:constraints`.
 - Full validation command: `bun run check` (tests + constraints).
 

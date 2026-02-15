@@ -120,4 +120,25 @@ export function run(input: string) {
       errors.includes('missing-example.ts: exported function "run" JSDoc must include @example.'),
     ).toBe(true);
   });
+
+  it("reports nested ternary operations", () => {
+    const source = `
+/**
+ * @fileoverview File.
+ */
+/**
+ * Handles nested.
+ * @param input - Input value.
+ * @example
+ * nested(input)
+ */
+export function nested(input: number) {
+  return input > 0 ? (input > 1 ? "big" : "small") : "none";
+}
+`;
+    const errors = validateFileConstraints("nested-ternary.ts", source);
+    expect(errors.includes("nested-ternary.ts: nested ternary operations are not allowed.")).toBe(
+      true,
+    );
+  });
 });

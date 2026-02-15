@@ -20,7 +20,12 @@ function toUnsupportedZodConstruct(zodSchema: ZodType<unknown>): string | undefi
     }
     visited.add(next);
 
-    const definition = isRecord(next._def) ? next._def : isRecord(next.def) ? next.def : undefined;
+    let definition: Record<string, unknown> | undefined;
+    if (isRecord(next._def)) {
+      definition = next._def;
+    } else if (isRecord(next.def)) {
+      definition = next.def;
+    }
     if (!definition) {
       for (const value of Object.values(next)) {
         if (Array.isArray(value)) {

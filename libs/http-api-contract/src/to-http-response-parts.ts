@@ -31,13 +31,17 @@ export function toHttpResponseParts(payload: unknown, contentType?: string): Htt
   }
 
   const normalized = resolvedContentType.toLowerCase();
+  let responseBody: string;
+  if (normalized.includes("/json") || normalized.includes("+json")) {
+    responseBody = JSON.stringify(payload);
+  } else if (typeof payload === "string") {
+    responseBody = payload;
+  } else {
+    responseBody = JSON.stringify(payload);
+  }
+
   return {
-    body:
-      normalized.includes("/json") || normalized.includes("+json")
-        ? JSON.stringify(payload)
-        : typeof payload === "string"
-          ? payload
-          : JSON.stringify(payload),
+    body: responseBody,
     contentType: resolvedContentType,
   };
 }
