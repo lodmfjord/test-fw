@@ -27,6 +27,10 @@ function appendEndpoint(
     Number.isInteger(candidate.successStatusCode) &&
     (candidate.successStatusCode as number) >= 200 &&
     (candidate.successStatusCode as number) <= 299;
+  const hasValidResponseByStatusCode =
+    candidate.responseByStatusCode &&
+    typeof candidate.responseByStatusCode === "object" &&
+    !Array.isArray(candidate.responseByStatusCode);
   if (
     typeof candidate.routeId !== "string" ||
     typeof candidate.method !== "string" ||
@@ -34,7 +38,8 @@ function appendEndpoint(
     !hasValidHandler ||
     !candidate.request ||
     !candidate.response ||
-    !hasValidSuccessStatusCode
+    !hasValidSuccessStatusCode ||
+    !hasValidResponseByStatusCode
   ) {
     throw new Error(`Invalid endpoint found in export "${exportName}"`);
   }

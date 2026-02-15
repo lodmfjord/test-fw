@@ -148,6 +148,24 @@ describe("buildContractFromEndpoints", () => {
     expect(optionRoutes).toHaveLength(1);
   });
 
+  it("uses 204 response status for explicit OPTIONS endpoints in OpenAPI", () => {
+    const contract = buildContractFromEndpoints({
+      apiName: "users-api",
+      version: "1.0.0",
+      endpoints: [
+        defineOptions({
+          path: "/users",
+          handler: () => ({ value: {} }),
+          response: schema.object({}),
+        }),
+      ],
+    });
+
+    const operation = contract.openapi.paths["/users"]?.options;
+    expect(operation?.responses["204"]?.content?.["application/json"]?.schema.type).toBe("object");
+    expect(operation?.responses["200"]).toBeUndefined();
+  });
+
   it("uses 202 for async step-function endpoint responses in OpenAPI", () => {
     const contract = buildContractFromEndpoints({
       apiName: "users-api",
@@ -199,5 +217,38 @@ describe("buildContractFromEndpoints", () => {
     const operation = contract.openapi.paths["/users"]?.post;
     expect(operation?.responses["201"]?.content?.["application/json"]?.schema.type).toBe("object");
     expect(operation?.responses["200"]).toBeUndefined();
+  });
+
+  it("includes additional response schemas in OpenAPI", () => {
+    const contract = buildContractFromEndpoints({
+      apiName: "users-api",
+      version: "1.0.0",
+      endpoints: [
+        definePost({
+          path: "/users/{id}",
+          handler: ({ params }) => ({
+            statusCode: 404,
+            value: { error: `User ${params.id} not found` },
+          }),
+          request: {
+            params: schema.object({
+              id: schema.string(),
+            }),
+          },
+          response: schema.object({
+            id: schema.string(),
+          }),
+          responses: {
+            404: schema.object({
+              error: schema.string(),
+            }),
+          },
+        }),
+      ],
+    });
+
+    const operation = contract.openapi.paths["/users/{id}"]?.post;
+    expect(operation?.responses["200"]?.content?.["application/json"]?.schema.type).toBe("object");
+    expect(operation?.responses["404"]?.content?.["application/json"]?.schema.type).toBe("object");
   });
 });

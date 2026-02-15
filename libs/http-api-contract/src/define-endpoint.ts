@@ -1,6 +1,7 @@
 import { defineRoute } from "./define-route";
 import type { EndpointRuntimeContext } from "./endpoint-context-types";
 import { registerDefinedEndpoint } from "./register-defined-endpoint";
+import type { Schema } from "@babbstack/schema";
 import type {
   EndpointContextInput,
   EndpointDbAccess,
@@ -20,7 +21,11 @@ function toHandlerId(routeId: string, providedHandlerId: string | undefined): st
   return normalized;
 }
 
-function toDefaultSuccessStatusCode(execution: RouteExecution): number {
+function toDefaultSuccessStatusCode(method: string, execution: RouteExecution): number {
+  if (method === "OPTIONS") {
+    return 204;
+  }
+
   if (execution.kind === "step-function" && execution.invocationType === "async") {
     return 202;
   }
@@ -28,13 +33,45 @@ function toDefaultSuccessStatusCode(execution: RouteExecution): number {
   return 200;
 }
 
-function toSuccessStatusCode(value: number | undefined, execution: RouteExecution): number {
-  const resolved = value ?? toDefaultSuccessStatusCode(execution);
+function toSuccessStatusCode(
+  value: number | undefined,
+  method: string,
+  execution: RouteExecution,
+): number {
+  const resolved = value ?? toDefaultSuccessStatusCode(method, execution);
   if (!Number.isInteger(resolved) || resolved < 200 || resolved > 299) {
     throw new Error("successStatusCode must be an integer between 200 and 299");
   }
 
   return resolved;
+}
+
+function toResponseByStatusCode(
+  successStatusCode: number,
+  successResponse: Schema<unknown>,
+  responses: Record<number, Schema<unknown>> | undefined,
+): Record<string, Schema<unknown>> {
+  const responseByStatusCode: Record<string, Schema<unknown>> = {
+    [String(successStatusCode)]: successResponse,
+  };
+  if (!responses) {
+    return responseByStatusCode;
+  }
+
+  for (const [statusCodeText, schema] of Object.entries(responses)) {
+    const statusCode = Number(statusCodeText);
+    if (!Number.isInteger(statusCode) || statusCode < 100 || statusCode > 599) {
+      throw new Error("responses status code must be an integer between 100 and 599");
+    }
+
+    if (statusCode === successStatusCode) {
+      throw new Error(`responses must not redefine successStatusCode ${successStatusCode}`);
+    }
+
+    responseByStatusCode[String(statusCode)] = schema;
+  }
+
+  return responseByStatusCode;
 }
 
 export function defineEndpoint<
@@ -124,6 +161,16 @@ export function defineEndpoint<
   }
 
   const handlerId = toHandlerId(baseRoute.routeId, input.handlerId);
+  const successStatusCode = toSuccessStatusCode(
+    input.successStatusCode,
+    baseRoute.method,
+    baseRoute.execution,
+  );
+  const responseByStatusCode = toResponseByStatusCode(
+    successStatusCode,
+    input.response as Schema<unknown>,
+    input.responses,
+  );
 
   const endpoint: EndpointDefinition<
     TParams,
@@ -152,8 +199,9 @@ export function defineEndpoint<
       ...(input.request?.params ? { params: input.request.params } : {}),
       ...(input.request?.query ? { query: input.request.query } : {}),
     },
+    responseByStatusCode,
     response: input.response,
-    successStatusCode: toSuccessStatusCode(input.successStatusCode, baseRoute.execution),
+    successStatusCode,
     routeId: baseRoute.routeId,
     ...(baseRoute.summary ? { summary: baseRoute.summary } : {}),
     tags: baseRoute.tags,

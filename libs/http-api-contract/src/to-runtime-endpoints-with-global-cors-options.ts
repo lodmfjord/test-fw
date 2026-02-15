@@ -80,6 +80,9 @@ export function toRuntimeEndpointsWithGlobalCorsOptions(
       operationId: route.operationId,
       path: route.path,
       request: {},
+      responseByStatusCode: {
+        "204": schema.object({}),
+      },
       response: schema.object({}),
       successStatusCode: 204,
       routeId: route.routeId,

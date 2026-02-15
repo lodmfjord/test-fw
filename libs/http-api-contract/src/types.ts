@@ -77,12 +77,11 @@ export type EndpointHandler<
     context: EndpointContext<TParams, TQuery, THeaders, TBody, TDbAccess, TContextInput>,
   ): Promise<EndpointHandlerOutput<TResponse>> | EndpointHandlerOutput<TResponse>;
 }["bivarianceHack"];
-
-export type EndpointHandlerOutput<TResponse> = {
+export type EndpointHandlerOutput<_TResponse> = {
   contentType?: string;
   headers?: Record<string, string>;
   statusCode?: number;
-  value: TResponse | Buffer;
+  value: unknown | Buffer;
 };
 
 export type EndpointInput<
@@ -108,6 +107,7 @@ export type EndpointInput<
   path: string;
   request?: EndpointRequest<TParams, TQuery, THeaders, TBody>;
   response: Schema<TResponse>;
+  responses?: Record<number, Schema<unknown>>;
   successStatusCode?: number;
   summary?: string;
   tags?: string[];
@@ -117,6 +117,7 @@ export type EndpointMetadata = Omit<RouteDefinition, "handler"> & {
   access?: EndpointAccess<EndpointDbAccess>;
   context?: EndpointRuntimeContext;
   handlerId: string;
+  responseByStatusCode: Record<string, Schema<unknown>>;
   successStatusCode: number;
 };
 

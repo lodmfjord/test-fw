@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
-import { collectTargetFiles } from "./constraints/collectTargetFiles";
-import { validateFileConstraints } from "./constraints/validateFileConstraints";
+import { collectTargetFiles } from "./constraints/collect-target-files";
+import { validateFileConstraints } from "./constraints/validate-file-constraints";
 
 const TARGET_DIRECTORIES = ["apps", "libs", "tools"];
 

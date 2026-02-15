@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { countExportedFunctions } from "./countExportedFunctions";
+import { countExportedFunctions } from "./count-exported-functions";
 
 describe("countExportedFunctions", () => {
   it("counts exported function declarations", () => {

@@ -173,4 +173,31 @@ describe("defineEndpoint", () => {
       }),
     ).toThrow("successStatusCode must be an integer between 200 and 299");
   });
+
+  it("stores additional response schemas by status code", () => {
+    const endpoint = defineEndpoint({
+      method: "GET",
+      path: "/users/{id}",
+      handler: ({ params }) => ({
+        statusCode: 404,
+        value: { error: `User ${params.id} not found` },
+      }),
+      request: {
+        params: schema.object({
+          id: schema.string(),
+        }),
+      },
+      response: schema.object({
+        id: schema.string(),
+      }),
+      responses: {
+        404: schema.object({
+          error: schema.string(),
+        }),
+      },
+    });
+
+    expect(endpoint.responseByStatusCode["200"]?.jsonSchema.type).toBe("object");
+    expect(endpoint.responseByStatusCode["404"]?.jsonSchema.type).toBe("object");
+  });
 });

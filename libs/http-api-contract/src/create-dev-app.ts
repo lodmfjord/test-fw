@@ -276,7 +276,9 @@ export function createDevApp(
         );
       }
 
-      const validatedOutput = endpoint.response.parse(handlerOutput.value, "response");
+      const responseSchema =
+        endpoint.responseByStatusCode[String(handlerOutput.statusCode)] ?? endpoint.response;
+      const validatedOutput = responseSchema.parse(handlerOutput.value, "response");
       return toResponse(
         handlerOutput.statusCode ?? 200,
         validatedOutput,

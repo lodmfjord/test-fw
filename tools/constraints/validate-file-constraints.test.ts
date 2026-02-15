@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { validateFileConstraints } from "./validateFileConstraints";
+import { validateFileConstraints } from "./validate-file-constraints";
 
 function makeLineBlock(lineCount: number): string {
   return Array.from({ length: lineCount }, (_, index) => `const line${index} = ${index};`).join(
@@ -34,5 +34,17 @@ describe("validateFileConstraints", () => {
     const errors = validateFileConstraints("too-many-lines.ts", source);
     expect(errors.length).toBe(1);
     expect(errors[0]?.includes("301 lines")).toBe(true);
+  });
+
+  it("accepts dotted kebab-case names", () => {
+    const source = "const value = 1;";
+    expect(validateFileConstraints("my-feature.test.ts", source)).toEqual([]);
+  });
+
+  it("rejects camelCase file names", () => {
+    const source = "const value = 1;";
+    const errors = validateFileConstraints("myFeature.ts", source);
+    expect(errors.length).toBe(1);
+    expect(errors[0]).toBe("myFeature.ts: file name must be kebab-case.");
   });
 });

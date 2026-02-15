@@ -35,6 +35,29 @@ function toParameters(
   }));
 }
 
+function toOpenApiResponses(
+  responseByStatusCode: Record<string, Schema<unknown>>,
+): OpenApiOperation["responses"] {
+  const sortedEntries = Object.entries(responseByStatusCode).sort(
+    ([left], [right]) => Number(left) - Number(right),
+  );
+
+  return Object.fromEntries(
+    sortedEntries.map(([statusCode, schema]) => [
+      statusCode,
+      {
+        content: {
+          "application/json": {
+            schema: schema.jsonSchema,
+          },
+        },
+        description:
+          Number(statusCode) >= 200 && Number(statusCode) <= 299 ? "Success" : "Response",
+      },
+    ]),
+  );
+}
+
 function toOpenApiDocument(input: BuildContractFromEndpointsInput): OpenApiDocument {
   const paths: Record<string, OpenApiPathItem> = {};
 
@@ -69,16 +92,7 @@ function toOpenApiDocument(input: BuildContractFromEndpointsInput): OpenApiDocum
             },
           }
         : {}),
-      responses: {
-        [String(endpoint.successStatusCode)]: {
-          content: {
-            "application/json": {
-              schema: endpoint.response.jsonSchema,
-            },
-          },
-          description: "Success",
-        },
-      },
+      responses: toOpenApiResponses(endpoint.responseByStatusCode),
       ...(endpoint.summary ? { summary: endpoint.summary } : {}),
       ...(endpoint.tags.length > 0 ? { tags: endpoint.tags } : {}),
     };

@@ -15,7 +15,9 @@ type DeployedSmokeTestOptions = {
 };
 
 type EndpointExpectation = {
-  method: "GET";
+  body?: unknown;
+  method: "GET" | "POST";
+  expectedStatusCode: number;
   name: string;
   path: string;
   validate: (payload: unknown) => void;
@@ -41,6 +43,7 @@ function assertObject(value: unknown, message: string): Record<string, unknown> 
 function toEndpointExpectations(): EndpointExpectation[] {
   return [
     {
+      expectedStatusCode: 200,
       method: "GET",
       name: "last-update",
       path: "/last-update",
@@ -56,6 +59,44 @@ function toEndpointExpectations(): EndpointExpectation[] {
         }
       },
     },
+    {
+      body: {
+        value: "demo",
+      },
+      expectedStatusCode: 200,
+      method: "POST",
+      name: "step-function-demo-success",
+      path: "/step-function-demo",
+      validate(payload) {
+        const parsed = assertObject(payload, "Expected /step-function-demo response object");
+        if (parsed.ok !== true) {
+          throw new Error(`Expected /step-function-demo ok true, received ${String(parsed.ok)}`);
+        }
+
+        if (parsed.source !== "step-function") {
+          throw new Error(
+            `Expected /step-function-demo source step-function, received ${String(parsed.source)}`,
+          );
+        }
+      },
+    },
+    {
+      body: {
+        value: 1,
+      },
+      expectedStatusCode: 400,
+      method: "POST",
+      name: "step-function-demo-invalid-body",
+      path: "/step-function-demo",
+      validate(payload) {
+        const parsed = assertObject(payload, "Expected /step-function-demo 400 response object");
+        if (typeof parsed.error !== "string") {
+          throw new Error(
+            `Expected /step-function-demo 400 error string, received ${String(parsed.error)}`,
+          );
+        }
+      },
+    },
   ];
 }
 
@@ -64,14 +105,32 @@ async function executeEndpoint(
   baseUrl: string,
   fetchImpl: DeployedFetch,
 ): Promise<void> {
-  const response = await fetchImpl(`${baseUrl}${endpoint.path}`, {
+  const requestInit: RequestInit = {
     method: endpoint.method,
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+  };
+  if (endpoint.body !== undefined) {
+    requestInit.body = JSON.stringify(endpoint.body);
+    requestInit.headers = {
+      "content-type": "application/json",
+    };
   }
 
-  endpoint.validate(await response.json());
+  const response = await fetchImpl(`${baseUrl}${endpoint.path}`, {
+    ...requestInit,
+  });
+  if (response.status !== endpoint.expectedStatusCode) {
+    throw new Error(
+      `Expected HTTP ${endpoint.expectedStatusCode}, received HTTP ${response.status}`,
+    );
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.toLowerCase().includes("/json") || contentType.toLowerCase().includes("+json")) {
+    endpoint.validate(await response.json());
+    return;
+  }
+
+  endpoint.validate(await response.text());
 }
 
 export async function runSmokeTestDeployedApi(

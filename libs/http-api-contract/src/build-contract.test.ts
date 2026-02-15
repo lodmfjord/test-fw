@@ -87,4 +87,23 @@ describe("buildContract", () => {
       }),
     ).toThrow('Route ID collision: "get_users_roles"');
   });
+
+  it("uses 204 response status for OPTIONS routes in OpenAPI", () => {
+    const contract = buildContract({
+      apiName: "example-api",
+      version: "1.0.0",
+      routes: [
+        defineRoute({
+          method: "OPTIONS",
+          path: "/users",
+          handler: "src/users/options.ts#handler",
+        }),
+      ],
+    });
+
+    expect(contract.openapi.paths["/users"]?.options?.responses["204"]?.description).toBe(
+      "Success",
+    );
+    expect(contract.openapi.paths["/users"]?.options?.responses["200"]).toBeUndefined();
+  });
 });

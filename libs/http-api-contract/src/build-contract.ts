@@ -18,6 +18,14 @@ function toOpenApiMethod(method: RouteDefinition["method"]): keyof OpenApiPathIt
   return method.toLowerCase() as keyof OpenApiPathItem;
 }
 
+function toOpenApiSuccessStatusCode(route: RouteDefinition): "200" | "204" {
+  if (route.method === "OPTIONS") {
+    return "204";
+  }
+
+  return "200";
+}
+
 function toNormalizedGlobalCors(input: BuildContractInput["cors"]): GlobalCors | undefined {
   if (!input) {
     return undefined;
@@ -96,7 +104,7 @@ function toOpenApiDocument(input: BuildContractInput): OpenApiDocument {
       ...(route.description ? { description: route.description } : {}),
       operationId: route.operationId,
       responses: {
-        "200": {
+        [toOpenApiSuccessStatusCode(route)]: {
           description: "Success",
         },
       },
