@@ -89,6 +89,7 @@
 
 - Run `bun run check`.
 - Run `bun run check` as the final step at the end of every task to catch formatting/lint/type/test regressions and fix issues from your changes before handoff.
+- Running only `bun run check:constraints` is not sufficient for handoff.
 - Do not hand off changes with failing tests or failing constraints.
 - Ensure formatting, linting, and typecheck pass via the `check` script.
 

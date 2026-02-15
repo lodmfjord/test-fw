@@ -37,7 +37,10 @@ function toNumericConstantValue(source: string, constantName: string): number {
 /** Converts constraint sources to extracted limit values. */
 function toExtractedLimits(input: FindStandardsDriftErrorsInput): ExtractedLimits {
   return {
-    maxOtherFileLines: toNumericConstantValue(input.validateFileConstraintsSource, "MAX_OTHER_FILE_LINES"),
+    maxOtherFileLines: toNumericConstantValue(
+      input.validateFileConstraintsSource,
+      "MAX_OTHER_FILE_LINES",
+    ),
     maxRuntimeExportSymbols: toNumericConstantValue(
       input.runtimeExportSurfaceSource,
       "MAX_RUNTIME_EXPORT_SYMBOLS",
@@ -46,12 +49,18 @@ function toExtractedLimits(input: FindStandardsDriftErrorsInput): ExtractedLimit
       input.srcFunctionDensitySource,
       "MAX_SRC_FUNCTION_COGNITIVE_COMPLEXITY",
     ),
-    maxSrcFileLines: toNumericConstantValue(input.validateFileConstraintsSource, "MAX_SRC_FILE_LINES"),
+    maxSrcFileLines: toNumericConstantValue(
+      input.validateFileConstraintsSource,
+      "MAX_SRC_FILE_LINES",
+    ),
     maxSrcFunctionLines: toNumericConstantValue(
       input.srcFunctionDensitySource,
       "MAX_SRC_FUNCTION_LINES",
     ),
-    maxTestFileLines: toNumericConstantValue(input.validateFileConstraintsSource, "MAX_TEST_FILE_LINES"),
+    maxTestFileLines: toNumericConstantValue(
+      input.validateFileConstraintsSource,
+      "MAX_TEST_FILE_LINES",
+    ),
   };
 }
 
@@ -93,7 +102,11 @@ function hasMaxSrcFunctionComplexity(
 /** Checks whether README duplicates exact numeric limits. */
 function hasReadmeDetailedLimits(readmeSource: string, limits: ExtractedLimits): boolean {
   const hasDetailedLineLimit =
-    hasLineLimitEntry(readmeSource, "non-test[^\\n]*outside\\s+[^\\n]*src", limits.maxOtherFileLines) ||
+    hasLineLimitEntry(
+      readmeSource,
+      "non-test[^\\n]*outside\\s+[^\\n]*src",
+      limits.maxOtherFileLines,
+    ) ||
     hasLineLimitEntry(readmeSource, "non-test[^\\n]*in\\s+[^\\n]*src", limits.maxSrcFileLines) ||
     hasLineLimitEntry(readmeSource, "test\\s+source\\s+file", limits.maxTestFileLines);
   const functionLineLimitPattern = new RegExp(
@@ -147,13 +160,25 @@ export function findStandardsDriftErrors(input: FindStandardsDriftErrorsInput): 
     );
   }
 
-  if (!hasLineLimitEntry(input.agentsSource, "non-test[^\\n]*outside\\s+[^\\n]*src", limits.maxOtherFileLines)) {
+  if (
+    !hasLineLimitEntry(
+      input.agentsSource,
+      "non-test[^\\n]*outside\\s+[^\\n]*src",
+      limits.maxOtherFileLines,
+    )
+  ) {
     errors.push(
       `${input.agentsFilePath}: must document max non-src file lines (${limits.maxOtherFileLines}).`,
     );
   }
 
-  if (!hasLineLimitEntry(input.agentsSource, "non-test[^\\n]*in\\s+[^\\n]*src", limits.maxSrcFileLines)) {
+  if (
+    !hasLineLimitEntry(
+      input.agentsSource,
+      "non-test[^\\n]*in\\s+[^\\n]*src",
+      limits.maxSrcFileLines,
+    )
+  ) {
     errors.push(
       `${input.agentsFilePath}: must document max src file lines (${limits.maxSrcFileLines}).`,
     );

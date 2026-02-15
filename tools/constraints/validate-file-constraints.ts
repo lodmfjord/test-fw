@@ -36,7 +36,9 @@ function isTestSourceFilePath(filePath: string): boolean {
 
 /** Checks whether file path is a non-test src source file. */
 function isSrcNonTestSourceFilePath(filePath: string): boolean {
-  return isSourceFilePath(filePath) && filePath.includes("/src/") && !isTestSourceFilePath(filePath);
+  return (
+    isSourceFilePath(filePath) && filePath.includes("/src/") && !isTestSourceFilePath(filePath)
+  );
 }
 
 /** Converts file path to max file line limit. */
