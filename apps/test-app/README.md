@@ -29,6 +29,9 @@ bun test apps/test-app/src/showcase.test.ts
 - `POST /step-function-demo` validation failure response behavior.
 - expected status codes per case (including multi-response expectations).
 
+`generate:contracts` first runs the workspace `build:libs` script so generation is deterministic from a clean checkout.
+`dev` also runs `build:libs` first so local runtime startup resolves built library exports from `dist`.
+
 ## Generated Outputs
 
 `generate:contracts` writes:

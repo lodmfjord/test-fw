@@ -1,81 +1,17 @@
-import {
-  createDynamoDatabase,
-  createRuntimeDynamoDb,
-  type DynamoDbClient,
-} from "@babbstack/dynamodb";
+import { createRuntimeDynamoDb } from "@babbstack/dynamodb";
 import { createRuntimeSqs } from "@babbstack/sqs";
+import { findEndpointRuntimeDefinition } from "./find-endpoint-runtime-definition";
 import { initializeEndpointEnv } from "./initialize-endpoint-env";
+import { logDevAppFailure } from "./log-dev-app-failure";
+import { toEndpointDatabaseContext } from "./to-endpoint-database-context";
+import { toDevAppResponse } from "./to-dev-app-response";
+import { toHttpRequestParts } from "./to-http-request-parts";
+import { toRequestCorrelationId } from "./to-request-correlation-id";
 import type { CreateDevAppOptions } from "./types";
 import type { EndpointRuntimeDefinition } from "./types";
 import { toEndpointSqsContext } from "./to-endpoint-sqs-context";
 import { toEndpointHandlerOutput } from "./to-endpoint-handler-output";
-import { toHttpResponseParts } from "./to-http-response-parts";
 import { toStepFunctionEndpointOutput } from "./to-step-function-endpoint-output";
-
-function toResponse(
-  status: number,
-  payload: unknown,
-  contentType?: string,
-  headers?: Record<string, string>,
-): Response {
-  const responseParts = toHttpResponseParts(payload, contentType);
-
-  return new Response(responseParts.body, {
-    headers: {
-      ...(headers ?? {}),
-      "content-type": responseParts.contentType,
-    },
-    status,
-  });
-}
-
-function matchPath(templatePath: string, requestPath: string): Record<string, string> | null {
-  const templateSegments = templatePath.split("/").filter((segment) => segment.length > 0);
-  const requestSegments = requestPath.split("/").filter((segment) => segment.length > 0);
-
-  if (templateSegments.length !== requestSegments.length) {
-    return null;
-  }
-
-  const params: Record<string, string> = {};
-
-  for (let index = 0; index < templateSegments.length; index += 1) {
-    const templateSegment = templateSegments[index] ?? "";
-    const requestSegment = requestSegments[index] ?? "";
-    const paramMatch = templateSegment.match(/^\{(.+)\}$/);
-
-    if (paramMatch?.[1]) {
-      params[paramMatch[1]] = decodeURIComponent(requestSegment);
-      continue;
-    }
-
-    if (templateSegment !== requestSegment) {
-      return null;
-    }
-  }
-
-  return params;
-}
-
-function toQuery(url: URL): Record<string, string> {
-  const query: Record<string, string> = {};
-
-  for (const [key, value] of url.searchParams.entries()) {
-    query[key] = value;
-  }
-
-  return query;
-}
-
-function toHeaders(headers: Headers): Record<string, string> {
-  const result: Record<string, string> = {};
-
-  for (const [key, value] of headers.entries()) {
-    result[key.toLowerCase()] = value;
-  }
-
-  return result;
-}
 
 async function readJsonBody(request: Request): Promise<unknown> {
   const source = await request.text();
@@ -91,71 +27,6 @@ async function readJsonBody(request: Request): Promise<unknown> {
   }
 }
 
-function findEndpoint(
-  endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
-  method: string,
-  path: string,
-):
-  | {
-      endpoint: EndpointRuntimeDefinition;
-      params: Record<string, string>;
-    }
-  | undefined {
-  for (const endpoint of endpoints) {
-    if (endpoint.method !== method) {
-      continue;
-    }
-
-    const params = matchPath(endpoint.path, path);
-    if (!params) {
-      continue;
-    }
-
-    return { endpoint, params };
-  }
-
-  return undefined;
-}
-
-function toDbForEndpoint(
-  db: DynamoDbClient,
-  endpoint: EndpointRuntimeDefinition,
-): DynamoDbClient | Pick<DynamoDbClient, "read"> {
-  if (endpoint.access?.db === "read") {
-    return {
-      read: db.read.bind(db),
-    };
-  }
-
-  return db;
-}
-
-function toDatabaseForEndpoint(
-  db: DynamoDbClient,
-  endpoint: EndpointRuntimeDefinition,
-): unknown | undefined {
-  const runtimeContext = endpoint.context?.database;
-  if (!runtimeContext) {
-    return undefined;
-  }
-
-  const scopedDb = runtimeContext.access.includes("write")
-    ? db
-    : {
-        read: db.read.bind(db),
-      };
-  const parser = {
-    parse(input: unknown): Record<string, unknown> {
-      return input as Record<string, unknown>;
-    },
-  };
-  const database = createDynamoDatabase(parser, runtimeContext.runtime.keyField, {
-    tableName: runtimeContext.runtime.tableName,
-  });
-
-  return database.bind(scopedDb as Pick<DynamoDbClient, "read"> | DynamoDbClient);
-}
-
 export function createDevApp(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   options: CreateDevAppOptions = {},
@@ -167,8 +38,15 @@ export function createDevApp(
   return async function fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const method = request.method.toUpperCase();
+    const requestId = toRequestCorrelationId(request);
+    const toResponse = (
+      status: number,
+      payload: unknown,
+      contentType?: string,
+      headers?: Record<string, string>,
+    ): Response => toDevAppResponse(status, payload, contentType, headers, requestId);
 
-    const matched = findEndpoint(endpoints, method, url.pathname);
+    const matched = findEndpointRuntimeDefinition(endpoints, method, url.pathname);
     if (!matched) {
       return toResponse(404, { error: "Not found" });
     }
@@ -185,8 +63,9 @@ export function createDevApp(
       }
     }
 
-    const rawHeaders = toHeaders(request.headers);
-    const rawQuery = toQuery(url);
+    const requestParts = toHttpRequestParts(url, request.headers);
+    const rawHeaders = requestParts.headers;
+    const rawQuery = requestParts.query;
 
     let validatedParams: unknown = params;
     let validatedQuery: unknown = rawQuery;
@@ -236,8 +115,7 @@ export function createDevApp(
           throw new Error("Missing handler for lambda endpoint");
         }
 
-        const endpointDb = toDbForEndpoint(db, endpoint);
-        const endpointDatabase = toDatabaseForEndpoint(db, endpoint);
+        const endpointDatabaseContext = toEndpointDatabaseContext(db, endpoint);
         const endpointSqs = toEndpointSqsContext(sqs, endpoint);
         const handler = endpoint.handler as (context: {
           body: unknown;
@@ -252,8 +130,8 @@ export function createDevApp(
 
         output = await handler({
           body: validatedBody,
-          database: endpointDatabase,
-          db: endpointDb,
+          database: endpointDatabaseContext.database,
+          db: endpointDatabaseContext.db,
           headers: validatedHeaders,
           params: validatedParams,
           query: validatedQuery,
@@ -261,7 +139,15 @@ export function createDevApp(
           sqs: endpointSqs,
         });
       }
-    } catch {
+    } catch (error) {
+      logDevAppFailure({
+        error,
+        event: "dev_app.handler_execution_failed",
+        method,
+        path: url.pathname,
+        requestId,
+        routeId: endpoint.routeId,
+      });
       return toResponse(500, { error: "Handler execution failed" });
     }
 
@@ -285,7 +171,15 @@ export function createDevApp(
         handlerOutput.contentType,
         handlerOutput.headers,
       );
-    } catch {
+    } catch (error) {
+      logDevAppFailure({
+        error,
+        event: "dev_app.output_validation_failed",
+        method,
+        path: url.pathname,
+        requestId,
+        routeId: endpoint.routeId,
+      });
       return toResponse(500, { error: "Output validation failed" });
     }
   };

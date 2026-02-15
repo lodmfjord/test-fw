@@ -26,6 +26,15 @@ Declare typed HTTP endpoints once, then reuse that declaration for:
 
 This means async Step Function routes and multi-response routes keep runtime and contract status codes aligned.
 
+## Dev Runtime Observability
+
+`createDevApp` now improves error-path observability:
+
+- every response includes an `x-request-id` header (incoming `x-request-id` is reused when provided)
+- handler execution failures emit structured logs with event `dev_app.handler_execution_failed`
+- output validation failures emit structured logs with event `dev_app.output_validation_failed`
+- structured logs include request correlation data (`requestId`, `method`, `path`, `routeId`) and error metadata
+
 ## Example: Multi-Response Endpoint
 
 ```ts

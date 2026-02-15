@@ -9,6 +9,12 @@ Typed Step Functions definition and local execution helpers used by babbstack en
 - task handler registry: `registerStepFunctionTaskHandler`
 - types for ASL state definitions and execution input/output
 
+## Package Export Targets
+
+- `bun`: `./dist/index.js`
+- `types`: `./dist/index.d.ts`
+- `default`: `./dist/index.js`
+
 ## Example
 
 ```ts

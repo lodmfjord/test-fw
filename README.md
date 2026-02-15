@@ -45,6 +45,10 @@ Contract generation writes outputs that external deploy/infra repos can consume:
 
 - Required Bun version: `1.3.0`
 - Tooling dependencies are pinned to exact versions in `/Users/lommi/Projects/simple-api/package.json` for reproducible local and CI checks.
+- Library package exports are normalized across `libs/*`:
+  - `bun`: `./dist/index.js`
+  - `types`: `./dist/index.d.ts`
+  - `default`: `./dist/index.js`
 
 ## Development
 
@@ -65,6 +69,8 @@ bun run --cwd apps/test-app dev
 ```bash
 bun run --cwd apps/test-app generate:contracts
 ```
+
+This command runs a full library build first (`build:libs`) so generation works from a clean checkout.
 
 4. Run full quality gate:
 

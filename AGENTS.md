@@ -38,6 +38,15 @@
 - Constraints are enforced by `bun run check:constraints`.
 - Full validation command: `bun run check` (tests + constraints).
 
+## Package Export Policy
+
+- All libraries in `libs/*` must export from `dist`, not from `src`.
+- For library `package.json` export maps, keep:
+  - `bun`: `./dist/index.js`
+  - `types`: `./dist/index.d.ts`
+  - `default`: `./dist/index.js`
+- Library build scripts must produce both runtime JS and declaration files in `dist`.
+
 ## Quality Gate Before Handoff
 
 - Run `bun run check`.

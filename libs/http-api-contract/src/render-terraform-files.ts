@@ -1,222 +1,16 @@
-import type {
-  TerraformGeneratorSettings,
-  TerraformResourceSelection,
-} from "./contract-generator-types";
+import type { TerraformResourceSelection } from "./contract-generator-types";
 import { createApiGatewayTerraformJson } from "./create-api-gateway-terraform-json";
+import { createApiGatewayLambdaBindingsTerraformJson } from "./create-api-gateway-lambda-bindings-terraform-json";
+import { createDynamodbTerraformJson } from "./create-dynamodb-terraform-json";
 import { createLambdasTerraformJson } from "./create-lambdas-terraform-json";
+import { createProviderTerraformJson } from "./create-provider-terraform-json";
+import { createSqsTerraformJson } from "./create-sqs-terraform-json";
 import { createStepFunctionsTerraformJson } from "./create-step-functions-terraform-json";
+import { toTerraformJsonString } from "./to-terraform-json-string";
+import type { TerraformRenderSettings } from "./terraform-render-types";
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
-import { toDynamodbTables } from "./to-dynamodb-tables";
-import { toSqsQueues } from "./to-sqs-queues";
-import { toStateKey } from "./to-state-key";
 import type { EndpointRuntimeDefinition } from "./types";
 import type { Contract } from "./types";
-
-type TerraformJson = Record<string, unknown>;
-type TerraformRenderSettings = Pick<
-  TerraformGeneratorSettings,
-  "region" | "resources" | "state"
-> & {
-  appName: string;
-  lambdaExternalModulesByRoute?: Record<string, string[]>;
-  prefix: string;
-};
-
-type TerraformResolvedState = {
-  bucket: string;
-  encrypt: boolean;
-  keyPrefix: string;
-  lockTableName?: string;
-};
-
-function toTerraformString(value: unknown): string {
-  return `${JSON.stringify(value, null, 2)}\n`;
-}
-
-function toTerraformReference(expression: string): string {
-  return `\${${expression}}`;
-}
-
-function toResolvedStateSettings(
-  settings: TerraformRenderSettings,
-  appName: string,
-): TerraformResolvedState | undefined {
-  if (settings.state) {
-    if (settings.state.enabled === false) {
-      return undefined;
-    }
-
-    return {
-      bucket: settings.state.bucket,
-      encrypt: settings.state.encrypt,
-      keyPrefix: settings.state.keyPrefix,
-      ...(settings.state.lockTableName
-        ? {
-            lockTableName: settings.state.lockTableName,
-          }
-        : {}),
-    };
-  }
-
-  const stateResourcePrefix =
-    settings.prefix.length > 0 ? `${settings.prefix}-${appName}` : appName;
-  return {
-    bucket: `${stateResourcePrefix}-terraform-state`,
-    encrypt: true,
-    keyPrefix: settings.prefix.length > 0 ? `${settings.prefix}/${appName}` : appName,
-    lockTableName: `${stateResourcePrefix}-terraform-locks`,
-  };
-}
-
-function toTerraformBlock(settings: TerraformRenderSettings, appName: string): TerraformJson {
-  const state = toResolvedStateSettings(settings, appName);
-  const terraformBlock: TerraformJson = {
-    required_providers: {
-      aws: {
-        source: "hashicorp/aws",
-        version: ">= 5.0.0",
-      },
-    },
-    required_version: ">= 1.5.0",
-  };
-
-  if (!state) {
-    return terraformBlock;
-  }
-
-  terraformBlock.backend = {
-    s3: {
-      bucket: state.bucket,
-      encrypt: state.encrypt,
-      key: toStateKey(state),
-      region: settings.region,
-      workspace_key_prefix: state.keyPrefix.replace(/\/+$/g, ""),
-      ...(state.lockTableName
-        ? {
-            dynamodb_table: state.lockTableName,
-          }
-        : {}),
-    },
-  };
-
-  return terraformBlock;
-}
-
-function createProviderTerraformJson(
-  settings: TerraformRenderSettings,
-  appName: string,
-): TerraformJson {
-  return {
-    locals: {
-      resource_name_prefix: `${toTerraformReference('join("-", compact([var.prefix, terraform.workspace, var.app_name]))')}-`,
-    },
-    provider: {
-      aws: {
-        region: toTerraformReference("var.aws_region"),
-      },
-    },
-    terraform: toTerraformBlock(settings, appName),
-    variable: {
-      aws_region: {
-        default: settings.region,
-        type: "string",
-      },
-      app_name: {
-        default: appName,
-        type: "string",
-      },
-      prefix: {
-        default: settings.prefix,
-        type: "string",
-      },
-    },
-  };
-}
-
-function createApiGatewayLambdaBindingsTerraformJson(): TerraformJson {
-  return {
-    resource: {
-      aws_apigatewayv2_integration: {
-        route: {
-          api_id: toTerraformReference("aws_apigatewayv2_api.http_api.id"),
-          for_each: toTerraformReference("aws_lambda_function.route"),
-          integration_type: "AWS_PROXY",
-          integration_uri: toTerraformReference("each.value.invoke_arn"),
-          payload_format_version: "2.0",
-        },
-      },
-      aws_apigatewayv2_route: {
-        route: {
-          api_id: toTerraformReference("aws_apigatewayv2_api.http_api.id"),
-          for_each: toTerraformReference("local.lambda_functions"),
-          route_key: `${toTerraformReference("each.value.method")} ${toTerraformReference("each.value.path")}`,
-          target: `integrations/${toTerraformReference("aws_apigatewayv2_integration.route[each.key].id")}`,
-        },
-      },
-      aws_lambda_permission: {
-        apigw_invoke: {
-          action: "lambda:InvokeFunction",
-          for_each: toTerraformReference("aws_lambda_function.route"),
-          function_name: toTerraformReference("each.value.function_name"),
-          principal: "apigateway.amazonaws.com",
-          source_arn: `${toTerraformReference("aws_apigatewayv2_api.http_api.execution_arn")}/*/*`,
-          statement_id: `AllowExecutionFromApiGateway-${toTerraformReference("each.key")}`,
-        },
-      },
-    },
-  };
-}
-
-function createDynamodbTerraformJson(
-  endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
-): TerraformJson {
-  return {
-    locals: {
-      dynamodb_tables: toDynamodbTables(endpoints),
-    },
-    resource: {
-      aws_dynamodb_table: {
-        table: {
-          attribute: [
-            {
-              name: toTerraformReference("each.value.hash_key"),
-              type: "S",
-            },
-          ],
-          billing_mode: "PAY_PER_REQUEST",
-          for_each: toTerraformReference("local.dynamodb_tables"),
-          hash_key: toTerraformReference("each.value.hash_key"),
-          name: `${toTerraformReference("local.resource_name_prefix")}${toTerraformReference("var.dynamodb_table_name_prefix")}${toTerraformReference("each.value.name")}`,
-        },
-      },
-    },
-    variable: {
-      dynamodb_table_name_prefix: { default: "", type: "string" },
-    },
-  };
-}
-
-function createSqsTerraformJson(
-  endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
-  listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
-): TerraformJson {
-  return {
-    locals: {
-      sqs_queues: toSqsQueues(endpoints, listeners),
-    },
-    resource: {
-      aws_sqs_queue: {
-        queue: {
-          for_each: toTerraformReference("local.sqs_queues"),
-          name: `${toTerraformReference("local.resource_name_prefix")}${toTerraformReference("var.sqs_queue_name_prefix")}${toTerraformReference("each.value.name")}`,
-        },
-      },
-    },
-    variable: {
-      sqs_queue_name_prefix: { default: "", type: "string" },
-    },
-  };
-}
 
 export function renderTerraformFiles(
   contract: Contract,
@@ -227,15 +21,15 @@ export function renderTerraformFiles(
   const appName = settings.appName.length > 0 ? settings.appName : contract.deployContract.apiName;
   const resources: TerraformResourceSelection = settings.resources;
   const files: Record<string, string> = {
-    "provider.tf.json": toTerraformString(createProviderTerraformJson(settings, appName)),
+    "provider.tf.json": toTerraformJsonString(createProviderTerraformJson(settings, appName)),
   };
 
   if (resources.apiGateway) {
-    files["api-gateway.tf.json"] = toTerraformString(createApiGatewayTerraformJson(contract));
+    files["api-gateway.tf.json"] = toTerraformJsonString(createApiGatewayTerraformJson(contract));
   }
 
   if (resources.lambdas) {
-    files["lambdas.tf.json"] = toTerraformString(
+    files["lambdas.tf.json"] = toTerraformJsonString(
       createLambdasTerraformJson(
         contract,
         endpoints,
@@ -248,21 +42,21 @@ export function renderTerraformFiles(
   }
 
   if (resources.apiGateway && resources.lambdas) {
-    files["api-gateway-lambda-bindings.tf.json"] = toTerraformString(
+    files["api-gateway-lambda-bindings.tf.json"] = toTerraformJsonString(
       createApiGatewayLambdaBindingsTerraformJson(),
     );
   }
 
   if (resources.dynamodb) {
-    files["dynamodb.tf.json"] = toTerraformString(createDynamodbTerraformJson(endpoints));
+    files["dynamodb.tf.json"] = toTerraformJsonString(createDynamodbTerraformJson(endpoints));
   }
 
   if (resources.sqs) {
-    files["sqs.tf.json"] = toTerraformString(createSqsTerraformJson(endpoints, sqsListeners));
+    files["sqs.tf.json"] = toTerraformJsonString(createSqsTerraformJson(endpoints, sqsListeners));
   }
 
   if (resources.stepFunctions) {
-    files["step-functions.tf.json"] = toTerraformString(
+    files["step-functions.tf.json"] = toTerraformJsonString(
       createStepFunctionsTerraformJson(
         endpoints,
         sqsListeners,
