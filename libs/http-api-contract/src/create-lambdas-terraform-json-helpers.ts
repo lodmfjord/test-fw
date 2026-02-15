@@ -13,8 +13,12 @@ const SQS_CONSUMER_ACTIONS = [
 
 export type LambdasTerraformContext = {
   hasLayers: boolean;
+  hasRouteEphemeralStorageMb: boolean;
   hasRouteDynamodbAccess: boolean;
+  hasRouteMemoryMb: boolean;
+  hasRouteReservedConcurrency: boolean;
   hasRouteSqsSendAccess: boolean;
+  hasRouteTimeoutSeconds: boolean;
   hasSqsListeners: boolean;
   layerMetadata: {
     layersByKey: Record<string, unknown>;
@@ -40,12 +44,34 @@ function toRouteConfig(context: LambdasTerraformContext): Record<string, unknown
     for_each: toTerraformReference("local.lambda_functions"),
     function_name: `${toTerraformReference("local.resource_name_prefix")}${toTerraformReference("var.lambda_function_name_prefix")}${toTerraformReference("each.key")}`,
     handler: toTerraformReference("var.lambda_handler"),
-    memory_size: toTerraformReference("each.value.memory_mb"),
     role: toTerraformReference("aws_iam_role.route[each.key].arn"),
     runtime: toTerraformReference("each.value.runtime"),
     source_code_hash: toTerraformReference("local.lambda_source_code_hash_by_route[each.key]"),
-    timeout: toTerraformReference("each.value.timeout_seconds"),
   };
+
+  if (context.hasRouteMemoryMb) {
+    routeConfig.memory_size = toTerraformReference('lookup(each.value, "memory_mb", null)');
+  }
+  if (context.hasRouteTimeoutSeconds) {
+    routeConfig.timeout = toTerraformReference('lookup(each.value, "timeout_seconds", null)');
+  }
+  if (context.hasRouteReservedConcurrency) {
+    routeConfig.reserved_concurrent_executions = toTerraformReference(
+      'lookup(each.value, "reserved_concurrency", null)',
+    );
+  }
+  if (context.hasRouteEphemeralStorageMb) {
+    routeConfig.dynamic = {
+      ephemeral_storage: {
+        content: {
+          size: toTerraformReference("ephemeral_storage.value"),
+        },
+        for_each: toTerraformReference(
+          'lookup(each.value, "ephemeral_storage_mb", null) == null ? [] : [lookup(each.value, "ephemeral_storage_mb", null)]',
+        ),
+      },
+    };
+  }
 
   const environmentVariables: Record<string, string> = {};
   if (context.usesManagedDynamodbTables) {

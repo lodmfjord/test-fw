@@ -58,8 +58,7 @@ Terraform reads generated outputs and creates:
 - Lambda runtime metadata defaults:
   - runtime `nodejs20.x`
   - architecture `arm64`
-  - timeout `15`
-  - memory `256`
+  - memory/timeout/ephemeral-storage/reserved-concurrency are omitted unless explicitly configured
 
 ## Future AWS Extensions
 Route metadata already supports an `aws` extension object for later features such as:

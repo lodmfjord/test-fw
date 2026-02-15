@@ -34,8 +34,20 @@ export function createLambdasTerraformJson(
 ): TerraformJson {
   const layerMetadata = toLambdaLayerMetadata(lambdaExternalModulesByRoute ?? {});
   const hasLayers = Object.keys(layerMetadata.layersByKey).length > 0;
+  const hasRouteEphemeralStorageMb = contract.lambdasManifest.functions.some(
+    (lambdaFunction) => lambdaFunction.ephemeralStorageMb !== undefined,
+  );
   const routeDynamodbAccess = toRouteDynamodbAccess(endpoints);
+  const hasRouteMemoryMb = contract.lambdasManifest.functions.some(
+    (lambdaFunction) => lambdaFunction.memoryMb !== undefined,
+  );
+  const hasRouteReservedConcurrency = contract.lambdasManifest.functions.some(
+    (lambdaFunction) => lambdaFunction.reservedConcurrency !== undefined,
+  );
   const routeSqsSendAccess = toRouteSqsSendAccess(endpoints);
+  const hasRouteTimeoutSeconds = contract.lambdasManifest.functions.some(
+    (lambdaFunction) => lambdaFunction.timeoutSeconds !== undefined,
+  );
   const sqsListenersById = toSqsListenersById(sqsListeners);
   const hasRouteDynamodbAccess = Object.keys(routeDynamodbAccess).length > 0;
   const hasRouteSqsSendAccess = Object.keys(routeSqsSendAccess).length > 0;
@@ -45,8 +57,12 @@ export function createLambdasTerraformJson(
   const hasUnmanagedDynamodbReferences = hasRouteDynamodbAccess && !usesManagedDynamodbTables;
   const context = {
     hasLayers,
+    hasRouteEphemeralStorageMb,
     hasRouteDynamodbAccess,
+    hasRouteMemoryMb,
+    hasRouteReservedConcurrency,
     hasRouteSqsSendAccess,
+    hasRouteTimeoutSeconds,
     hasSqsListeners,
     layerMetadata,
     routeDynamodbAccess,

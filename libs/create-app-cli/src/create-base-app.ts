@@ -1,5 +1,5 @@
 /**
- * @fileoverview Creates a minimal Bun app scaffold with a hello-world entrypoint.
+ * @fileoverview Creates a minimal Bun app scaffold with a compliant hello-world entrypoint.
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -27,7 +27,7 @@ export async function createBaseApp(appName: string, repoRoot: string): Promise<
         private: true,
         type: "module",
         scripts: {
-          dev: "bun src/index.ts",
+          dev: "bun src/app-bin.ts",
         },
       },
       null,
@@ -43,10 +43,10 @@ export async function createBaseApp(appName: string, repoRoot: string): Promise<
   );
 
   await writeFile(
-    join(srcRoot, "index.ts"),
+    join(srcRoot, "app-bin.ts"),
     [
       "/**",
-      " * @fileoverview Prints a hello-world message for the generated app.",
+      " * @fileoverview Runs the hello-world entrypoint for the generated app.",
       " */",
       'console.log("Hello world");',
       "",

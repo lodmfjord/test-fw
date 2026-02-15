@@ -1,9 +1,26 @@
 /**
  * @fileoverview Implements types.
  */
-import type { EndpointRuntimeDefinition, Schema } from "@babbstack/http-api-contract";
 
-type AnyEndpoint = EndpointRuntimeDefinition;
+type SchemaLike<TValue = unknown> = {
+  optional?: boolean;
+  parse(value: unknown, path?: string): TValue | undefined;
+};
+
+type EndpointRequestLike = {
+  body?: SchemaLike<unknown>;
+  headers?: SchemaLike<unknown>;
+  params?: SchemaLike<unknown>;
+  query?: SchemaLike<unknown>;
+};
+
+type AnyEndpoint = {
+  method: string;
+  path: string;
+  request?: EndpointRequestLike;
+  response: SchemaLike<unknown>;
+  routeId: string;
+};
 type AnyRouteReference = {
   routeId: string;
 };
@@ -35,7 +52,16 @@ type ClientRouteReferenceUnion<TRouteEndpoints> = [
   ? AnyRouteReference
   : FlattenRouteReferences<TRouteEndpoints>;
 
-type SchemaValue<TSchema> = TSchema extends Schema<infer TValue> ? TValue : unknown;
+type SchemaValue<TSchema> = TSchema extends {
+  optional: true;
+  parse: (value: unknown, path?: string) => infer TValue;
+}
+  ? Exclude<TValue, undefined>
+  : TSchema extends {
+        parse: (value: unknown, path?: string) => infer TValue;
+      }
+    ? TValue
+    : unknown;
 
 type EndpointParams<TEndpoint> = TEndpoint extends { request: { params?: infer TSchema } }
   ? SchemaValue<NonNullable<TSchema>>

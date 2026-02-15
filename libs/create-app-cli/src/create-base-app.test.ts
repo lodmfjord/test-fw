@@ -15,10 +15,14 @@ describe("createBaseApp", () => {
 
     const packageJson = await readFile(join(root, "apps", "demo-app", "package.json"), "utf8");
     const readme = await readFile(join(root, "apps", "demo-app", "README.md"), "utf8");
-    const indexSource = await readFile(join(root, "apps", "demo-app", "src", "index.ts"), "utf8");
+    const appBinSource = await readFile(
+      join(root, "apps", "demo-app", "src", "app-bin.ts"),
+      "utf8",
+    );
 
     expect(packageJson).toContain('"name": "demo-app"');
+    expect(packageJson).toContain('"dev": "bun src/app-bin.ts"');
     expect(readme).toContain("Minimal generated app");
-    expect(indexSource).toContain('console.log("Hello world")');
+    expect(appBinSource).toContain('console.log("Hello world");');
   });
 });

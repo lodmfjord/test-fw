@@ -15,6 +15,7 @@
     "dev:client": "bun run --cwd apps/test-app-client dev",
     "dev:all": "sh -c 'bun run --cwd apps/test-app dev & server=$!; trap \"kill $server\" EXIT INT TERM; ready=0; for _ in $(seq 1 60); do if curl -fsS http://localhost:3000/env-demo >/dev/null 2>&1; then ready=1; break; fi; sleep 1; done; if [ \"$ready\" -ne 1 ]; then echo \"test-app did not become ready on http://localhost:3000\"; exit 1; fi; bun run --cwd apps/test-app-client dev ${1:-http://localhost:3000}' --",
     "build:libs": "bun run --cwd libs/schema build && bun run --cwd libs/step-functions build && bun run --cwd libs/dynamodb build && bun run --cwd libs/sqs build && bun run --cwd libs/logger build && bun run --cwd libs/s3 build && bun run --cwd libs/http-api-contract build && bun run --cwd libs/client build && bun run --cwd libs/create-app-cli build",
+    "build:test-app": "bun run --cwd apps/test-app generate:contracts",
     "build": "bun run build:libs",
     "test": "bun run build:libs && bun test",
     "test:watch": "bun test --watch",

@@ -8,6 +8,7 @@ import { findModuleConstraintsErrors } from "./find-module-constraints-errors";
 import { findNestedTernaryErrors } from "./find-nested-ternary-errors";
 import { findRuntimeExportSurfaceErrors } from "./find-runtime-export-surface-errors";
 import { findSrcFunctionDensityErrors } from "./find-src-function-density-errors";
+import { findUnsafeCastErrors } from "./find-unsafe-cast-errors";
 import { isWithinLineLimit } from "./is-within-line-limit";
 
 const MAX_OTHER_FILE_LINES = 220;
@@ -70,6 +71,7 @@ export function validateFileConstraints(filePath: string, source: string): strin
     ...findNestedTernaryErrors(filePath, source),
     ...findRuntimeExportSurfaceErrors(filePath, source),
     ...findSrcFunctionDensityErrors(filePath, source),
+    ...findUnsafeCastErrors(filePath, source),
   ];
   const lineCount = source.split(/\r?\n/).length;
   const maxFileLines = toMaxFileLines(filePath);

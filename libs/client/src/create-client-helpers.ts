@@ -186,7 +186,7 @@ function toEndpointList(endpoints: unknown): EndpointDescriptor[] {
   return [];
 }
 
-const createClientHelpers = {
+const clientHelpers = {
   appendQuery,
   toBaseUrl,
   toEndpointList,
@@ -198,4 +198,12 @@ const createClientHelpers = {
   toStringHeaders,
 };
 
-export { createClientHelpers };
+/**
+ * Builds the local helper API used by createClient.
+ * @example
+ * const helpers = createClientHelpers();
+ * @returns Reusable helper functions for client creation.
+ */
+export function createClientHelpers() {
+  return clientHelpers;
+}

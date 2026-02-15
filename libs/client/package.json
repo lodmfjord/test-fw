@@ -12,7 +12,7 @@
       "default": "./dist/index.js"
     }
   },
-  "dependencies": {
+  "devDependencies": {
     "@babbstack/http-api-contract": "workspace:*"
   }
 }

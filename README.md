@@ -19,7 +19,7 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
 - `@babbstack/dynamodb` (`libs/dynamodb`): runtime DynamoDB adapters and typed table helpers.
 - `@babbstack/s3` (`libs/s3`): runtime S3 adapters for local and AWS execution.
 - `@babbstack/logger` (`libs/logger`): structured logging wrapper around AWS Lambda Powertools Logger.
-- `@babbstack/create-app-cli` (`libs/create-app-cli`): CLI scaffold generator that creates a new `apps/<name>` hello-world app.
+- `@babbstack/create-app-cli` (`libs/create-app-cli`): CLI scaffold generator that creates a new `apps/<name>` hello-world app with a compliant `src/app-bin.ts` entrypoint.
 - `@babbstack/test-app` (`apps/test-app`): showcase app that exercises the framework end to end.
 - `@babbstack/test-app-client` (`apps/test-app-client`): typed client smoke app using `@babbstack/client` against `test-app` endpoints.
 
@@ -37,6 +37,8 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
 - Generated Lambda runtime entries keep `zod` external (`import "zod"`). Terraform generation now always includes `zod` in lambda layer module planning.
 - Generated Lambda runtime entries emit structured lifecycle and failure logs (`lambda.invocation.start`, `lambda.invocation.complete`, `lambda.validation.input_failed`, `lambda.handler.failed`, `lambda.validation.output_failed`) with request correlation fields using AWS Lambda Powertools Logger.
 - Generated Lambda runtime responses always include `x-request-id` (reusing inbound `x-request-id` when provided).
+- Contract builders (`buildContract`, `buildContractFromEndpoints`) support optional `lambdaDefaults` for `memoryMb`, `timeoutSeconds`, `ephemeralStorageMb`, and `reservedConcurrency`; endpoint-level `aws` options override those defaults per route.
+- Generated Terraform lambda resources always default architecture to `arm64` and only set `memory_size`, `timeout`, `ephemeral_storage`, and `reserved_concurrent_executions` when configured; when unset, AWS provider defaults are used.
 - `schema.fromZod(...)` is parity-safe for JSON-schema-representable behavior; custom refinements and transform/preprocess pipelines are rejected.
 
 ## Generated Artifacts
@@ -117,6 +119,7 @@ For authoritative repository standards and exact constraint values, see AGENTS.m
 - Use strict TDD and keep changes within repository constraints.
 - `bun run check:constraints` enforces constraints for `apps/`, `libs/`, and `tools/`.
 - `bun run check` is fail-fast: constraints run first before format/lint/typecheck/tests.
+- Unsafe cast policy in non-test files: `as never` is forbidden, and `as unknown as` requires an immediately preceding `// unsafe-cast:` invariant marker.
 
 ## Documentation Rule
 

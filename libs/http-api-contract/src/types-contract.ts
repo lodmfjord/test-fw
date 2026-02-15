@@ -5,7 +5,7 @@ import type { GlobalCors } from "./cors-types";
 import type { EnvSchema } from "./env-schema-types";
 import type { EndpointContractDefinition } from "./types-endpoint";
 import type { OpenApiDocument } from "./types-openapi";
-import type { HttpMethod, RouteDefinition } from "./types-route";
+import type { AwsRouteOptions, HttpMethod, RouteDefinition } from "./types-route";
 
 export type EnvVarDefinition = {
   default?: string;
@@ -18,6 +18,7 @@ export type BuildContractInput = {
   apiName: string;
   cors?: GlobalCors;
   env?: EnvVarDefinition[];
+  lambdaDefaults?: AwsRouteOptions;
   routes: RouteDefinition[];
   version: string;
 };
@@ -27,6 +28,7 @@ export type BuildContractFromEndpointsInput = {
   cors?: GlobalCors;
   endpoints: ReadonlyArray<EndpointContractDefinition>;
   env?: EnvVarDefinition[];
+  lambdaDefaults?: AwsRouteOptions;
   version: string;
 };
 
@@ -46,14 +48,16 @@ export type RoutesManifest = {
 export type LambdaDefinition = {
   architecture: "arm64";
   artifactPath: string;
+  ephemeralStorageMb?: number;
   functionId: string;
   handler: string;
-  memoryMb: number;
+  memoryMb?: number;
   method: HttpMethod;
   path: string;
+  reservedConcurrency?: number;
   routeId: string;
   runtime: "nodejs20.x";
-  timeoutSeconds: number;
+  timeoutSeconds?: number;
 };
 
 export type LambdasManifest = {

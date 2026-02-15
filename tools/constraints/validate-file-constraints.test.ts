@@ -231,4 +231,26 @@ export function run() {
       ),
     ).toBe(true);
   });
+
+  it("reports unsafe casts in runtime files", () => {
+    const source = `
+/**
+ * @fileoverview File.
+ */
+const one = value as never;
+const two = value as unknown as { id: string };
+`;
+    const errors = validateFileConstraints("libs/sample/src/runtime.ts", source);
+
+    expect(
+      errors.includes(
+        'libs/sample/src/runtime.ts:5: unsafe cast "as never" is not allowed in non-test code.',
+      ),
+    ).toBe(true);
+    expect(
+      errors.includes(
+        'libs/sample/src/runtime.ts:6: unsafe cast "as unknown as" requires an immediately preceding "// unsafe-cast:" comment.',
+      ),
+    ).toBe(true);
+  });
 });

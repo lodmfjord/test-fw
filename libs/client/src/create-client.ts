@@ -37,8 +37,9 @@ export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
   baseUrl: string,
   endpoints?: TRouteEndpoints,
 ): HttpApiClient<TEndpoints, TRouteEndpoints> {
-  const normalizedBaseUrl = createClientHelpers.toBaseUrl(baseUrl);
-  const endpointList = createClientHelpers.toEndpointList(endpoints);
+  const clientHelpers = createClientHelpers();
+  const normalizedBaseUrl = clientHelpers.toBaseUrl(baseUrl);
+  const endpointList = clientHelpers.toEndpointList(endpoints);
   const endpointByRouteId = new Map<string, { method: string; path: string; routeId: string }>();
   for (const endpoint of endpointList) {
     endpointByRouteId.set(endpoint.routeId, endpoint);
@@ -51,15 +52,15 @@ export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
   ): Promise<ClientResponse<ClientEndpointResponse<TEndpoint>>> {
     const endpointSource = endpoint as { method: string; path: string };
     const params = (input.params as Record<string, string | number | boolean | undefined>) ?? {};
-    const headers = createClientHelpers.toStringHeaders(input.headers);
-    const requestBody = createClientHelpers.toRequestBody(input.body, headers);
+    const headers = clientHelpers.toStringHeaders(input.headers);
+    const requestBody = clientHelpers.toRequestBody(input.body, headers);
     const url = new URL(
-      createClientHelpers.toResolvedPath(endpointSource.path, params),
+      clientHelpers.toResolvedPath(endpointSource.path, params),
       `${normalizedBaseUrl}/`,
     );
-    createClientHelpers.appendQuery(
+    clientHelpers.appendQuery(
       url.searchParams,
-      input.query as Parameters<typeof createClientHelpers.appendQuery>[1],
+      input.query as Parameters<typeof clientHelpers.appendQuery>[1],
     );
 
     const requestInit: RequestInit = {
@@ -71,10 +72,8 @@ export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
     const response = await fetch(url, requestInit);
 
     return {
-      data: (await createClientHelpers.toResponseData(
-        response,
-      )) as ClientEndpointResponse<TEndpoint>,
-      headers: createClientHelpers.toResponseHeaders(response.headers),
+      data: (await clientHelpers.toResponseData(response)) as ClientEndpointResponse<TEndpoint>,
+      headers: clientHelpers.toResponseHeaders(response.headers),
       ok: response.ok,
       statusCode: response.status,
     };
@@ -88,7 +87,10 @@ export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
       throw new Error(`Unknown routeId "${String(routeId)}"`);
     }
 
-    return requestCore(endpoint as ClientEndpointUnion<TEndpoints>, input as never);
+    return requestCore(
+      endpoint as ClientEndpointUnion<TEndpoints>,
+      input as ClientRequestInput<ClientEndpointUnion<TEndpoints>>,
+    );
   };
 
   for (const method of HTTP_METHODS) {
@@ -104,9 +106,9 @@ export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
             return requestCore(
               {
                 method,
-                path: createClientHelpers.toPathKey(rawPathKey),
+                path: clientHelpers.toPathKey(rawPathKey),
               } as ClientEndpointUnion<TEndpoints>,
-              input as never,
+              input as ClientRequestInput<ClientEndpointUnion<TEndpoints>>,
             );
           };
         },
@@ -121,7 +123,10 @@ export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
     }
 
     (request as Record<string, unknown>)[routeId] = (input: unknown) => {
-      return requestCore(endpoint as ClientEndpointUnion<TEndpoints>, input as never);
+      return requestCore(
+        endpoint as ClientEndpointUnion<TEndpoints>,
+        input as ClientRequestInput<ClientEndpointUnion<TEndpoints>>,
+      );
     };
   }
 

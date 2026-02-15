@@ -38,6 +38,7 @@ export function startSqsListenerPolling(
     isPolling = true;
     try {
       for (const listener of listeners) {
+        // unsafe-cast: invariant = listener runtime definitions are normalized to SqsQueueListener<SqsMessage>.
         const typedListener = listener as unknown as SqsQueueListener<SqsMessage>;
         const processed = await runSqsQueueListener(typedListener, sqs);
         if (processed > 0) {

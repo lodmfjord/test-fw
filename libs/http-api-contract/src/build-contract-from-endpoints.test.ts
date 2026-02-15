@@ -149,4 +149,55 @@ describe("buildContractFromEndpoints", () => {
     );
     expect(optionRoutes).toHaveLength(1);
   });
+
+  it("applies global lambda defaults and allows per-endpoint aws overrides", () => {
+    const contract = buildContractFromEndpoints({
+      apiName: "users-api",
+      version: "1.0.0",
+      lambdaDefaults: {
+        ephemeralStorageMb: 1024,
+        memoryMb: 768,
+        reservedConcurrency: 5,
+        timeoutSeconds: 20,
+      },
+      endpoints: [
+        defineEndpoint({
+          method: "GET",
+          path: "/users",
+          handler: () => ({ value: { ok: true } }),
+          response: schema.object({
+            ok: schema.boolean(),
+          }),
+        }),
+        defineEndpoint({
+          aws: {
+            memoryMb: 1536,
+            reservedConcurrency: 2,
+          },
+          method: "POST",
+          path: "/users",
+          handler: () => ({ value: { ok: true } }),
+          response: schema.object({
+            ok: schema.boolean(),
+          }),
+        }),
+      ],
+    });
+
+    expect(contract.lambdasManifest.functions).toHaveLength(2);
+    expect(contract.lambdasManifest.functions[0]).toMatchObject({
+      architecture: "arm64",
+      ephemeralStorageMb: 1024,
+      memoryMb: 768,
+      reservedConcurrency: 5,
+      timeoutSeconds: 20,
+    });
+    expect(contract.lambdasManifest.functions[1]).toMatchObject({
+      architecture: "arm64",
+      ephemeralStorageMb: 1024,
+      memoryMb: 1536,
+      reservedConcurrency: 2,
+      timeoutSeconds: 20,
+    });
+  });
 });

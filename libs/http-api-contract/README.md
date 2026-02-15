@@ -31,6 +31,17 @@ Declare typed HTTP endpoints once, then reuse that declaration for:
 
 This means async Step Function routes and multi-response routes keep runtime and contract status codes aligned.
 
+## Lambda Resource Settings
+
+- `buildContract` and `buildContractFromEndpoints` accept optional `lambdaDefaults`:
+  - `memoryMb`
+  - `timeoutSeconds`
+  - `ephemeralStorageMb`
+  - `reservedConcurrency`
+- Endpoint-level `aws` values override matching `lambdaDefaults` values per route.
+- Route lambdas default architecture to `arm64`.
+- Terraform generation only sets lambda `memory_size`, `timeout`, `ephemeral_storage`, and `reserved_concurrent_executions` when those values are configured. When omitted, AWS defaults are left untouched.
+
 ## Dev Runtime Observability
 
 `createDevApp` now improves error-path observability:

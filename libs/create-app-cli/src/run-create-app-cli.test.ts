@@ -17,10 +17,11 @@ describe("runCreateAppCli", () => {
       join(tempRoot, "apps", "hello-app", "package.json"),
       "utf8",
     );
-    const appIndex = await readFile(join(tempRoot, "apps", "hello-app", "src", "index.ts"), "utf8");
+    const appBin = await readFile(join(tempRoot, "apps", "hello-app", "src", "app-bin.ts"), "utf8");
 
     expect(exitCode).toBe(0);
     expect(appPackageJson).toContain('"name": "hello-app"');
-    expect(appIndex).toContain('console.log("Hello world");');
+    expect(appPackageJson).toContain('"dev": "bun src/app-bin.ts"');
+    expect(appBin).toContain('console.log("Hello world");');
   });
 });

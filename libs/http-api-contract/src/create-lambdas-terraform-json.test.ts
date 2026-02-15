@@ -130,4 +130,88 @@ describe("createLambdasTerraformJson", () => {
     });
     expect(terraformJson.variable.sqs_queue_name_prefix).toBeDefined();
   });
+
+  it("omits optional lambda sizing fields when routes do not configure them", () => {
+    const terraformJson = createLambdasTerraformJson(
+      {
+        lambdasManifest: {
+          functions: [
+            {
+              architecture: "arm64",
+              artifactPath: "get-users.zip",
+              method: "GET",
+              path: "/users",
+              routeId: "get_users",
+              runtime: "nodejs20.x",
+            },
+          ],
+        },
+      } as never,
+      [],
+      [],
+      undefined,
+      false,
+      false,
+    ) as {
+      resource: {
+        aws_lambda_function: {
+          route: Record<string, unknown>;
+        };
+      };
+    };
+
+    const routeConfig = terraformJson.resource.aws_lambda_function.route;
+    expect(routeConfig.memory_size).toBeUndefined();
+    expect(routeConfig.timeout).toBeUndefined();
+    expect(routeConfig.reserved_concurrent_executions).toBeUndefined();
+    expect(routeConfig.ephemeral_storage).toBeUndefined();
+  });
+
+  it("renders optional lambda sizing fields when at least one route configures them", () => {
+    const terraformJson = createLambdasTerraformJson(
+      {
+        lambdasManifest: {
+          functions: [
+            {
+              architecture: "arm64",
+              artifactPath: "get-users.zip",
+              ephemeralStorageMb: 2048,
+              memoryMb: 512,
+              method: "GET",
+              path: "/users",
+              reservedConcurrency: 3,
+              routeId: "get_users",
+              runtime: "nodejs20.x",
+              timeoutSeconds: 20,
+            },
+            {
+              architecture: "arm64",
+              artifactPath: "post-users.zip",
+              method: "POST",
+              path: "/users",
+              routeId: "post_users",
+              runtime: "nodejs20.x",
+            },
+          ],
+        },
+      } as never,
+      [],
+      [],
+      undefined,
+      false,
+      false,
+    ) as {
+      resource: {
+        aws_lambda_function: {
+          route: Record<string, unknown>;
+        };
+      };
+    };
+
+    const routeConfig = terraformJson.resource.aws_lambda_function.route;
+    expect(routeConfig.memory_size).toBeDefined();
+    expect(routeConfig.timeout).toBeDefined();
+    expect(routeConfig.reserved_concurrent_executions).toBeDefined();
+    expect(routeConfig.dynamic).toBeDefined();
+  });
 });

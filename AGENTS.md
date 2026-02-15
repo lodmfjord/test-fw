@@ -45,6 +45,10 @@
 - Each top-level function in non-test `src` files must be at most 160 lines.
 - Each top-level function in non-test `src` files must have cognitive complexity at most 30.
 - Nested ternary operations are not allowed.
+- `as never` casts are disallowed in non-test source files.
+- `as unknown as` casts are disallowed in non-test source files unless the immediately previous line is a one-line `// unsafe-cast: ...` invariant marker.
+- Allowed unsafe casts should stay at typed-boundary points, include a nearby runtime guard when feasible, and have focused test coverage for the cast path.
+- Test files are exempt from unsafe-cast constraints.
 - Constraints are enforced by `bun run check:constraints`.
 - Full validation command: `bun run check` (tests + constraints).
 

@@ -136,6 +136,7 @@ const schema = {
 
   fromZod<TValue>(zodSchema: ZodType<TValue>): Schema<TValue> {
     schemaParityHelpers.assertLambdaParitySafeFromZodSchema(
+      // unsafe-cast: invariant = parity checks validate the incoming zod schema shape at runtime.
       zodSchema as unknown as ZodType<unknown>,
     );
     return toSchema(zodSchema, toJsonSchema(zodSchema));
@@ -159,11 +160,13 @@ const schema = {
       jsonSchema: toObjectSchema(shape),
       parse(value: unknown, path?: string): ObjectFromShape<TShape> {
         return parseWithZod(
+          // unsafe-cast: invariant = zodShape is built from shape validators keyed to the same object fields.
           z.object(zodShape) as unknown as ZodType<ObjectFromShape<TShape>>,
           value,
           path,
         );
       },
+      // unsafe-cast: invariant = zodShape is assembled from the exact generic shape keys and validators.
       zodSchema: z.object(zodShape) as unknown as ZodType<ObjectFromShape<TShape>>,
     };
   },

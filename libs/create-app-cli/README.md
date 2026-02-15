@@ -13,7 +13,7 @@ This creates:
 
 - `apps/my-app/package.json`
 - `apps/my-app/README.md`
-- `apps/my-app/src/index.ts` with `console.log("Hello world");`
+- `apps/my-app/src/app-bin.ts` with `console.log("Hello world");`
 
 ## API
 

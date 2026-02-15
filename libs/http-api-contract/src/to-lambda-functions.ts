@@ -20,11 +20,17 @@ export function toLambdaFunctions(contract: Contract): Record<string, Record<str
     result[item.routeId] = {
       architecture: item.architecture,
       artifact_path: item.artifactPath,
-      memory_mb: item.memoryMb,
+      ...(item.ephemeralStorageMb === undefined
+        ? {}
+        : { ephemeral_storage_mb: item.ephemeralStorageMb }),
+      ...(item.memoryMb === undefined ? {} : { memory_mb: item.memoryMb }),
       method: item.method,
       path: item.path,
+      ...(item.reservedConcurrency === undefined
+        ? {}
+        : { reserved_concurrency: item.reservedConcurrency }),
       runtime: item.runtime,
-      timeout_seconds: item.timeoutSeconds,
+      ...(item.timeoutSeconds === undefined ? {} : { timeout_seconds: item.timeoutSeconds }),
     };
   }
 

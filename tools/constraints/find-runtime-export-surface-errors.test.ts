@@ -107,6 +107,28 @@ export const bag = {
     );
   });
 
+  it("disallows helper-object bags exported via export declarations", () => {
+    const source = `
+/**
+ * @fileoverview Re-exported helper bag.
+ */
+function run() {
+  return "ok";
+}
+
+const bag = {
+  run,
+};
+
+export { bag };
+`;
+    const errors = findRuntimeExportSurfaceErrors("libs/example/src/re-exported-bag.ts", source);
+
+    expect(errors).toContain(
+      'libs/example/src/re-exported-bag.ts: exported helper-object bags are not allowed ("bag"). Keep helpers file-local and export one public entry function.',
+    );
+  });
+
   it("allows exported object literals without function-valued members", () => {
     const source = `
 /**
@@ -119,6 +141,30 @@ export const config = {
 `;
 
     expect(findRuntimeExportSurfaceErrors("libs/example/src/config.ts", source)).toEqual([]);
+  });
+
+  it("skips helper-object bag errors for allowlisted legacy files", () => {
+    const source = `
+/**
+ * @fileoverview Legacy helper bag.
+ */
+function run() {
+  return "ok";
+}
+
+const helpers = {
+  run,
+};
+
+export { helpers };
+`;
+
+    expect(
+      findRuntimeExportSurfaceErrors(
+        "tools/constraints/find-documentation-constraints-jsdoc.ts",
+        source,
+      ),
+    ).toEqual([]);
   });
 
   it("skips test files", () => {

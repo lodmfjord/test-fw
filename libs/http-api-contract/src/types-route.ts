@@ -9,7 +9,9 @@ export type RouteAuth = "none" | "jwt" | "iam";
 
 export type AwsRouteOptions = {
   authorizerId?: string;
+  ephemeralStorageMb?: number;
   memoryMb?: number;
+  reservedConcurrency?: number;
   timeoutSeconds?: number;
 };
 

@@ -1,6 +1,7 @@
 # @babbstack/client
 
 Type-safe HTTP client for APIs defined with `@babbstack/http-api-contract`.
+The runtime package has no dependency on `@babbstack/http-api-contract`; endpoint contracts are consumed as structural TypeScript types.
 
 ## Exports
 

@@ -40,21 +40,33 @@ function toRoutesManifest(input: BuildContractInput): RoutesManifest {
 /** Converts to lambdas manifest. */
 function toLambdasManifest(input: BuildContractInput): LambdasManifest {
   const lambdaRoutes = input.routes.filter((route) => route.execution?.kind !== "step-function");
+  const lambdaDefaults = input.lambdaDefaults;
 
   return {
     apiName: input.apiName,
-    functions: lambdaRoutes.map((route) => ({
-      architecture: "arm64",
-      artifactPath: `lambda-artifacts/${route.routeId}.zip`,
-      functionId: route.routeId,
-      handler: route.handler,
-      memoryMb: route.aws?.memoryMb ?? 256,
-      method: route.method,
-      path: route.path,
-      routeId: route.routeId,
-      runtime: "nodejs20.x",
-      timeoutSeconds: route.aws?.timeoutSeconds ?? 15,
-    })),
+    functions: lambdaRoutes.map((route) => {
+      const memoryMb = route.aws?.memoryMb ?? lambdaDefaults?.memoryMb;
+      const timeoutSeconds = route.aws?.timeoutSeconds ?? lambdaDefaults?.timeoutSeconds;
+      const ephemeralStorageMb =
+        route.aws?.ephemeralStorageMb ?? lambdaDefaults?.ephemeralStorageMb;
+      const reservedConcurrency =
+        route.aws?.reservedConcurrency ?? lambdaDefaults?.reservedConcurrency;
+
+      return {
+        architecture: "arm64",
+        artifactPath: `lambda-artifacts/${route.routeId}.zip`,
+        ...(ephemeralStorageMb === undefined ? {} : { ephemeralStorageMb }),
+        functionId: route.routeId,
+        handler: route.handler,
+        ...(memoryMb === undefined ? {} : { memoryMb }),
+        method: route.method,
+        path: route.path,
+        ...(reservedConcurrency === undefined ? {} : { reservedConcurrency }),
+        routeId: route.routeId,
+        runtime: "nodejs20.x",
+        ...(timeoutSeconds === undefined ? {} : { timeoutSeconds }),
+      };
+    }),
     schemaVersion: "1.0.0",
     version: input.version,
   };

@@ -109,4 +109,49 @@ describe("buildContract", () => {
     );
     expect(contract.openapi.paths["/users"]?.options?.responses["200"]).toBeUndefined();
   });
+
+  it("applies global lambda defaults and route aws overrides", () => {
+    const contract = buildContract({
+      apiName: "example-api",
+      version: "1.0.0",
+      lambdaDefaults: {
+        ephemeralStorageMb: 1024,
+        memoryMb: 1024,
+        reservedConcurrency: 4,
+        timeoutSeconds: 20,
+      },
+      routes: [
+        defineRoute({
+          method: "GET",
+          path: "/users",
+          handler: "src/users/get.ts#handler",
+        }),
+        defineRoute({
+          method: "POST",
+          path: "/users",
+          handler: "src/users/post.ts#handler",
+          aws: {
+            memoryMb: 2048,
+            reservedConcurrency: 1,
+          },
+        }),
+      ],
+    });
+
+    expect(contract.lambdasManifest.functions).toHaveLength(2);
+    expect(contract.lambdasManifest.functions[0]).toMatchObject({
+      architecture: "arm64",
+      ephemeralStorageMb: 1024,
+      memoryMb: 1024,
+      reservedConcurrency: 4,
+      timeoutSeconds: 20,
+    });
+    expect(contract.lambdasManifest.functions[1]).toMatchObject({
+      architecture: "arm64",
+      ephemeralStorageMb: 1024,
+      memoryMb: 2048,
+      reservedConcurrency: 1,
+      timeoutSeconds: 20,
+    });
+  });
 });

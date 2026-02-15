@@ -159,6 +159,7 @@ export function buildContractFromEndpoints(input: BuildContractFromEndpointsInpu
     apiName: input.apiName,
     ...(input.cors ? { cors: { ...input.cors } } : {}),
     ...(input.env ? { env: input.env } : {}),
+    ...(input.lambdaDefaults ? { lambdaDefaults: { ...input.lambdaDefaults } } : {}),
     routes: input.endpoints.map((endpoint) => ({
       auth: endpoint.auth,
       ...(endpoint.aws ? { aws: { ...endpoint.aws } } : {}),

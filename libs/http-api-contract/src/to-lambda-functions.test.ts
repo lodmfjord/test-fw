@@ -12,19 +12,19 @@ describe("toLambdaFunctions", () => {
           {
             architecture: "arm64",
             artifactPath: "b.zip",
-            memoryMb: 256,
             method: "POST",
             path: "/b",
             routeId: "route_b",
             runtime: "nodejs20.x",
-            timeoutSeconds: 15,
           },
           {
             architecture: "arm64",
             artifactPath: "a.zip",
+            ephemeralStorageMb: 2048,
             memoryMb: 128,
             method: "GET",
             path: "/a",
+            reservedConcurrency: 3,
             routeId: "route_a",
             runtime: "nodejs20.x",
             timeoutSeconds: 10,
@@ -37,11 +37,20 @@ describe("toLambdaFunctions", () => {
     expect(functions.route_a).toEqual({
       architecture: "arm64",
       artifact_path: "a.zip",
+      ephemeral_storage_mb: 2048,
       memory_mb: 128,
       method: "GET",
       path: "/a",
+      reserved_concurrency: 3,
       runtime: "nodejs20.x",
       timeout_seconds: 10,
+    });
+    expect(functions.route_b).toEqual({
+      architecture: "arm64",
+      artifact_path: "b.zip",
+      method: "POST",
+      path: "/b",
+      runtime: "nodejs20.x",
     });
   });
 });
