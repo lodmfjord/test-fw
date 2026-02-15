@@ -44,12 +44,124 @@ function getHandlerFromSource(
   return factory(runtimeRequire);
 }
 
-describe("generated lambda execution", () => {
+describe("generated lambda zod parity", () => {
   beforeEach(() => {
     resetDefinedEndpoints();
   });
 
-  it("executes bundled lambda source and returns expected response", async () => {
+  it("validates recursive $ref schemas from schema.fromZod", async () => {
+    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
+    const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
+    const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
+    const zodImportPath = fileURLToPath(new URL("../node_modules/zod/index.js", import.meta.url));
+    await writeFile(
+      endpointModulePath,
+      `
+import { definePost, schema } from "${frameworkImportPath}";
+import { z } from "${zodImportPath}";
+
+const treeNode = z.object({
+  children: z.array(z.lazy(() => treeNode)).optional(),
+  name: z.string(),
+});
+
+definePost({
+  path: "/tree",
+  handler: async ({ body }) => ({
+    value: {
+      name: body.name,
+    },
+  }),
+  request: {
+    body: schema.fromZod(treeNode),
+  },
+  response: schema.object({
+    name: schema.string(),
+  }),
+});
+`,
+      "utf8",
+    );
+
+    await import(pathToFileURL(endpointModulePath).href);
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
+    await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
+      endpointModulePath,
+      frameworkImportPath,
+    });
+    const source = await readFile(join(outputDirectory, "post_tree.mjs"), "utf8");
+
+    const handler = getHandlerFromSource(source);
+    const response = await handler({
+      body: JSON.stringify({
+        children: [{ name: 123 }],
+        name: "root",
+      }),
+      headers: {},
+      pathParameters: {},
+      queryStringParameters: {},
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body)).toEqual({
+      error: "body.children.0.name: expected string",
+    });
+  });
+
+  it("applies schema.fromZod default values during request validation", async () => {
+    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
+    const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
+    const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
+    const zodImportPath = fileURLToPath(new URL("../node_modules/zod/index.js", import.meta.url));
+    await writeFile(
+      endpointModulePath,
+      `
+import { definePost, schema } from "${frameworkImportPath}";
+import { z } from "${zodImportPath}";
+
+definePost({
+  path: "/defaults",
+  handler: async ({ body }) => ({
+    value: {
+      name: body.name,
+    },
+  }),
+  request: {
+    body: schema.fromZod(z.object({
+      name: z.string().default("sam"),
+    })),
+  },
+  response: schema.object({
+    name: schema.string(),
+  }),
+});
+`,
+      "utf8",
+    );
+
+    await import(pathToFileURL(endpointModulePath).href);
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
+    await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
+      endpointModulePath,
+      frameworkImportPath,
+    });
+    const source = await readFile(join(outputDirectory, "post_defaults.mjs"), "utf8");
+
+    const handler = getHandlerFromSource(source);
+    const response = await handler({
+      body: JSON.stringify({}),
+      headers: {},
+      pathParameters: {},
+      queryStringParameters: {},
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(JSON.parse(response.body)).toEqual({
+      name: "sam",
+    });
+  });
+
+  it("fails fast for unsupported schema keywords instead of silently accepting", async () => {
     const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
@@ -59,37 +171,19 @@ describe("generated lambda execution", () => {
 import { definePost, schema } from "${frameworkImportPath}";
 
 definePost({
-  path: "/users",
-  handler: async ({ body, db }) => {
-    const id = "user-" + body.name;
-    await db.write({
-      item: {
-        name: body.name,
-      },
-      key: {
-        id,
-      },
-      tableName: "users",
-    });
-    const savedUser = await db.read({
-      key: {
-        id,
-      },
-      tableName: "users",
-    });
-
-    return {
-      statusCode: 201,
-      value: { id: String(savedUser?.id ?? "") },
-    };
-  },
+  path: "/unsupported",
+  handler: async ({ body }) => ({
+    value: {
+      name: body.name,
+    },
+  }),
   request: {
     body: schema.object({
       name: schema.string(),
     }),
   },
   response: schema.object({
-    id: schema.string(),
+    name: schema.string(),
   }),
 });
 `,
@@ -97,177 +191,44 @@ definePost({
     );
 
     await import(pathToFileURL(endpointModulePath).href);
+    const endpoints = listDefinedEndpoints();
+    const endpoint = endpoints[0];
+    if (!endpoint?.request.body) {
+      throw new Error("Expected endpoint with request body schema");
+    }
+    endpoint.request.body.jsonSchema = {
+      not: {
+        type: "null",
+      },
+      properties: {
+        name: {
+          type: "string",
+        },
+      },
+      required: ["name"],
+      type: "object",
+    } as unknown as typeof endpoint.request.body.jsonSchema;
+
     const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
-    await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
+    await writeLambdaJsFiles(outputDirectory, endpoints, {
       endpointModulePath,
       frameworkImportPath,
     });
-    const source = await readFile(join(outputDirectory, "post_users.mjs"), "utf8");
+    const source = await readFile(join(outputDirectory, "post_unsupported.mjs"), "utf8");
 
     const handler = getHandlerFromSource(source);
     const response = await handler({
-      body: JSON.stringify({ name: "sam" }),
-      headers: {},
-      pathParameters: {},
-      queryStringParameters: {},
-    });
-
-    expect(response.statusCode).toBe(201);
-    expect(response.headers["content-type"]).toBe("application/json");
-    expect(JSON.parse(response.body)).toEqual({ id: "user-sam" });
-  });
-
-  it("rejects lambda source with import statements", () => {
-    const source = `
-      import { something } from "x";
-      export async function handler() {
-        return { statusCode: 200, headers: {}, body: "{}" };
-      }
-    `;
-
-    expect(() => getHandlerFromSource(source)).toThrow("Imports are forbidden");
-  });
-
-  it("enforces read-only db access for generated lambdas", async () => {
-    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
-    const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
-    const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
-    await writeFile(
-      endpointModulePath,
-      `
-import { defineGet, schema } from "${frameworkImportPath}";
-
-defineGet({
-  access: {
-    db: "read",
-  },
-  path: "/users",
-  handler: async ({ db }) => {
-    const writer = db;
-    await writer.write({
-      item: {
+      body: JSON.stringify({
         name: "sam",
-      },
-      key: {
-        id: "user-1",
-      },
-      tableName: "users",
-    });
-    return { ok: true };
-  },
-  response: schema.object({
-    ok: schema.boolean(),
-  }),
-});
-`,
-      "utf8",
-    );
-
-    await import(pathToFileURL(endpointModulePath).href);
-    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
-    await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
-      endpointModulePath,
-      frameworkImportPath,
-    });
-    const source = await readFile(join(outputDirectory, "get_users.mjs"), "utf8");
-
-    const handler = getHandlerFromSource(source);
-    const capturedErrors: Array<Record<string, unknown>> = [];
-    const originalConsoleError = console.error;
-    console.error = (...args: unknown[]) => {
-      if (args.length > 0 && args[0] && typeof args[0] === "object") {
-        capturedErrors.push(args[0] as Record<string, unknown>);
-      }
-    };
-    const response = await handler({
-      body: "",
+      }),
       headers: {},
       pathParameters: {},
       queryStringParameters: {},
     });
-    console.error = originalConsoleError;
 
-    expect(response.statusCode).toBe(500);
-    expect(JSON.parse(response.body)).toEqual({ error: "Handler execution failed" });
-    expect(
-      capturedErrors.some(
-        (entry) =>
-          entry.event === "lambda.handler.failed" &&
-          entry.method === "GET" &&
-          entry.path === "/users",
-      ),
-    ).toBe(true);
-  });
-
-  it("enforces read-only context.database for generated lambdas", async () => {
-    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
-    const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
-    const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
-    const dynamodbImportPath = fileURLToPath(
-      new URL("../../dynamodb/src/index.ts", import.meta.url),
-    );
-    await writeFile(
-      endpointModulePath,
-      `
-import { createDynamoDatabase } from "${dynamodbImportPath}";
-import { defineGet, schema } from "${frameworkImportPath}";
-
-const usersDatabase = createDynamoDatabase({
-  parse(input) {
-    return input;
-  },
-}, "id", {
-  tableName: "users",
-});
-
-defineGet({
-  path: "/users/{id}",
-  context: {
-    database: {
-      access: ["read"],
-      handler: usersDatabase,
-    },
-  },
-  handler: async ({ database, params }) => {
-    const writer = database;
-    await writer.write({
-      id: params.id,
-      name: "sam",
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body)).toEqual({
+      error: "body: Unsupported schema keyword: not",
     });
-    return { ok: true };
-  },
-  request: {
-    params: schema.object({
-      id: schema.string(),
-    }),
-  },
-  response: schema.object({
-    ok: schema.boolean(),
-  }),
-});
-`,
-      "utf8",
-    );
-
-    await import(pathToFileURL(endpointModulePath).href);
-    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
-    await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
-      endpointModulePath,
-      frameworkImportPath,
-    });
-    const source = await readFile(join(outputDirectory, "get_users_param_id.mjs"), "utf8");
-
-    const handler = getHandlerFromSource(source);
-    const response = await handler({
-      body: "",
-      headers: {},
-      pathParameters: {
-        id: "user-1",
-      },
-      queryStringParameters: {},
-    });
-
-    expect(response.statusCode).toBe(500);
-    expect(JSON.parse(response.body)).toEqual({ error: "Handler execution failed" });
   });
 });

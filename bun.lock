@@ -30,7 +30,6 @@
       "name": "@babbstack/test-app-client",
       "dependencies": {
         "@babbstack/client": "workspace:*",
-        "@babbstack/http-api-contract": "workspace:*",
       },
     },
     "libs/client": {
@@ -60,6 +59,7 @@
         "@babbstack/sqs": "workspace:*",
         "@babbstack/step-functions": "workspace:*",
         "esbuild": "^0.27.3",
+        "zod": "^4.3.6",
       },
     },
     "libs/s3": {

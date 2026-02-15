@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS_TEMPLATE = `{
   "endpointExportName": "endpoints",
   "endpointModulePath": "./src/endpoints.ts",
   // packages must be installed in this app and are layered only for lambdas that need them
+  // note: zod is always treated as an external runtime dependency for generated route lambdas
   "externalModules": ["@aws-sdk/client-dynamodb", "@aws-sdk/util-dynamodb", "@aws-sdk/client-sqs"],
   "lambdaOutputDirectory": "./dist/lambda-js",
   "prefix": "babb",

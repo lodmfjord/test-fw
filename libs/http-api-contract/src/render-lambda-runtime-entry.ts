@@ -45,7 +45,9 @@ const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};`
     : "";
   const endpointSqsValue = hasContextSqs ? "endpointSqs" : "undefined";
   const envBootstrapSource = renderLambdaEnvBootstrapSource(endpoint);
+  const zodImportLine = 'import { z as simpleApiZod } from "zod";';
   const preludeLines = [
+    zodImportLine,
     ...importLines,
     ...(runtimeDbImport.length > 0 ? [runtimeDbImport] : []),
     ...(runtimeSqsImport.length > 0 ? [runtimeSqsImport] : []),
@@ -80,10 +82,12 @@ const endpointDbAccess = ${JSON.stringify(endpoint.access?.db ?? "write")};`
     ]),
   );
   const responseSchema = endpoint.response.jsonSchema;
-
   return `${prelude}${runtimeDbState}
 ${runtimeSqsState}
 const endpointSuccessStatusCode = ${JSON.stringify(endpoint.successStatusCode)};
+const endpointRouteId = ${JSON.stringify(endpoint.routeId)};
+const endpointMethod = ${JSON.stringify(endpoint.method)};
+const endpointPath = ${JSON.stringify(endpoint.path)};
 ${endpointDatabaseContextLine}
 ${endpointSqsContextLine}
 const endpointRequestSchemas = ${JSON.stringify(requestSchemas)};
@@ -91,17 +95,30 @@ const endpointResponseByStatusCodeSchemas = ${JSON.stringify(responseByStatusCod
 const endpointResponseSchema = ${JSON.stringify(responseSchema)};
 const endpointHandler = (${handlerSource});
 ${renderLambdaRuntimeSourceBlocks.toResponseAndHandlerHelpersSource()}
-${renderLambdaRuntimeSourceBlocks.toSchemaValidationSupportSource()}
+${renderLambdaRuntimeSourceBlocks.toObservabilitySupportSource()}
+${renderLambdaRuntimeSourceBlocks.toZodValidationSupportSource()}
 ${dbAccessSupport}
 ${contextDatabaseHelper}
 ${contextSqsHelper}
 ${envBootstrapSource}
 
 export async function handler(event) {
+  const invocationLogContext = createInvocationLogContext(
+    event,
+    endpointRouteId,
+    endpointMethod,
+    endpointPath
+  );
+  logInvocationStart(invocationLogContext);
   await ensureEndpointEnvLoaded();
   const bodyResult = parseJsonBody(event);
   if (!bodyResult.ok) {
-    return bodyResult.error;
+    const error = new Error("Invalid JSON body");
+    logInputValidationFailure(invocationLogContext, error);
+    logInvocationComplete(invocationLogContext, 400);
+    return toResponse(400, { error: "Invalid JSON body" }, undefined, {
+      "x-request-id": invocationLogContext.requestId
+    });
   }
 
   const params = event?.pathParameters ?? {};
@@ -119,7 +136,11 @@ export async function handler(event) {
     validatedBody = parseBySchema(endpointRequestSchemas.body, bodyResult.value, "body");
   } catch (error) {
     const message = error instanceof Error ? error.message : "input validation failed";
-    return toResponse(400, { error: message });
+    logInputValidationFailure(invocationLogContext, error);
+    logInvocationComplete(invocationLogContext, 400);
+    return toResponse(400, { error: message }, undefined, {
+      "x-request-id": invocationLogContext.requestId
+    });
   }
 
   ${endpointDbLine}
@@ -141,33 +162,45 @@ export async function handler(event) {
       sqs: ${endpointSqsValue}
     });
   } catch (error) {
-    console.error("Handler execution failed for ${endpoint.method} ${endpoint.path}", error);
-    return toResponse(500, { error: "Handler execution failed" });
+    logHandlerFailure(invocationLogContext, error);
+    logInvocationComplete(invocationLogContext, 500);
+    return toResponse(500, { error: "Handler execution failed" }, undefined, {
+      "x-request-id": invocationLogContext.requestId
+    });
   }
 
   try {
     const handlerOutput = toHandlerOutput(output, endpointSuccessStatusCode);
+    const responseHeaders = {
+      ...(handlerOutput.headers ?? {}),
+      "x-request-id": invocationLogContext.requestId
+    };
     if (isBufferValue(handlerOutput.value)) {
+      logInvocationComplete(invocationLogContext, handlerOutput.statusCode);
       return toResponse(
         handlerOutput.statusCode,
         handlerOutput.value,
         handlerOutput.contentType,
-        handlerOutput.headers
+        responseHeaders
       );
     }
 
     const responseSchema =
       endpointResponseByStatusCodeSchemas[String(handlerOutput.statusCode)] ?? endpointResponseSchema;
     const validatedOutput = parseBySchema(responseSchema, handlerOutput.value, "response");
+    logInvocationComplete(invocationLogContext, handlerOutput.statusCode);
     return toResponse(
       handlerOutput.statusCode,
       validatedOutput,
       handlerOutput.contentType,
-      handlerOutput.headers
+      responseHeaders
     );
   } catch (error) {
-    console.error("Output validation failed for ${endpoint.method} ${endpoint.path}", error);
-    return toResponse(500, { error: "Output validation failed" });
+    logOutputValidationFailure(invocationLogContext, error);
+    logInvocationComplete(invocationLogContext, 500);
+    return toResponse(500, { error: "Output validation failed" }, undefined, {
+      "x-request-id": invocationLogContext.requestId
+    });
   }
 }
 `;

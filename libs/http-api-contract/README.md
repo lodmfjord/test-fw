@@ -23,8 +23,11 @@ Declare typed HTTP endpoints once, then reuse that declaration for:
   - `200` otherwise
 - Additional response schemas can be declared via `responses`.
 - OpenAPI generation includes all declared response status codes from `responseByStatusCode`.
-- Generated Lambda runtime entries validate request schemas (`params`, `query`, `headers`, `body`) and return `400` on input validation failures.
-- Generated Lambda runtime entries validate output schema by resolved status code and return `500` on output validation failures.
+- Generated Lambda runtime entries validate request schemas (`params`, `query`, `headers`, `body`) with Zod-backed validators derived from endpoint schemas and return `400` on input validation failures.
+- Generated Lambda runtime entries validate output schema by resolved status code with the same runtime validator flow and return `500` on output validation failures.
+- Generated Lambda runtime entries keep `zod` external (`import "zod"`), and terraform generation always plans a lambda layer dependency for `zod`.
+- Lambda runtime validation supports JSON-schema refs/defaults and fails fast on unsupported schema keywords to avoid silent validation gaps.
+- Generated Lambda runtime entries emit structured logs for invocation lifecycle and failures (`lambda.invocation.start`, `lambda.invocation.complete`, `lambda.validation.input_failed`, `lambda.handler.failed`, `lambda.validation.output_failed`) and always return `x-request-id` response headers.
 
 This means async Step Function routes and multi-response routes keep runtime and contract status codes aligned.
 

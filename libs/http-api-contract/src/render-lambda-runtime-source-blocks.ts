@@ -1,4 +1,5 @@
-import { toSchemaValidationSupportSource } from "./render-lambda-schema-validation-source";
+import { toLambdaObservabilitySupportSource } from "./render-lambda-observability-source";
+import { toZodValidationSupportSource } from "./render-lambda-zod-validation-source";
 
 const RESPONSE_AND_HANDLER_HELPERS_SOURCE = `
 function isBufferValue(payload) {
@@ -155,11 +156,14 @@ export const renderLambdaRuntimeSourceBlocks = {
   toDbAccessSupportSource(): string {
     return DB_ACCESS_SUPPORT_SOURCE;
   },
+  toObservabilitySupportSource(): string {
+    return toLambdaObservabilitySupportSource();
+  },
   toResponseAndHandlerHelpersSource(): string {
     return RESPONSE_AND_HANDLER_HELPERS_SOURCE;
   },
-  toSchemaValidationSupportSource(): string {
-    return toSchemaValidationSupportSource();
+  toZodValidationSupportSource(): string {
+    return toZodValidationSupportSource();
   },
   toSqsContextHelperSource(): string {
     return SQS_CONTEXT_HELPER_SOURCE;

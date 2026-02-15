@@ -21,6 +21,9 @@ Schema primitives used by the framework for:
 - `schema.optional(innerSchema)`
 - `schema.fromZod(zodSchema)`
 
+`schema.fromZod(...)` intentionally accepts only lambda-parity-safe Zod behavior.
+Custom refinements (`refine`/`superRefine`) and transform/preprocess pipelines are rejected.
+
 ## Example
 
 ```ts

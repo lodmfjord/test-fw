@@ -19,11 +19,15 @@ type SqsResponse = {
 };
 
 function getHandlerFromSource(source: string): (event: SqsEvent) => Promise<SqsResponse> {
-  if (/^\s*import\s/m.test(source)) {
+  const sourceWithoutZodImport = source.replace(
+    /import\s+\{\s*z\s+as\s+simpleApiZod\s*\}\s+from\s+["']zod["'];?\s*/g,
+    'const { z: simpleApiZod } = require("zod");\n',
+  );
+  if (/^\s*import\s/m.test(sourceWithoutZodImport)) {
     throw new Error("Imports are forbidden in enclosed lambda runtime");
   }
 
-  const transformedSource = source
+  const transformedSource = sourceWithoutZodImport
     .replace(/export\s+async\s+function\s+handler\s*\(/, "async function handler(")
     .replace(/export\s*\{\s*handler\s*\};?/g, "");
   const runtimeRequire = createRequire(import.meta.url);

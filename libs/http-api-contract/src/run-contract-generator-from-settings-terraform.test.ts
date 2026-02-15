@@ -189,7 +189,7 @@ export const contract = buildContractFromEndpoints({
     expect(lambdaSource.includes('"lambda_layer_key_by_route"')).toBe(true);
     expect(lambdaSource.includes('"get_users_param_id": "')).toBe(true);
     expect(lambdaSource.includes('"get_users_param_id_details": "')).toBe(true);
-    expect(lambdaSource.includes('"get_health": "')).toBe(false);
+    expect(lambdaSource.includes('"get_health": "')).toBe(true);
     const layerArtifacts = await readdir(
       join(workspaceDirectory, "dist/terraform/layer-artifacts"),
     );

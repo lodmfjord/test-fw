@@ -31,6 +31,7 @@ async function writeFakeModule(
 
 export async function createFakeLayerModulesForTest(workspaceDirectory: string): Promise<void> {
   const nodeModulesDirectory = join(workspaceDirectory, "node_modules");
+  await writeFakeModule(nodeModulesDirectory, "zod", {}, "z");
   await writeFakeModule(nodeModulesDirectory, "fake-layer-shared", {}, "shared");
   await writeFakeModule(
     nodeModulesDirectory,

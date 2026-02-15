@@ -42,4 +42,14 @@ describe("schema", () => {
     expect(validator.jsonSchema.type).toBe("object");
     expect(validator.jsonSchema.properties?.id?.type).toBe("string");
   });
+
+  it("rejects custom refine schemas that cannot be made lambda-parity safe", () => {
+    expect(() =>
+      schema.fromZod(
+        z.object({
+          id: z.string().refine((value) => value.startsWith("u-"), "must start with u-"),
+        }),
+      ),
+    ).toThrow("schema.fromZod does not support custom refinements");
+  });
 });

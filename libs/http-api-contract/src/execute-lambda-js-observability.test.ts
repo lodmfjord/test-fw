@@ -13,12 +13,19 @@ type LambdaLikeEvent = {
   headers?: Record<string, string>;
   pathParameters?: Record<string, string>;
   queryStringParameters?: Record<string, string>;
+  requestContext?: {
+    requestId?: string;
+  };
 };
 
 type LambdaLikeResponse = {
   body: string;
   headers: Record<string, string>;
   statusCode: number;
+};
+
+type LoggedEntry = {
+  [key: string]: unknown;
 };
 
 function getHandlerFromSource(
@@ -44,63 +51,16 @@ function getHandlerFromSource(
   return factory(runtimeRequire);
 }
 
-describe("generated lambda execution validation", () => {
+function toEventLog(loggedEntries: LoggedEntry[], event: string): LoggedEntry | undefined {
+  return loggedEntries.find((entry) => entry.event === event);
+}
+
+describe("generated lambda observability", () => {
   beforeEach(() => {
     resetDefinedEndpoints();
   });
 
-  it("returns 400 when request input does not match endpoint schema", async () => {
-    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
-    const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
-    const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
-    await writeFile(
-      endpointModulePath,
-      `
-import { definePost, schema } from "${frameworkImportPath}";
-
-definePost({
-  path: "/users",
-  handler: async ({ body }) => ({
-    value: {
-      id: "user-" + body.name,
-    },
-  }),
-  request: {
-    body: schema.object({
-      name: schema.string(),
-    }),
-  },
-  response: schema.object({
-    id: schema.string(),
-  }),
-});
-`,
-      "utf8",
-    );
-
-    await import(pathToFileURL(endpointModulePath).href);
-    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
-    await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
-      endpointModulePath,
-      frameworkImportPath,
-    });
-    const source = await readFile(join(outputDirectory, "post_users.mjs"), "utf8");
-
-    const handler = getHandlerFromSource(source);
-    const response = await handler({
-      body: JSON.stringify({ name: 1 }),
-      headers: {},
-      pathParameters: {},
-      queryStringParameters: {},
-    });
-
-    expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body)).toEqual({
-      error: "body.name: expected string",
-    });
-  });
-
-  it("returns 500 when handler output does not match response schema", async () => {
+  it("emits structured invocation lifecycle logs and propagates correlation ids", async () => {
     const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
@@ -110,21 +70,14 @@ definePost({
 import { defineGet, schema } from "${frameworkImportPath}";
 
 defineGet({
-  path: "/users/{id}",
-  handler: async ({ params }) => ({
+  path: "/health",
+  handler: () => ({
     value: {
-      id: 123,
-      name: params.id,
+      ok: true,
     },
   }),
-  request: {
-    params: schema.object({
-      id: schema.string(),
-    }),
-  },
   response: schema.object({
-    id: schema.string(),
-    name: schema.string(),
+    ok: schema.boolean(),
   }),
 });
 `,
@@ -137,49 +90,72 @@ defineGet({
       endpointModulePath,
       frameworkImportPath,
     });
-    const source = await readFile(join(outputDirectory, "get_users_param_id.mjs"), "utf8");
+    const source = await readFile(join(outputDirectory, "get_health.mjs"), "utf8");
 
     const handler = getHandlerFromSource(source);
+    const originalConsoleLog = console.log;
+    const loggedEntries: LoggedEntry[] = [];
+    console.log = (...args: unknown[]) => {
+      if (args.length > 0 && args[0] && typeof args[0] === "object") {
+        loggedEntries.push(args[0] as LoggedEntry);
+      }
+    };
+
     const response = await handler({
       body: "",
-      headers: {},
-      pathParameters: {
-        id: "user-1",
+      headers: {
+        "x-amzn-trace-id": "Root=1-test-trace",
+        "x-request-id": "req-abc",
       },
+      pathParameters: {},
       queryStringParameters: {},
+      requestContext: {
+        requestId: "aws-req-123",
+      },
     });
+    console.log = originalConsoleLog;
 
-    expect(response.statusCode).toBe(500);
-    expect(JSON.parse(response.body)).toEqual({
-      error: "Output validation failed",
+    expect(response.statusCode).toBe(200);
+    expect(response.headers["x-request-id"]).toBe("req-abc");
+
+    const startLog = toEventLog(loggedEntries, "lambda.invocation.start");
+    const completeLog = toEventLog(loggedEntries, "lambda.invocation.complete");
+    expect(startLog).toBeDefined();
+    expect(completeLog).toBeDefined();
+    expect(startLog).toMatchObject({
+      method: "GET",
+      path: "/health",
+      requestId: "req-abc",
+      routeId: "get_health",
+      traceId: "Root=1-test-trace",
     });
+    expect(completeLog).toMatchObject({
+      method: "GET",
+      path: "/health",
+      requestId: "req-abc",
+      routeId: "get_health",
+      statusCode: 200,
+      traceId: "Root=1-test-trace",
+    });
+    expect(typeof completeLog?.durationMs).toBe("number");
   });
 
-  it("uses zod-backed constraints from schema.fromZod for request validation", async () => {
+  it("emits structured handler failure logs", async () => {
     const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-exec-endpoint-"));
     const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
     const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
     await writeFile(
       endpointModulePath,
       `
-import { definePost, schema } from "${frameworkImportPath}";
+import { defineGet, schema } from "${frameworkImportPath}";
 
-const minThreeChars = schema.fromZod((schema.string().zodSchema).min(3));
-
-definePost({
-  path: "/users",
-  handler: async ({ body }) => ({
-    value: {
-      name: body.name,
-    },
-  }),
-  request: {
-    body: schema.object({
-      name: minThreeChars,
-    }),
+defineGet({
+  path: "/boom",
+  handler: () => {
+    throw new Error("handler exploded");
   },
   response: schema.object({
-    name: schema.string(),
+    ok: schema.boolean(),
   }),
 });
 `,
@@ -192,19 +168,38 @@ definePost({
       endpointModulePath,
       frameworkImportPath,
     });
-    const source = await readFile(join(outputDirectory, "post_users.mjs"), "utf8");
+    const source = await readFile(join(outputDirectory, "get_boom.mjs"), "utf8");
 
     const handler = getHandlerFromSource(source);
+    const originalConsoleError = console.error;
+    const loggedErrors: LoggedEntry[] = [];
+    console.error = (...args: unknown[]) => {
+      if (args.length > 0 && args[0] && typeof args[0] === "object") {
+        loggedErrors.push(args[0] as LoggedEntry);
+      }
+    };
+
     const response = await handler({
-      body: JSON.stringify({ name: "ab" }),
+      body: "",
       headers: {},
       pathParameters: {},
       queryStringParameters: {},
+      requestContext: {
+        requestId: "aws-req-500",
+      },
     });
+    console.error = originalConsoleError;
 
-    expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body)).toEqual({
-      error: "body.name: Too small: expected string to have >=3 characters",
+    expect(response.statusCode).toBe(500);
+    const failureLog = toEventLog(loggedErrors, "lambda.handler.failed");
+    expect(failureLog).toBeDefined();
+    expect(failureLog).toMatchObject({
+      errorMessage: "handler exploded",
+      errorName: "Error",
+      method: "GET",
+      path: "/boom",
+      requestId: "aws-req-500",
+      routeId: "get_boom",
     });
   });
 });

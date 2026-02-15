@@ -43,7 +43,7 @@ defineGet({
     expect(fileNames).toEqual(["get_health.mjs"]);
 
     const source = await readFile(join(outputDirectory, "get_health.mjs"), "utf8");
-    expect(/^\s*import\s/m.test(source)).toBe(false);
+    expect(source.includes('import { z as simpleApiZod } from "zod";')).toBe(true);
     expect(source.includes("Handler execution failed")).toBe(true);
     expect(source.includes('const dynamoClientModuleName = "@aws-sdk/client-dynamodb";')).toBe(
       false,
@@ -109,6 +109,38 @@ defineGet({
     expect(source.includes("@aws-sdk/util-dynamodb")).toBe(true);
     expect(source.includes("@smithy/")).toBe(false);
     expect(source.includes("node_modules/.bun/@aws-sdk+client-dynamodb")).toBe(false);
+  });
+
+  it("keeps zod as an external runtime import in generated lambdas", async () => {
+    const endpointModuleDirectory = await mkdtemp(join(tmpdir(), "babbstack-endpoint-module-"));
+    const endpointModulePath = join(endpointModuleDirectory, "endpoints.ts");
+    const frameworkImportPath = fileURLToPath(new URL("./index.ts", import.meta.url));
+    await writeFile(
+      endpointModulePath,
+      `
+import { defineGet, schema } from "${frameworkImportPath}";
+
+defineGet({
+  path: "/health",
+  handler: async () => ({ value: { status: "ok" } }),
+  response: schema.object({
+    status: schema.string(),
+  }),
+});
+`,
+      "utf8",
+    );
+
+    await import(pathToFileURL(endpointModulePath).href);
+    const outputDirectory = await mkdtemp(join(tmpdir(), "babbstack-lambda-js-"));
+    await writeLambdaJsFiles(outputDirectory, listDefinedEndpoints(), {
+      endpointModulePath,
+      frameworkImportPath,
+    });
+    const source = await readFile(join(outputDirectory, "get_health.mjs"), "utf8");
+
+    expect(source.includes('from "zod"')).toBe(true);
+    expect(source.includes("node_modules/zod")).toBe(false);
   });
 
   it("rejects endpoints with colliding route ids", async () => {

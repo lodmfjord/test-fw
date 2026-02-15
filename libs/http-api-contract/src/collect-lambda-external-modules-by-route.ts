@@ -1,16 +1,10 @@
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { join } from "node:path";
+import { toRequiredRuntimeExternalModules } from "./to-required-runtime-external-modules";
 
 function toExternalModules(externalModules: string[] | undefined): string[] {
-  if (!externalModules) {
-    return [];
-  }
-
-  return externalModules
-    .map((moduleName) => moduleName.trim())
-    .filter((moduleName) => moduleName.length > 0)
-    .sort((left, right) => left.localeCompare(right));
+  return toRequiredRuntimeExternalModules(externalModules);
 }
 
 function toRouteId(fileName: string): string {

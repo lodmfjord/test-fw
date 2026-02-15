@@ -4,6 +4,7 @@ import { isAbsolute, join, resolve } from "node:path";
 import { build } from "esbuild";
 import { assertUniqueRouteIds } from "./assert-unique-route-ids";
 import { renderLambdaRuntimeEntrySource } from "./render-lambda-runtime-entry";
+import { toRequiredRuntimeExternalModules } from "./to-required-runtime-external-modules";
 import type { EndpointRuntimeDefinition, LambdaJsGenerationOptions } from "./types";
 
 function resolveEndpointModulePath(endpointModulePath: string): string {
@@ -87,7 +88,10 @@ export async function writeLambdaJsFiles(
   assertUniqueRouteIds(lambdaEndpoints);
 
   const endpointModulePath = resolveEndpointModulePath(options.endpointModulePath);
-  const externalModules = resolveExternalModules(options.externalModules, endpointModulePath);
+  const externalModules = resolveExternalModules(
+    toRequiredRuntimeExternalModules(options.externalModules),
+    endpointModulePath,
+  );
   const endpointModuleSource = await readFile(endpointModulePath, "utf8");
   await mkdir(directory, { recursive: true });
 

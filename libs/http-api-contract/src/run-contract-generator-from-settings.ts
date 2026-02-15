@@ -11,6 +11,7 @@ import { toContractGeneratorSettings } from "./to-contract-generator-settings";
 import { toContract } from "./to-contract";
 import { toImportPath } from "./to-import-path";
 import { toLambdaLayerMetadata } from "./to-lambda-layer-metadata";
+import { toRequiredRuntimeExternalModules } from "./to-required-runtime-external-modules";
 import { toRuntimeEndpointsWithGlobalCorsOptions } from "./to-runtime-endpoints-with-global-cors-options";
 import { writeContractFiles } from "./write-contract-files-export";
 import { writeLambdaLayerArtifacts } from "./write-lambda-layer-artifacts";
@@ -76,13 +77,14 @@ export async function runContractGeneratorFromSettings(
     settings.contractExportName ?? "contract",
   );
   const endpointsWithCorsOptions = toRuntimeEndpointsWithGlobalCorsOptions(contract, endpoints);
+  const runtimeExternalModules = toRequiredRuntimeExternalModules(settings.externalModules);
   const contractFiles = await writeContractFiles(contractsOutputDirectory, contract);
   const routeLambdaFiles = await writeLambdaJsFiles(
     lambdaOutputDirectory,
     endpointsWithCorsOptions,
     {
       endpointModulePath,
-      ...(settings.externalModules ? { externalModules: settings.externalModules } : {}),
+      externalModules: runtimeExternalModules,
     },
   );
   const sqsListenerLambdaFiles = await writeSqsListenerJsFiles(
@@ -90,7 +92,7 @@ export async function runContractGeneratorFromSettings(
     lambdaSqsListeners,
     {
       endpointModulePath,
-      ...(settings.externalModules ? { externalModules: settings.externalModules } : {}),
+      externalModules: runtimeExternalModules,
     },
   );
   const lambdaFiles = [...routeLambdaFiles, ...sqsListenerLambdaFiles].sort((left, right) =>
@@ -99,7 +101,7 @@ export async function runContractGeneratorFromSettings(
   const lambdaExternalModulesByRoute = await collectLambdaExternalModulesByRoute(
     lambdaOutputDirectory,
     lambdaFiles,
-    settings.externalModules,
+    runtimeExternalModules,
     endpointModulePath,
   );
   const lambdaLayerMetadata = toLambdaLayerMetadata(lambdaExternalModulesByRoute);
