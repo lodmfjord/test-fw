@@ -11,6 +11,7 @@ Shared reusable framework packages live in this folder.
 - `libs/sqs`: SQS clients, queue/listener abstractions, listener runtime wiring.
 - `libs/dynamodb`: DynamoDB runtime adapters and typed table helpers.
 - `libs/s3`: S3 runtime adapters and helper operations.
+- `libs/create-app-cli`: CLI app scaffold generator for minimal hello-world apps.
 
 ## Guardrails
 

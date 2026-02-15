@@ -18,6 +18,7 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
 - `@babbstack/sqs` (`libs/sqs`): runtime SQS adapters, queue definitions, listener registration.
 - `@babbstack/dynamodb` (`libs/dynamodb`): runtime DynamoDB adapters and typed table helpers.
 - `@babbstack/s3` (`libs/s3`): runtime S3 adapters for local and AWS execution.
+- `@babbstack/create-app-cli` (`libs/create-app-cli`): CLI scaffold generator that creates a new `apps/<name>` hello-world app.
 - `@babbstack/test-app` (`apps/test-app`): showcase app that exercises the framework end to end.
 - `@babbstack/test-app-client` (`apps/test-app-client`): typed client smoke app using `@babbstack/client` against `test-app` endpoints.
 
@@ -104,6 +105,7 @@ bun run check
 - `bun run check:constraints`
 - `bun run check:fast`
 - `bun run check`
+- `bun run create:app -- <app-name>`
 
 ## Constraints
 
@@ -122,6 +124,9 @@ bun run check
 - `apps/*` sources can only import from other apps using type-only imports.
 - `export * from ...` is disallowed. Use explicit named exports.
 - Deep cross-package `src` imports are disallowed. Import from package entrypoints instead.
+- Exported-function source files must have a sibling test file (`*.test.ts`) for configured roots.
+- Tested-export roots default to `libs` and can include apps by setting `CONSTRAINT_TESTED_EXPORTS_ROOTS=libs,apps`.
+- Deprecated APIs and types are disallowed across `apps/`, `libs/`, and `tools/`.
 - `bun run check:constraints` enforces constraints for `apps/`, `libs/`, and `tools/`.
 - `bun run check` is fail-fast: constraints run first before format/lint/typecheck/tests.
 

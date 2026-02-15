@@ -37,7 +37,7 @@ describe("schema", () => {
   it("supports native zod schemas", () => {
     const validator = schema.fromZod(
       z.object({
-        id: z.string().uuid(),
+        id: z.uuid(),
       }),
     );
 

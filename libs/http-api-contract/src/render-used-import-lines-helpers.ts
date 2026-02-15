@@ -95,7 +95,7 @@ function toImportDescriptor(
     return { moduleSpecifier, namedImports: [], sideEffectOnly: true, sourcePath };
   }
 
-  if (clause.isTypeOnly) {
+  if (clause.phaseModifier === ts.SyntaxKind.TypeKeyword) {
     return null;
   }
 

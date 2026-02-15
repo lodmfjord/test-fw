@@ -1,7 +1,7 @@
 /**
  * @fileoverview Implements schema.
  */
-import { z, type ZodIssue, type ZodType } from "zod";
+import { z, type ZodType } from "zod";
 import { schemaParityHelpers } from "./schema-parity-helpers";
 import type { JsonSchema, ObjectFromShape, OptionalSchema, Schema } from "./schema-types";
 
@@ -34,7 +34,7 @@ function toIssuePath(path: PropertyKey[]): string | undefined {
 }
 
 /** Converts values to issue message. */
-function toIssueMessage(issue: ZodIssue): string {
+function toIssueMessage(issue: z.core.$ZodIssue): string {
   if (issue.code === "invalid_type") {
     return `expected ${issue.expected}`;
   }

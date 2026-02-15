@@ -76,7 +76,7 @@ function isTypeOnlyImport(importClause: ts.ImportClause | undefined): boolean {
     return false;
   }
 
-  if (importClause.isTypeOnly) {
+  if (importClause.phaseModifier === ts.SyntaxKind.TypeKeyword) {
     return true;
   }
 
