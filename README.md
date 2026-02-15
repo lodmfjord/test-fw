@@ -41,6 +41,11 @@ Contract generation writes outputs that external deploy/infra repos can consume:
 - `dist/lambda-js/*.mjs` (lambda runtime entries)
 - optional Terraform artifacts (`dist/*.tf.json`, `dist/lambda-artifacts`, `dist/layer-artifacts`) when enabled by settings
 
+## Toolchain
+
+- Required Bun version: `1.3.0`
+- Tooling dependencies are pinned to exact versions in `/Users/lommi/Projects/simple-api/package.json` for reproducible local and CI checks.
+
 ## Development
 
 1. Install dependencies:
@@ -88,6 +93,7 @@ bun run check
 - Strict TDD: test first, minimal implementation, then refactor.
 - File names must use kebab-case.
 - Each source file may export at most one function.
+- Export counting is AST-based and includes `export { fn }` / `export default fn` forms for local functions.
 - Each source file must be 300 lines or fewer.
 - `bun run check:constraints` enforces constraints for `apps/`, `libs/`, and `tools/`.
 

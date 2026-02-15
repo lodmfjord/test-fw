@@ -1,125 +1,194 @@
-const EXPORTED_FUNCTION_PATTERNS = [
-  /\bexport\s+default\s+(?:async\s+)?function\b/g,
-  /\bexport\s+(?:async\s+)?function\b/g,
-  /\bexport\s+const\s+[A-Za-z_$][\w$]*\s*=\s*(?:async\s*)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>/g,
-];
+import * as ts from "typescript";
 
-function stripStringsAndComments(source: string): string {
-  const chars = source.split("");
-  const cleaned: string[] = [];
-  let i = 0;
-  let inSingleQuote = false;
-  let inDoubleQuote = false;
-  let inTemplate = false;
-  let inLineComment = false;
-  let inBlockComment = false;
+type FunctionBindingMap = Map<string, string>;
 
-  while (i < chars.length) {
-    const current = chars[i] ?? "";
-    const next = chars[i + 1] ?? "";
-    const previous = chars[i - 1] ?? "";
-
-    if (inLineComment) {
-      if (current === "\n") {
-        inLineComment = false;
-        cleaned.push("\n");
-      } else {
-        cleaned.push(" ");
-      }
-      i += 1;
-      continue;
-    }
-
-    if (inBlockComment) {
-      if (current === "*" && next === "/") {
-        inBlockComment = false;
-        cleaned.push(" ", " ");
-        i += 2;
-      } else {
-        cleaned.push(current === "\n" ? "\n" : " ");
-        i += 1;
-      }
-      continue;
-    }
-
-    if (inSingleQuote) {
-      if (current === "'" && previous !== "\\") {
-        inSingleQuote = false;
-      }
-      cleaned.push(current === "\n" ? "\n" : " ");
-      i += 1;
-      continue;
-    }
-
-    if (inDoubleQuote) {
-      if (current === '"' && previous !== "\\") {
-        inDoubleQuote = false;
-      }
-      cleaned.push(current === "\n" ? "\n" : " ");
-      i += 1;
-      continue;
-    }
-
-    if (inTemplate) {
-      if (current === "`" && previous !== "\\") {
-        inTemplate = false;
-      }
-      cleaned.push(current === "\n" ? "\n" : " ");
-      i += 1;
-      continue;
-    }
-
-    if (current === "/" && next === "/") {
-      inLineComment = true;
-      cleaned.push(" ", " ");
-      i += 2;
-      continue;
-    }
-
-    if (current === "/" && next === "*") {
-      inBlockComment = true;
-      cleaned.push(" ", " ");
-      i += 2;
-      continue;
-    }
-
-    if (current === "'") {
-      inSingleQuote = true;
-      cleaned.push(" ");
-      i += 1;
-      continue;
-    }
-
-    if (current === '"') {
-      inDoubleQuote = true;
-      cleaned.push(" ");
-      i += 1;
-      continue;
-    }
-
-    if (current === "`") {
-      inTemplate = true;
-      cleaned.push(" ");
-      i += 1;
-      continue;
-    }
-
-    cleaned.push(current);
-    i += 1;
-  }
-
-  return cleaned.join("");
+function toBindingId(node: ts.Node): string {
+  return `${node.pos}:${node.end}`;
 }
 
-function countPatternMatches(source: string, pattern: RegExp): number {
-  const matches = source.match(pattern);
-  return matches ? matches.length : 0;
+function hasModifier(
+  node: ts.Node & {
+    modifiers?: ts.NodeArray<ts.ModifierLike>;
+  },
+  kind: ts.SyntaxKind,
+): boolean {
+  return node.modifiers?.some((modifier) => modifier.kind === kind) ?? false;
+}
+
+function unwrapExpression(expression: ts.Expression): ts.Expression {
+  if (ts.isParenthesizedExpression(expression)) {
+    return unwrapExpression(expression.expression);
+  }
+
+  return expression;
+}
+
+function toBoundFunctionExpression(
+  expression: ts.Expression | undefined,
+): ts.FunctionExpression | ts.ArrowFunction | undefined {
+  if (!expression) {
+    return undefined;
+  }
+
+  const normalized = unwrapExpression(expression);
+  if (ts.isArrowFunction(normalized) || ts.isFunctionExpression(normalized)) {
+    return normalized;
+  }
+
+  return undefined;
+}
+
+function toFunctionBindingMap(sourceFile: ts.SourceFile): FunctionBindingMap {
+  const bindings: FunctionBindingMap = new Map();
+  const aliases: Array<{ aliasName: string; sourceName: string }> = [];
+
+  for (const statement of sourceFile.statements) {
+    if (ts.isFunctionDeclaration(statement) && statement.name) {
+      bindings.set(statement.name.text, toBindingId(statement));
+      continue;
+    }
+
+    if (!ts.isVariableStatement(statement)) {
+      continue;
+    }
+
+    for (const declaration of statement.declarationList.declarations) {
+      if (!ts.isIdentifier(declaration.name)) {
+        continue;
+      }
+
+      const declarationName = declaration.name.text;
+      const functionExpression = toBoundFunctionExpression(declaration.initializer);
+      if (functionExpression) {
+        bindings.set(declarationName, toBindingId(functionExpression));
+        continue;
+      }
+
+      if (declaration.initializer && ts.isIdentifier(declaration.initializer)) {
+        aliases.push({
+          aliasName: declarationName,
+          sourceName: declaration.initializer.text,
+        });
+      }
+    }
+  }
+
+  let hasUpdates = true;
+  while (hasUpdates) {
+    hasUpdates = false;
+    for (const alias of aliases) {
+      if (bindings.has(alias.aliasName)) {
+        continue;
+      }
+
+      const bindingId = bindings.get(alias.sourceName);
+      if (!bindingId) {
+        continue;
+      }
+
+      bindings.set(alias.aliasName, bindingId);
+      hasUpdates = true;
+    }
+  }
+
+  return bindings;
+}
+
+function collectNamedExportedFunctions(
+  sourceFile: ts.SourceFile,
+  bindings: FunctionBindingMap,
+  exportedBindingIds: Set<string>,
+): void {
+  for (const statement of sourceFile.statements) {
+    if (ts.isFunctionDeclaration(statement)) {
+      if (!hasModifier(statement, ts.SyntaxKind.ExportKeyword)) {
+        continue;
+      }
+
+      if (statement.name) {
+        const bindingId = bindings.get(statement.name.text);
+        if (bindingId) {
+          exportedBindingIds.add(bindingId);
+        }
+        continue;
+      }
+
+      exportedBindingIds.add(toBindingId(statement));
+      continue;
+    }
+
+    if (ts.isVariableStatement(statement)) {
+      if (!hasModifier(statement, ts.SyntaxKind.ExportKeyword)) {
+        continue;
+      }
+
+      for (const declaration of statement.declarationList.declarations) {
+        if (!ts.isIdentifier(declaration.name)) {
+          continue;
+        }
+
+        const bindingId = bindings.get(declaration.name.text);
+        if (bindingId) {
+          exportedBindingIds.add(bindingId);
+        }
+      }
+      continue;
+    }
+
+    if (ts.isExportDeclaration(statement)) {
+      if (statement.isTypeOnly || statement.moduleSpecifier || !statement.exportClause) {
+        continue;
+      }
+
+      if (!ts.isNamedExports(statement.exportClause)) {
+        continue;
+      }
+
+      for (const element of statement.exportClause.elements) {
+        if (element.isTypeOnly) {
+          continue;
+        }
+
+        const sourceName = (element.propertyName ?? element.name).text;
+        const bindingId = bindings.get(sourceName);
+        if (bindingId) {
+          exportedBindingIds.add(bindingId);
+        }
+      }
+      continue;
+    }
+
+    if (!ts.isExportAssignment(statement)) {
+      continue;
+    }
+
+    const expression = unwrapExpression(statement.expression);
+    const functionExpression = toBoundFunctionExpression(expression);
+    if (functionExpression) {
+      exportedBindingIds.add(toBindingId(functionExpression));
+      continue;
+    }
+
+    if (ts.isIdentifier(expression)) {
+      const bindingId = bindings.get(expression.text);
+      if (bindingId) {
+        exportedBindingIds.add(bindingId);
+      }
+    }
+  }
 }
 
 export function countExportedFunctions(source: string): number {
-  const cleanSource = stripStringsAndComments(source);
+  const sourceFile = ts.createSourceFile(
+    "source.ts",
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX,
+  );
+  const bindings = toFunctionBindingMap(sourceFile);
+  const exportedBindingIds = new Set<string>();
+  collectNamedExportedFunctions(sourceFile, bindings, exportedBindingIds);
 
-  return EXPORTED_FUNCTION_PATTERNS.reduce((total, pattern) => {
-    return total + countPatternMatches(cleanSource, pattern);
-  }, 0);
+  return exportedBindingIds.size;
 }
