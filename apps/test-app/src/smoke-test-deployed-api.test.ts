@@ -91,7 +91,23 @@ function createFetchImpl(calls: string[]): DeployedFetch {
           status: 200,
         });
       case "OPTIONS /order ":
+        if (request.headers.get("origin") !== "https://app.example.com") {
+          return new Response("missing origin", { status: 400 });
+        }
+        if (request.headers.get("access-control-request-method") !== "PUT") {
+          return new Response("missing requested method", { status: 400 });
+        }
+        if (
+          request.headers.get("access-control-request-headers") !== "content-type,authorization"
+        ) {
+          return new Response("missing requested headers", { status: 400 });
+        }
         return new Response("", {
+          headers: {
+            "access-control-allow-headers": "content-type,authorization",
+            "access-control-allow-methods": "PUT,PATCH,DELETE,HEAD,OPTIONS",
+            "access-control-allow-origin": "https://app.example.com",
+          },
           status: 204,
         });
       case `DELETE /order/${orderId} `:

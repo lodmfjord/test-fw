@@ -86,6 +86,11 @@ const optionsOrderEndpoint = defineOptions({
   path: "/order",
   handler: () => {
     return {
+      headers: {
+        "access-control-allow-headers": "content-type,authorization",
+        "access-control-allow-methods": "PUT,PATCH,DELETE,HEAD,OPTIONS",
+        "access-control-allow-origin": "https://app.example.com",
+      },
       value: {
         methods: ["PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
       },

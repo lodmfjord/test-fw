@@ -26,5 +26,6 @@ export type EndpointExpectation = {
   expectedStatusCode: number;
   name: string;
   path: string;
+  requestHeaders?: Record<string, string>;
   validate: (payload: unknown, response: Response) => void;
 };

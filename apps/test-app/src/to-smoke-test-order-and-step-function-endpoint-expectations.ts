@@ -5,6 +5,15 @@ import type { EndpointExpectation } from "./smoke-test-deployed-api-types";
 
 const smokeOrderId = "smoke-order-123";
 const smokeEventId = "smoke-event-123";
+const corsOriginUrl = "https://app.example.com";
+
+/** Converts to csv values. */
+function toCsvValues(value: string): string[] {
+  return value
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter((item) => item.length > 0);
+}
 
 /** Runs assert object. */
 function assertObject(value: unknown, message: string): Record<string, unknown> {
@@ -86,10 +95,38 @@ export function toSmokeTestOrderAndStepFunctionEndpointExpectations(): EndpointE
       method: "OPTIONS",
       name: "order-options",
       path: "/order",
-      validate(payload) {
+      requestHeaders: {
+        "access-control-request-headers": "content-type,authorization",
+        "access-control-request-method": "PUT",
+        origin: corsOriginUrl,
+      },
+      validate(payload, response) {
         if (payload !== "" && payload !== null) {
           throw new Error(
             `Expected empty or null OPTIONS /order payload, received ${String(payload)}`,
+          );
+        }
+
+        const allowOrigin = response.headers.get("access-control-allow-origin") ?? "";
+        if (allowOrigin !== corsOriginUrl) {
+          throw new Error(
+            `Expected OPTIONS /order access-control-allow-origin ${corsOriginUrl}, received ${allowOrigin}`,
+          );
+        }
+
+        const allowMethodsHeader = response.headers.get("access-control-allow-methods") ?? "";
+        const allowMethods = new Set(toCsvValues(allowMethodsHeader));
+        if (!allowMethods.has("put") || !allowMethods.has("options")) {
+          throw new Error(
+            `Expected OPTIONS /order allow methods to include PUT and OPTIONS, received ${allowMethodsHeader}`,
+          );
+        }
+
+        const allowHeadersHeader = response.headers.get("access-control-allow-headers") ?? "";
+        const allowHeaders = new Set(toCsvValues(allowHeadersHeader));
+        if (!allowHeaders.has("content-type") || !allowHeaders.has("authorization")) {
+          throw new Error(
+            `Expected OPTIONS /order allow headers to include content-type and authorization, received ${allowHeadersHeader}`,
           );
         }
       },

@@ -32,7 +32,10 @@ bun test apps/test-app/src/showcase.test.ts
 - order demo routes (`PUT`, `PATCH`, `HEAD`, `OPTIONS`, `DELETE`)
 - Step Function routes (`/step-function-demo`, `/step-function-random-branch`, `/step-function-events`)
 - expected status codes and response-shape checks per route.
-- `OPTIONS /order` is validated as `204` to match the endpoint default success status for `OPTIONS`.
+- `OPTIONS /order` is validated as `204` and checks CORS preflight headers:
+- `access-control-allow-origin` matches `https://app.example.com`
+- `access-control-allow-methods` includes `PUT` and `OPTIONS`
+- `access-control-allow-headers` includes `content-type` and `authorization`
 
 S3 demo routes now use a fixed bucket configured via `createBucket({ name: "test-app-s3-demo" })`
 and `context.s3` access declarations, so deployed smoke tests no longer require a bucket-name CLI arg.

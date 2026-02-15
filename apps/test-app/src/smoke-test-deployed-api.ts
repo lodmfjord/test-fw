@@ -27,14 +27,18 @@ async function executeEndpoint(
   baseUrl: string,
   fetchImpl: DeployedFetch,
 ): Promise<void> {
+  const headers: Record<string, string> = { ...(endpoint.requestHeaders ?? {}) };
   const requestInit: RequestInit = {
     method: endpoint.method,
   };
   if (endpoint.body !== undefined) {
     requestInit.body = JSON.stringify(endpoint.body);
-    requestInit.headers = {
-      "content-type": "application/json",
-    };
+    if (!headers["content-type"]) {
+      headers["content-type"] = "application/json";
+    }
+  }
+  if (Object.keys(headers).length > 0) {
+    requestInit.headers = headers;
   }
 
   const response = await fetchImpl(`${baseUrl}${endpoint.path}`, {
