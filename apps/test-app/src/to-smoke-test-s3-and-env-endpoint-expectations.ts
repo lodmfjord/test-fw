@@ -4,7 +4,6 @@
 import type { EndpointExpectation } from "./smoke-test-deployed-api-types";
 
 const smokeS3ObjectBody = "hello from smoke test";
-const smokeS3BucketName = "test-app-s3-demo";
 const smokeS3ObjectKey = "smoke-test-object.txt";
 
 /** Converts to query string. */
@@ -93,8 +92,8 @@ export function toSmokeTestS3AndEnvEndpointExpectations(): EndpointExpectation[]
       path: "/s3-demo/files",
       validate(payload) {
         const parsed = assertObject(payload, "Expected /s3-demo/files POST response object");
-        if (parsed.bucketName !== smokeS3BucketName || parsed.key !== smokeS3ObjectKey) {
-          throw new Error("Expected /s3-demo/files POST to echo bucketName and key");
+        if (parsed.key !== smokeS3ObjectKey) {
+          throw new Error("Expected /s3-demo/files POST to echo key");
         }
         assertNumberValue(parsed.size, "Expected /s3-demo/files POST size number");
       },

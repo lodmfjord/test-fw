@@ -51,6 +51,8 @@ describe("buildContractFromEndpoints", () => {
     expect(contract.lambdasManifest.functions[1]?.functionId).toBe("post_users");
     expect(contract.lambdasManifest.functions[0]?.handler).toBe("get_users_param_id_handler");
     expect(contract.lambdasManifest.functions[1]?.handler).toBe("post_users_handler");
+    expect(contract.lambdasManifest.functions[0]?.timeoutSeconds).toBe(15);
+    expect(contract.lambdasManifest.functions[1]?.timeoutSeconds).toBe(15);
 
     const getOperation = contract.openapi.paths["/users/{id}"]?.get;
     expect(getOperation?.parameters?.[0]?.in).toBe("path");

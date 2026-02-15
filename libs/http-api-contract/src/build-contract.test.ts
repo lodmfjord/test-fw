@@ -44,6 +44,7 @@ describe("buildContract", () => {
     expect(contract.lambdasManifest.functions).toHaveLength(2);
 
     expect(contract.lambdasManifest.functions[0]?.functionId).toBe("get_users_param_id");
+    expect(contract.lambdasManifest.functions[0]?.timeoutSeconds).toBe(15);
     expect(contract.lambdasManifest.functions[1]?.timeoutSeconds).toBe(30);
     expect(contract.lambdasManifest.functions[1]?.memoryMb).toBe(512);
 

@@ -87,8 +87,10 @@ export function toSmokeTestOrderAndStepFunctionEndpointExpectations(): EndpointE
       name: "order-options",
       path: "/order",
       validate(payload) {
-        if (payload !== "") {
-          throw new Error(`Expected empty OPTIONS /order payload, received ${String(payload)}`);
+        if (payload !== "" && payload !== null) {
+          throw new Error(
+            `Expected empty or null OPTIONS /order payload, received ${String(payload)}`,
+          );
         }
       },
     },

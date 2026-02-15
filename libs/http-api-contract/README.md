@@ -39,8 +39,9 @@ This means async Step Function routes and multi-response routes keep runtime and
   - `ephemeralStorageMb`
   - `reservedConcurrency`
 - Endpoint-level `aws` values override matching `lambdaDefaults` values per route.
+- When no route/default timeout is provided, route lambda `timeoutSeconds` defaults to `15`.
 - Route lambdas default architecture to `arm64`.
-- Terraform generation only sets lambda `memory_size`, `timeout`, `ephemeral_storage`, and `reserved_concurrent_executions` when those values are configured. When omitted, AWS defaults are left untouched.
+- Terraform generation sets lambda `timeout` whenever it is present in the lambda manifest (including the default `15`). `memory_size`, `ephemeral_storage`, and `reserved_concurrent_executions` are only set when configured.
 - Route IAM generation now also includes per-route S3 policies when `context.s3` is configured on lambda endpoints.
 - Terraform generation creates managed S3 buckets for `context.s3` usage and injects `SIMPLE_API_S3_BUCKET_NAME_PREFIX` so runtime bucket names align with deployed resources.
 - Route SQS send IAM now includes both `sqs:GetQueueUrl` and `sqs:SendMessage`.

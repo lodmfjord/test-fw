@@ -11,6 +11,8 @@ import type {
   RoutesManifest,
 } from "./types";
 
+const DEFAULT_LAMBDA_TIMEOUT_SECONDS = 15;
+
 /** Runs validate duplicate routes. */
 function validateDuplicateRoutes(routes: RouteDefinition[]): void {
   const seen = new Set<string>();
@@ -46,7 +48,10 @@ function toLambdasManifest(input: BuildContractInput): LambdasManifest {
     apiName: input.apiName,
     functions: lambdaRoutes.map((route) => {
       const memoryMb = route.aws?.memoryMb ?? lambdaDefaults?.memoryMb;
-      const timeoutSeconds = route.aws?.timeoutSeconds ?? lambdaDefaults?.timeoutSeconds;
+      const timeoutSeconds =
+        route.aws?.timeoutSeconds ??
+        lambdaDefaults?.timeoutSeconds ??
+        DEFAULT_LAMBDA_TIMEOUT_SECONDS;
       const ephemeralStorageMb =
         route.aws?.ephemeralStorageMb ?? lambdaDefaults?.ephemeralStorageMb;
       const reservedConcurrency =

@@ -13,6 +13,7 @@ Showcase app for `@babbstack/http-api-contract`. It demonstrates endpoint defini
 - Deployed smoke checks for status-code and response-shape drift.
 
 Endpoints are defined in `apps/test-app/src/endpoints.ts` and Step Function demos in `apps/test-app/src/step-function-demo.ts`.
+`apps/test-app/src/test-app-contract.ts` sets `lambdaDefaults.timeoutSeconds` to `15`.
 
 ## Commands
 
