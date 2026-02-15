@@ -1,8 +1,17 @@
-/** @fileoverview Implements resolve runtime module specifier. @module libs/http-api-contract/src/resolve-runtime-module-specifier */
+/**
+ * @fileoverview Implements resolve runtime module specifier.
+ */
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
-/** Handles resolve runtime module specifier. @example `resolveRuntimeModuleSpecifier(input)` */
+/**
+ * Handles resolve runtime module specifier.
+ * @param endpointModulePath - Endpoint module path parameter.
+ * @param moduleName - Module name parameter.
+ * @param fallbackPath - Fallback path parameter.
+ * @example
+ * resolveRuntimeModuleSpecifier(endpointModulePath, moduleName, fallbackPath)
+ */
 export function resolveRuntimeModuleSpecifier(
   endpointModulePath: string,
   moduleName: string,

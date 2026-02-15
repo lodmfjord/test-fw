@@ -1,4 +1,6 @@
-/** @fileoverview Implements smoke test deployed api. @module apps/test-app/src/smoke-test-deployed-api */
+/**
+ * @fileoverview Implements smoke test deployed api.
+ */
 type SmokeTestResult = {
   failed: number;
   passed: number;
@@ -137,7 +139,13 @@ type EndpointExpectation = {
   endpoint.validate(await response.text());
 }
 
-/** Runs smoke test deployed api. @example `await runSmokeTestDeployedApi(input)` */ export async function runSmokeTestDeployedApi(
+/**
+ * Runs smoke test deployed api.
+ * @param baseUrl - Base url parameter.
+ * @param options - Options parameter.
+ * @example
+ * await runSmokeTestDeployedApi(baseUrl, options)
+ */ export async function runSmokeTestDeployedApi(
   baseUrl: string,
   options?: DeployedSmokeTestOptions,
 ): Promise<SmokeTestResult> {

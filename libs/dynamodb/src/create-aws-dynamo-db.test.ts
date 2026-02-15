@@ -1,4 +1,6 @@
-/** @fileoverview Tests create aws dynamo db. @module libs/dynamodb/src/create-aws-dynamo-db.test */
+/**
+ * @fileoverview Tests create aws dynamo db.
+ */
 import { describe, expect, it } from "bun:test";
 import { createAwsDynamoDb } from "./create-aws-dynamo-db";
 

@@ -1,7 +1,13 @@
-/** @fileoverview Implements reset defined endpoints. @module libs/http-api-contract/src/reset-defined-endpoints */
+/**
+ * @fileoverview Implements reset defined endpoints.
+ */
 import { endpointRegistry } from "./endpoint-registry-store";
 
-/** Handles reset defined endpoints. @example `resetDefinedEndpoints(input)` */
+/**
+ * Handles reset defined endpoints.
+ * @example
+ * resetDefinedEndpoints()
+ */
 export function resetDefinedEndpoints(): void {
   endpointRegistry.length = 0;
 }

@@ -1,8 +1,15 @@
-/** @fileoverview Implements to secret definition. @module libs/http-api-contract/src/to-secret-definition */
+/**
+ * @fileoverview Implements to secret definition.
+ */
 const SECRET_PREFIX = "simple-api:ssm:";
 const LOCAL_ENV_MARKER = "|local-env:";
 
-/** Converts values to secret definition. @example `toSecretDefinition(input)` */
+/**
+ * Converts values to secret definition.
+ * @param value - Value parameter.
+ * @example
+ * toSecretDefinition(value)
+ */
 export function toSecretDefinition(
   value: string,
 ): { localEnvName?: string; parameterName: string } | undefined {

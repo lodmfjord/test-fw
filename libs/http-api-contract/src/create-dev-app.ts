@@ -1,4 +1,6 @@
-/** @fileoverview Implements create dev app. @module libs/http-api-contract/src/create-dev-app */
+/**
+ * @fileoverview Implements create dev app.
+ */
 import { createRuntimeDynamoDb } from "@babbstack/dynamodb";
 import { createRuntimeSqs } from "@babbstack/sqs";
 import { findEndpointRuntimeDefinition } from "./find-endpoint-runtime-definition";
@@ -29,7 +31,13 @@ async function readJsonBody(request: Request): Promise<unknown> {
   }
 }
 
-/** Creates dev app. @example `createDevApp(input)` */
+/**
+ * Creates dev app.
+ * @param endpoints - Endpoints parameter.
+ * @param options - Options parameter.
+ * @example
+ * createDevApp(endpoints, options)
+ */
 export function createDevApp(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   options: CreateDevAppOptions = {},

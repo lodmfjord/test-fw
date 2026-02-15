@@ -1,4 +1,6 @@
-/** @fileoverview Implements create memory sqs. @module libs/sqs/src/create-memory-sqs */
+/**
+ * @fileoverview Implements create memory sqs.
+ */
 import type {
   SqsClient,
   SqsMessage,
@@ -53,7 +55,11 @@ function toReceivedMessage(message: StoredMessage): SqsReceivedMessage {
   };
 }
 
-/** Creates memory sqs. @example `createMemorySqs(input)` */
+/**
+ * Creates memory sqs.
+ * @example
+ * createMemorySqs()
+ */
 export function createMemorySqs(): SqsClient {
   const store = new Map<string, StoredMessage[]>();
   let receiptIndex = 0;

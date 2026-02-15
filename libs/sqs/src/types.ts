@@ -1,4 +1,6 @@
-/** @fileoverview Implements types. @module libs/sqs/src/types */
+/**
+ * @fileoverview Implements types.
+ */
 import type { StepFunctionTaskHandler } from "@babbstack/step-functions";
 import type { SqsListenerTarget, SqsListenerTargetInput } from "./listener-target-types";
 

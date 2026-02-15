@@ -1,4 +1,6 @@
-/** @fileoverview Implements define step function. @module libs/step-functions/src/define-step-function */
+/**
+ * @fileoverview Implements define step function.
+ */
 import type {
   StepFunctionDefinition,
   StepFunctionDefinitionShape,
@@ -6,7 +8,12 @@ import type {
   StepFunctionStateInput,
 } from "./asl-types";
 
-/** @example `defineStepFunction(input)` */ export function defineStepFunction<
+/**
+ * Defines step function.
+ * @param definition - Definition parameter.
+ * @example
+ * defineStepFunction(definition)
+ */ export function defineStepFunction<
   const TStates extends Record<string, StepFunctionStateInput>,
 >(definition: StepFunctionDefinitionShape<TStates>): StepFunctionDefinition {
   return {

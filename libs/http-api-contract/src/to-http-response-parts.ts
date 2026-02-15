@@ -1,4 +1,6 @@
-/** @fileoverview Implements to http response parts. @module libs/http-api-contract/src/to-http-response-parts */
+/**
+ * @fileoverview Implements to http response parts.
+ */
 type HttpResponseParts = {
   body: string | Blob;
   contentType: string;
@@ -9,7 +11,13 @@ function isBufferValue(payload: unknown): payload is Buffer {
   return typeof Buffer !== "undefined" && Buffer.isBuffer(payload);
 }
 
-/** Converts values to http response parts. @example `toHttpResponseParts(input)` */
+/**
+ * Converts values to http response parts.
+ * @param payload - Payload parameter.
+ * @param contentType - Content type parameter.
+ * @example
+ * toHttpResponseParts(payload, contentType)
+ */
 export function toHttpResponseParts(payload: unknown, contentType?: string): HttpResponseParts {
   const resolvedContentType =
     contentType ?? (isBufferValue(payload) ? "application/octet-stream" : "application/json");

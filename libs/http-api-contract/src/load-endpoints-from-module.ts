@@ -1,4 +1,6 @@
-/** @fileoverview Implements load endpoints from module. @module libs/http-api-contract/src/load-endpoints-from-module */
+/**
+ * @fileoverview Implements load endpoints from module.
+ */
 import { toImportPath } from "./to-import-path";
 import type { EndpointRuntimeDefinition } from "./types";
 
@@ -49,7 +51,13 @@ function appendEndpoint(
   result.push(candidate as EndpointRuntimeDefinition);
 }
 
-/** Handles load endpoints from module. @example `await loadEndpointsFromModule(input)` */
+/**
+ * Handles load endpoints from module.
+ * @param endpointModulePath - Endpoint module path parameter.
+ * @param endpointExportName - Endpoint export name parameter.
+ * @example
+ * await loadEndpointsFromModule(endpointModulePath, endpointExportName)
+ */
 export async function loadEndpointsFromModule(
   endpointModulePath: string,
   endpointExportName: string,

@@ -1,2 +1,4 @@
-/** @fileoverview Implements setup. @module tools/test/setup */
+/**
+ * @fileoverview Implements setup.
+ */
 process.env.TZ = "UTC";

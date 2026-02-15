@@ -1,4 +1,6 @@
-/** @fileoverview Tests create aws sqs. @module libs/sqs/src/create-aws-sqs.test */
+/**
+ * @fileoverview Tests create aws sqs.
+ */
 import { describe, expect, it } from "bun:test";
 import { createAwsSqs } from "./create-aws-sqs";
 

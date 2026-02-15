@@ -1,4 +1,6 @@
-/** @fileoverview Implements endpoint registry store. @module libs/http-api-contract/src/endpoint-registry-store */
+/**
+ * @fileoverview Implements endpoint registry store.
+ */
 import type { EndpointRuntimeDefinition } from "./types";
 
 const ENDPOINT_REGISTRY_KEY = Symbol.for("babbstack.endpoint-registry");

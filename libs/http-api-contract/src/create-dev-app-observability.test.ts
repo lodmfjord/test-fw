@@ -1,4 +1,6 @@
-/** @fileoverview Tests create dev app observability. @module libs/http-api-contract/src/create-dev-app-observability.test */
+/**
+ * @fileoverview Tests create dev app observability.
+ */
 import { describe, expect, it } from "bun:test";
 import { createDevApp } from "./create-dev-app";
 import { defineEndpoint } from "./define-endpoint";

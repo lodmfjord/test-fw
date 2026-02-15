@@ -1,4 +1,6 @@
-/** @fileoverview Tests create dev app content type. @module libs/http-api-contract/src/create-dev-app-content-type.test */
+/**
+ * @fileoverview Tests create dev app content type.
+ */
 import { describe, expect, it } from "bun:test";
 import { schema } from "@babbstack/schema";
 import { createDevApp } from "./create-dev-app";

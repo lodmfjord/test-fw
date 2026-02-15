@@ -1,4 +1,6 @@
-/** @fileoverview Implements render used import lines. @module libs/http-api-contract/src/render-used-import-lines */
+/**
+ * @fileoverview Implements render used import lines.
+ */
 import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { extname, resolve } from "node:path";
@@ -260,7 +262,14 @@ function toImportLines(handlerSource: string, imports: ImportDescriptor[]): stri
   return lines;
 }
 
-/** Handles render used import lines. @example `renderUsedImportLines(input)` */
+/**
+ * Handles render used import lines.
+ * @param endpointModulePath - Endpoint module path parameter.
+ * @param endpointModuleSource - Endpoint module source parameter.
+ * @param handlerSource - Handler source parameter.
+ * @example
+ * renderUsedImportLines(endpointModulePath, endpointModuleSource, handlerSource)
+ */
 export function renderUsedImportLines(
   endpointModulePath: string,
   endpointModuleSource: string,

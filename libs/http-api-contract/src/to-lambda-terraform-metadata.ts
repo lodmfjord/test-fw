@@ -1,4 +1,6 @@
-/** @fileoverview Implements to lambda terraform metadata. @module libs/http-api-contract/src/to-lambda-terraform-metadata */
+/**
+ * @fileoverview Implements to lambda terraform metadata.
+ */
 import type { EndpointRuntimeDefinition } from "./types";
 
 type LambdaDynamodbAccess = {
@@ -27,7 +29,12 @@ function toTableKey(tableName: string): string {
   return tableName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
-/** Converts values to route dynamodb access. @example `toRouteDynamodbAccess(input)` */
+/**
+ * Converts values to route dynamodb access.
+ * @param endpoints - Endpoints parameter.
+ * @example
+ * toRouteDynamodbAccess(endpoints)
+ */
 export function toRouteDynamodbAccess(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
 ): Record<string, LambdaDynamodbAccess> {

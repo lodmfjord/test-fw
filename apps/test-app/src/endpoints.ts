@@ -1,4 +1,6 @@
-/** @fileoverview Implements endpoints. @module apps/test-app/src/endpoints */
+/**
+ * @fileoverview Implements endpoints.
+ */
 import { lastUpdateEndpoints, lastUpdateListener } from "./last-update-endpoints";
 import { orderEndpoints } from "./order-endpoints";
 import { s3DemoEndpoints } from "./s3-demo-endpoints";

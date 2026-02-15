@@ -1,4 +1,6 @@
-/** @fileoverview Implements run contract generator from settings. @module libs/http-api-contract/src/run-contract-generator-from-settings */
+/**
+ * @fileoverview Implements run contract generator from settings.
+ */
 import { readFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { listDefinedSqsListeners, resetDefinedSqsListeners } from "@babbstack/sqs";
@@ -21,7 +23,12 @@ import { writeLambdaJsFiles } from "./write-lambda-js-files-export";
 import { writeSqsListenerJsFiles } from "./write-sqs-listener-js-files";
 import { writeTerraformFiles } from "./write-terraform-files";
 
-/** Runs contract generator from settings. @example `await runContractGeneratorFromSettings(input)` */
+/**
+ * Runs contract generator from settings.
+ * @param settingsFilePath - Settings file path parameter.
+ * @example
+ * await runContractGeneratorFromSettings(settingsFilePath)
+ */
 export async function runContractGeneratorFromSettings(
   settingsFilePath: string,
 ): Promise<ContractGeneratorOutput> {

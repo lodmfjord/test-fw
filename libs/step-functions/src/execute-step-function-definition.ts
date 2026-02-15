@@ -1,4 +1,6 @@
-/** @fileoverview Implements execute step function definition. @module libs/step-functions/src/execute-step-function-definition */
+/**
+ * @fileoverview Implements execute step function definition.
+ */
 import type {
   ExecuteStepFunctionDefinitionOptions,
   StepFunctionDefinitionInput,
@@ -7,7 +9,14 @@ import type {
 import { parseStepFunctionDefinition } from "./parse-step-function-definition";
 import { stepFunctionExecutionUtils } from "./step-function-execution-utils";
 
-/** Handles execute step function definition. @example `await executeStepFunctionDefinition(input)` */
+/**
+ * Handles execute step function definition.
+ * @param definition - Definition parameter.
+ * @param input - Input parameter.
+ * @param options - Options parameter.
+ * @example
+ * await executeStepFunctionDefinition(definition, input, options)
+ */
 export async function executeStepFunctionDefinition(
   definition: StepFunctionDefinitionInput,
   input: unknown,

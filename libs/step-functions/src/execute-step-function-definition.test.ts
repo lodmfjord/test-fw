@@ -1,4 +1,6 @@
-/** @fileoverview Tests execute step function definition. @module libs/step-functions/src/execute-step-function-definition.test */
+/**
+ * @fileoverview Tests execute step function definition.
+ */
 import { describe, expect, it } from "bun:test";
 import { executeStepFunctionDefinition } from "./execute-step-function-definition";
 import { defineStepFunction } from "./define-step-function";

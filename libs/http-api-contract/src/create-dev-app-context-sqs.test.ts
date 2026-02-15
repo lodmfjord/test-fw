@@ -1,4 +1,6 @@
-/** @fileoverview Tests create dev app context sqs. @module libs/http-api-contract/src/create-dev-app-context-sqs.test */
+/**
+ * @fileoverview Tests create dev app context sqs.
+ */
 import { describe, expect, it } from "bun:test";
 import { createMemorySqs, createSqsQueue } from "@babbstack/sqs";
 import { schema } from "@babbstack/schema";

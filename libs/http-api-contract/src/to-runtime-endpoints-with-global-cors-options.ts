@@ -1,4 +1,6 @@
-/** @fileoverview Implements to runtime endpoints with global cors options. @module libs/http-api-contract/src/to-runtime-endpoints-with-global-cors-options */
+/**
+ * @fileoverview Implements to runtime endpoints with global cors options.
+ */
 import { schema } from "@babbstack/schema";
 import type { GlobalCors } from "./cors-types";
 import type { Contract, EndpointRuntimeDefinition } from "./types";
@@ -36,7 +38,13 @@ function toMethodsByPath(contract: Contract): Map<string, Set<string>> {
   return methodsByPath;
 }
 
-/** Converts values to runtime endpoints with global cors options. @example `toRuntimeEndpointsWithGlobalCorsOptions(input)` */
+/**
+ * Converts values to runtime endpoints with global cors options.
+ * @param contract - Contract parameter.
+ * @param endpoints - Endpoints parameter.
+ * @example
+ * toRuntimeEndpointsWithGlobalCorsOptions(contract, endpoints)
+ */
 export function toRuntimeEndpointsWithGlobalCorsOptions(
   contract: Contract,
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

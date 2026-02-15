@@ -1,4 +1,6 @@
-/** @fileoverview Tests render terraform files sqs. @module libs/http-api-contract/src/render-terraform-files-sqs.test */
+/**
+ * @fileoverview Tests render terraform files sqs.
+ */
 import { beforeEach, describe, expect, it } from "bun:test";
 import { createSqsQueue, listDefinedSqsListeners, resetDefinedSqsListeners } from "@babbstack/sqs";
 import { schema } from "@babbstack/schema";

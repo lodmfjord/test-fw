@@ -1,4 +1,6 @@
-/** @fileoverview Implements types contract. @module libs/http-api-contract/src/types-contract */
+/**
+ * @fileoverview Implements types contract.
+ */
 import type { GlobalCors } from "./cors-types";
 import type { EnvSchema } from "./env-schema-types";
 import type { EndpointContractDefinition } from "./types-endpoint";

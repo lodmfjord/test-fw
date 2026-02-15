@@ -1,4 +1,6 @@
-/** @fileoverview Tests create runtime dynamo db. @module libs/dynamodb/src/create-runtime-dynamo-db.test */
+/**
+ * @fileoverview Tests create runtime dynamo db.
+ */
 import { describe, expect, it } from "bun:test";
 import type { DynamoDbClient } from "./types";
 import { createRuntimeDynamoDb } from "./create-runtime-dynamo-db";

@@ -1,4 +1,6 @@
-/** @fileoverview Implements check constraints. @module tools/check-constraints */
+/**
+ * @fileoverview Implements check constraints.
+ */
 import { readFile } from "node:fs/promises";
 import { collectTargetFiles } from "./constraints/collect-target-files";
 import { validateFileConstraints } from "./constraints/validate-file-constraints";
@@ -18,7 +20,11 @@ const TARGET_DIRECTORIES = ["apps", "libs", "tools"];
   return errors;
 }
 
-/** Runs constraint checks. @example `await runConstraintChecks(input)` */ export async function runConstraintChecks(): Promise<number> {
+/**
+ * Runs constraint checks.
+ * @example
+ * await runConstraintChecks()
+ */ export async function runConstraintChecks(): Promise<number> {
   const targetFiles = await collectTargetFiles(TARGET_DIRECTORIES);
   const errors = await getConstraintErrors(targetFiles);
 

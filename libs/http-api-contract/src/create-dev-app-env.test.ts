@@ -1,4 +1,6 @@
-/** @fileoverview Tests create dev app env. @module libs/http-api-contract/src/create-dev-app-env.test */
+/**
+ * @fileoverview Tests create dev app env.
+ */
 import { beforeEach, describe, expect, it } from "bun:test";
 import { createDevApp } from "./create-dev-app";
 import { createEnv } from "./create-env";

@@ -1,4 +1,6 @@
-/** @fileoverview Implements schema. @module libs/schema/src/schema */
+/**
+ * @fileoverview Implements schema.
+ */
 import { z, type ZodIssue, type ZodType } from "zod";
 import type { JsonSchema, ObjectFromShape, OptionalSchema, Schema } from "./schema-types";
 

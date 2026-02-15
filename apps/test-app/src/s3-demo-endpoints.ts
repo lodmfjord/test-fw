@@ -1,4 +1,6 @@
-/** @fileoverview Implements s3 demo endpoints. @module apps/test-app/src/s3-demo-endpoints */
+/**
+ * @fileoverview Implements s3 demo endpoints.
+ */
 import { createRuntimeS3 } from "@babbstack/s3";
 import { defineGet, definePost } from "@babbstack/http-api-contract";
 import { schema } from "@babbstack/schema";

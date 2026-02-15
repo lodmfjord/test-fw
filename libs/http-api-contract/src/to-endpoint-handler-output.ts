@@ -1,4 +1,6 @@
-/** @fileoverview Implements to endpoint handler output. @module libs/http-api-contract/src/to-endpoint-handler-output */
+/**
+ * @fileoverview Implements to endpoint handler output.
+ */
 import type { EndpointHandlerOutput } from "./types";
 
 /** Converts values to output headers. */
@@ -23,7 +25,13 @@ function toOutputHeaders(headers: unknown): Record<string, string> | undefined {
   return normalized;
 }
 
-/** Converts values to endpoint handler output. @example `toEndpointHandlerOutput(input)` */
+/**
+ * Converts values to endpoint handler output.
+ * @param output - Output parameter.
+ * @param defaultStatusCode - Default status code parameter.
+ * @example
+ * toEndpointHandlerOutput(output, defaultStatusCode)
+ */
 export function toEndpointHandlerOutput(
   output: unknown,
   defaultStatusCode = 200,

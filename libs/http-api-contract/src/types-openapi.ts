@@ -1,4 +1,6 @@
-/** @fileoverview Implements types openapi. @module libs/http-api-contract/src/types-openapi */
+/**
+ * @fileoverview Implements types openapi.
+ */
 import type { JsonSchema } from "@babbstack/schema";
 import type { EndpointAccess, EndpointDbAccess } from "./endpoint-context-types";
 import type { RouteExecution } from "./route-execution-types";

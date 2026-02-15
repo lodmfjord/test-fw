@@ -1,4 +1,6 @@
-/** @fileoverview Implements create dynamo database. @module libs/dynamodb/src/create-dynamo-database */
+/**
+ * @fileoverview Implements create dynamo database.
+ */
 import type { DynamoDbClient, DynamoDbItem } from "./types";
 
 type Parser<TItem extends DynamoDbItem> = {
@@ -87,7 +89,14 @@ function toRecord(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-/** Creates dynamo database. @example `createDynamoDatabase(input)` */ export function createDynamoDatabase<
+/**
+ * Creates dynamo database.
+ * @param parser - Parser parameter.
+ * @param keyField - Key field parameter.
+ * @param options - Options parameter.
+ * @example
+ * createDynamoDatabase(parser, keyField, options)
+ */ export function createDynamoDatabase<
   TItem extends DynamoDbItem,
   TKeyField extends keyof TItem & string,
 >(

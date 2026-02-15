@@ -1,4 +1,6 @@
-/** @fileoverview Implements render lambda observability source. @module libs/http-api-contract/src/render-lambda-observability-source */
+/**
+ * @fileoverview Implements render lambda observability source.
+ */
 const LAMBDA_OBSERVABILITY_SUPPORT_SOURCE = `
 /** Converts values to header value. */
 function toHeaderValue(headers, name) {
@@ -159,7 +161,11 @@ function logOutputValidationFailure(context, error) {
 }
 `;
 
-/** Converts values to lambda observability support source. @example `toLambdaObservabilitySupportSource(input)` */
+/**
+ * Converts values to lambda observability support source.
+ * @example
+ * toLambdaObservabilitySupportSource()
+ */
 export function toLambdaObservabilitySupportSource(): string {
   return LAMBDA_OBSERVABILITY_SUPPORT_SOURCE;
 }

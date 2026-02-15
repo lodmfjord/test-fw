@@ -1,4 +1,6 @@
-/** @fileoverview Implements types route. @module libs/http-api-contract/src/types-route */
+/**
+ * @fileoverview Implements types route.
+ */
 import type { RouteExecution, RouteExecutionInput } from "./route-execution-types";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | "HEAD";

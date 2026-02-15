@@ -1,4 +1,6 @@
-/** @fileoverview Implements index. @module apps/test-app-client/src/index */
+/**
+ * @fileoverview Implements index.
+ */
 import { createClient } from "@babbstack/client";
 import type { endpoints as testAppEndpoints } from "../../test-app/src/endpoints";
 

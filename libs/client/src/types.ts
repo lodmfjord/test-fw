@@ -1,4 +1,6 @@
-/** @fileoverview Implements types. @module libs/client/src/types */
+/**
+ * @fileoverview Implements types.
+ */
 import type { EndpointRuntimeDefinition, Schema } from "@babbstack/http-api-contract";
 
 type AnyEndpoint = EndpointRuntimeDefinition;

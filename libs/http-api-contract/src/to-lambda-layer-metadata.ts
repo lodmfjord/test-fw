@@ -1,4 +1,6 @@
-/** @fileoverview Implements to lambda layer metadata. @module libs/http-api-contract/src/to-lambda-layer-metadata */
+/**
+ * @fileoverview Implements to lambda layer metadata.
+ */
 import { createHash } from "node:crypto";
 
 type LambdaLayerDefinition = {
@@ -18,7 +20,12 @@ function toLayerKey(moduleNames: ReadonlyArray<string>): string {
   return `layer_${hash}`;
 }
 
-/** Converts values to lambda layer metadata. @example `toLambdaLayerMetadata(input)` */
+/**
+ * Converts values to lambda layer metadata.
+ * @param lambdaExternalModulesByRoute - Lambda external modules by route parameter.
+ * @example
+ * toLambdaLayerMetadata(lambdaExternalModulesByRoute)
+ */
 export function toLambdaLayerMetadata(
   lambdaExternalModulesByRoute: Record<string, string[]>,
 ): LambdaLayerMetadata {

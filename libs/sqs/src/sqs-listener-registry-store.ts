@@ -1,4 +1,6 @@
-/** @fileoverview Implements sqs listener registry store. @module libs/sqs/src/sqs-listener-registry-store */
+/**
+ * @fileoverview Implements sqs listener registry store.
+ */
 import type { SqsListenerRuntimeDefinition } from "./types";
 
 const SQS_LISTENER_REGISTRY_KEY = Symbol.for("babbstack.sqs-listener-registry");

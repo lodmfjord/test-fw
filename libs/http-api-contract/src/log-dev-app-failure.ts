@@ -1,4 +1,6 @@
-/** @fileoverview Implements log dev app failure. @module libs/http-api-contract/src/log-dev-app-failure */
+/**
+ * @fileoverview Implements log dev app failure.
+ */
 type DevAppFailureEvent = "dev_app.handler_execution_failed" | "dev_app.output_validation_failed";
 
 type LogDevAppFailureInput = {
@@ -30,7 +32,12 @@ function toErrorMetadata(error: unknown): {
   };
 }
 
-/** Handles log dev app failure. @example `logDevAppFailure(input)` */
+/**
+ * Handles log dev app failure.
+ * @param input - Input parameter.
+ * @example
+ * logDevAppFailure(input)
+ */
 export function logDevAppFailure(input: LogDevAppFailureInput): void {
   console.error({
     ...toErrorMetadata(input.error),

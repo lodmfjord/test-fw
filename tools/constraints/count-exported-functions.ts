@@ -1,4 +1,6 @@
-/** @fileoverview Implements count exported functions. @module tools/constraints/count-exported-functions */
+/**
+ * @fileoverview Implements count exported functions.
+ */
 import * as ts from "typescript";
 
 type FunctionBindingMap = Map<string, string>;
@@ -183,9 +185,12 @@ type FunctionBindingMap = Map<string, string>;
   }
 }
 
-/** Handles count exported functions. @example `countExportedFunctions(input)` */ export function countExportedFunctions(
-  source: string,
-): number {
+/**
+ * Handles count exported functions.
+ * @param source - Source parameter.
+ * @example
+ * countExportedFunctions(source)
+ */ export function countExportedFunctions(source: string): number {
   const sourceFile = ts.createSourceFile(
     "source.ts",
     source,

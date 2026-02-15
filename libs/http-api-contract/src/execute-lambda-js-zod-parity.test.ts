@@ -1,4 +1,6 @@
-/** @fileoverview Tests execute lambda js zod parity. @module libs/http-api-contract/src/execute-lambda-js-zod-parity.test */
+/**
+ * @fileoverview Tests execute lambda js zod parity.
+ */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";

@@ -1,4 +1,6 @@
-/** @fileoverview Implements types. @module libs/s3/src/types */
+/**
+ * @fileoverview Implements types.
+ */
 export type S3Body = Uint8Array | string;
 
 export type S3ObjectSummary = {

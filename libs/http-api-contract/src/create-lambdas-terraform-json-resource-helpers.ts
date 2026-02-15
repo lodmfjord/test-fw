@@ -1,4 +1,6 @@
-/** @fileoverview Implements create lambdas terraform json resource helpers. @module libs/http-api-contract/src/create-lambdas-terraform-json-resource-helpers */
+/**
+ * @fileoverview Implements create lambdas terraform json resource helpers.
+ */
 import type { LambdasTerraformContext } from "./create-lambdas-terraform-json-helpers";
 
 /** Converts values to terraform reference. */

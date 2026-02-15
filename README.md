@@ -113,7 +113,10 @@ bun run check
 - Export counting is AST-based and includes `export { fn }` / `export default fn` forms for local functions.
 - Each source file must be 300 lines or fewer.
 - Each source file must begin with a file-level JSDoc header.
+- File-level JSDoc headers must include `@fileoverview`, must use multiline format, and must not include `@module`.
 - Function declarations and function-valued variable declarations must have JSDoc.
+- Exported function declarations and exported function-valued variable declarations must use multiline JSDoc.
+- Exported function declarations and exported function-valued variable declarations must include `@param` descriptions for all parameters.
 - Exported function declarations and exported function-valued variable declarations must include `@example` in JSDoc.
 - `libs/*` sources cannot import from `apps/*`.
 - `apps/*` sources can only import from other apps using type-only imports.

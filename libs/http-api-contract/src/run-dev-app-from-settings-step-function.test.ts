@@ -1,4 +1,6 @@
-/** @fileoverview Tests run dev app from settings step function. @module libs/http-api-contract/src/run-dev-app-from-settings-step-function.test */
+/**
+ * @fileoverview Tests run dev app from settings step function.
+ */
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

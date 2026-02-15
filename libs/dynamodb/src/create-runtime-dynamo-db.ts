@@ -1,4 +1,6 @@
-/** @fileoverview Implements create runtime dynamo db. @module libs/dynamodb/src/create-runtime-dynamo-db */
+/**
+ * @fileoverview Implements create runtime dynamo db.
+ */
 import { createAwsDynamoDb } from "./create-aws-dynamo-db";
 import { createMemoryDynamoDb } from "./create-memory-dynamo-db";
 import type { CreateRuntimeDynamoDbInput, DynamoDbClient } from "./types";
@@ -12,7 +14,12 @@ function detectLambdaRuntime(): boolean {
   return Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME ?? process.env.LAMBDA_TASK_ROOT);
 }
 
-/** Creates runtime dynamo db. @example `createRuntimeDynamoDb(input)` */
+/**
+ * Creates runtime dynamo db.
+ * @param input - Input parameter.
+ * @example
+ * createRuntimeDynamoDb(input)
+ */
 export function createRuntimeDynamoDb(input: CreateRuntimeDynamoDbInput = {}): DynamoDbClient {
   const createAwsDb = input.createAwsDb ?? (() => createAwsDynamoDb());
   const createMemoryDb = input.createMemoryDb ?? createMemoryDynamoDb;

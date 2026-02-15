@@ -1,4 +1,6 @@
-/** @fileoverview Tests create dev app. @module libs/http-api-contract/src/create-dev-app.test */
+/**
+ * @fileoverview Tests create dev app.
+ */
 import { describe, expect, it } from "bun:test";
 import { createDevApp } from "./create-dev-app";
 import { defineEndpoint } from "./define-endpoint";

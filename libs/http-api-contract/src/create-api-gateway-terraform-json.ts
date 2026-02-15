@@ -1,4 +1,6 @@
-/** @fileoverview Implements create api gateway terraform json. @module libs/http-api-contract/src/create-api-gateway-terraform-json */
+/**
+ * @fileoverview Implements create api gateway terraform json.
+ */
 import type { Contract } from "./types";
 
 type TerraformJson = Record<string, unknown>;
@@ -29,7 +31,12 @@ function toCorsConfiguration(contract: Contract): Record<string, unknown> | unde
   };
 }
 
-/** Creates api gateway terraform json. @example `createApiGatewayTerraformJson(input)` */
+/**
+ * Creates api gateway terraform json.
+ * @param contract - Contract parameter.
+ * @example
+ * createApiGatewayTerraformJson(contract)
+ */
 export function createApiGatewayTerraformJson(contract: Contract): TerraformJson {
   const corsConfiguration = toCorsConfiguration(contract);
 

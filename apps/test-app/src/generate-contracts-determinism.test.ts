@@ -1,4 +1,6 @@
-/** @fileoverview Tests generate contracts determinism. @module apps/test-app/src/generate-contracts-determinism.test */
+/**
+ * @fileoverview Tests generate contracts determinism.
+ */
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { expect, test } from "bun:test";

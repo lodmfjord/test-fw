@@ -1,4 +1,6 @@
-/** @fileoverview Implements define patch. @module libs/http-api-contract/src/define-patch */
+/**
+ * @fileoverview Implements define patch.
+ */
 import { defineEndpoint } from "./define-endpoint";
 import type {
   EndpointContextInput,
@@ -34,7 +36,12 @@ type PatchEndpointDefinition<
   path: TPath;
 };
 
-/** @example `definePatch(input)` */ export function definePatch<
+/**
+ * Defines patch.
+ * @param input - Input parameter.
+ * @example
+ * definePatch(input)
+ */ export function definePatch<
   TParams,
   TQuery,
   THeaders,

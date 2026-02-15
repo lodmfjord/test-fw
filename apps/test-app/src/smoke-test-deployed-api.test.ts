@@ -1,4 +1,6 @@
-/** @fileoverview Tests smoke test deployed api. @module apps/test-app/src/smoke-test-deployed-api.test */
+/**
+ * @fileoverview Tests smoke test deployed api.
+ */
 import { describe, expect, it } from "bun:test";
 import { runSmokeTestDeployedApi } from "./smoke-test-deployed-api";
 

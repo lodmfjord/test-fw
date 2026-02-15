@@ -1,7 +1,14 @@
-/** @fileoverview Implements assert unique listener ids. @module libs/sqs/src/assert-unique-listener-ids */
+/**
+ * @fileoverview Implements assert unique listener ids.
+ */
 import type { SqsListenerRuntimeDefinition } from "./types";
 
-/** Handles assert unique listener ids. @example `assertUniqueListenerIds(input)` */
+/**
+ * Handles assert unique listener ids.
+ * @param listeners - Listeners parameter.
+ * @example
+ * assertUniqueListenerIds(listeners)
+ */
 export function assertUniqueListenerIds(
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
 ): void {

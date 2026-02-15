@@ -1,4 +1,6 @@
-/** @fileoverview Tests execute sqs listener js. @module libs/http-api-contract/src/execute-sqs-listener-js.test */
+/**
+ * @fileoverview Tests execute sqs listener js.
+ */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";

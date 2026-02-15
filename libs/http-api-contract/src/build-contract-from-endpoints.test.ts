@@ -1,4 +1,6 @@
-/** @fileoverview Tests build contract from endpoints. @module libs/http-api-contract/src/build-contract-from-endpoints.test */
+/**
+ * @fileoverview Tests build contract from endpoints.
+ */
 import { describe, expect, it } from "bun:test";
 import { buildContractFromEndpoints } from "./build-contract-from-endpoints";
 import { defineEndpoint } from "./define-endpoint";

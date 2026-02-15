@@ -1,4 +1,6 @@
-/** @fileoverview Implements types endpoint. @module libs/http-api-contract/src/types-endpoint */
+/**
+ * @fileoverview Implements types endpoint.
+ */
 import type { DynamoDbClient } from "@babbstack/dynamodb";
 import type { Schema } from "@babbstack/schema";
 import type { StepFunctionTaskHandler } from "@babbstack/step-functions";

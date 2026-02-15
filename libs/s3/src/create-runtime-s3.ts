@@ -1,4 +1,6 @@
-/** @fileoverview Implements create runtime s3. @module libs/s3/src/create-runtime-s3 */
+/**
+ * @fileoverview Implements create runtime s3.
+ */
 import { createAwsS3 } from "./create-aws-s3";
 import { createMemoryS3 } from "./create-memory-s3";
 import type { CreateRuntimeS3Input, S3Client } from "./types";
@@ -12,7 +14,12 @@ function detectLambdaRuntime(): boolean {
   return Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME ?? process.env.LAMBDA_TASK_ROOT);
 }
 
-/** Creates runtime s3. @example `createRuntimeS3(input)` */
+/**
+ * Creates runtime s3.
+ * @param input - Input parameter.
+ * @example
+ * createRuntimeS3(input)
+ */
 export function createRuntimeS3(input: CreateRuntimeS3Input = {}): S3Client {
   const createAwsRuntimeS3 = input.createAwsS3 ?? (() => createAwsS3());
   const createMemoryRuntimeS3 = input.createMemoryS3 ?? createMemoryS3;

@@ -1,4 +1,6 @@
-/** @fileoverview Implements define options. @module libs/http-api-contract/src/define-options */
+/**
+ * @fileoverview Implements define options.
+ */
 import { defineEndpoint } from "./define-endpoint";
 import type {
   EndpointContextInput,
@@ -34,7 +36,12 @@ type OptionsEndpointDefinition<
   path: TPath;
 };
 
-/** @example `defineOptions(input)` */ export function defineOptions<
+/**
+ * Defines options.
+ * @param input - Input parameter.
+ * @example
+ * defineOptions(input)
+ */ export function defineOptions<
   TParams,
   TQuery,
   THeaders,

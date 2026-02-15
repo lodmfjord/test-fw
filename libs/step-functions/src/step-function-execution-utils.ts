@@ -1,4 +1,6 @@
-/** @fileoverview Implements step function execution utils. @module libs/step-functions/src/step-function-execution-utils */
+/**
+ * @fileoverview Implements step function execution utils.
+ */
 import type {
   ExecuteStepFunctionDefinitionOptions,
   StepFunctionChoiceRule,

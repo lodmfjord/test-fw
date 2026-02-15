@@ -1,4 +1,6 @@
-/** @fileoverview Tests file constraint validation. @module tools/constraints/validate-file-constraints.test */
+/**
+ * @fileoverview Tests file constraint validation.
+ */
 import { describe, expect, it } from "bun:test";
 import { validateFileConstraints } from "./validate-file-constraints";
 
@@ -12,9 +14,17 @@ function makeLineBlock(lineCount: number): string {
 /** Builds a valid documented exported function source. */
 function toDocumentedExportedFunctionSource(functionName: string): string {
   return `
-/** @fileoverview Valid file. @module valid */
-/** Handles ${functionName}. @example \`${functionName}(input)\` */
-export function ${functionName}() {
+/**
+ * @fileoverview Valid file.
+ */
+/**
+ * Handles ${functionName}.
+ * @param input - Input value.
+ * @example
+ * ${functionName}(input)
+ */
+export function ${functionName}(input: string) {
+  void input;
   return 1;
 }
 `;
@@ -29,11 +39,27 @@ describe("validateFileConstraints", () => {
 
   it("reports too many exported functions", () => {
     const source = `
-/** @fileoverview Too many exports. @module too-many-exports */
-/** Handles one. @example \`one(input)\` */
-export function one() {}
-/** Handles two. @example \`two(input)\` */
-export function two() {}
+/**
+ * @fileoverview Too many exports.
+ */
+/**
+ * Handles one.
+ * @param input - Input value.
+ * @example
+ * one(input)
+ */
+export function one(input: string) {
+  void input;
+}
+/**
+ * Handles two.
+ * @param input - Input value.
+ * @example
+ * two(input)
+ */
+export function two(input: string) {
+  void input;
+}
     `;
 
     const errors = validateFileConstraints("too-many-exports.ts", source);
@@ -41,18 +67,22 @@ export function two() {}
   });
 
   it("reports too many lines", () => {
-    const source = `/** @fileoverview Too many lines. @module too-many-lines */\n${makeLineBlock(300)}`;
+    const source = `/**\n * @fileoverview Too many lines.\n */\n${makeLineBlock(300)}`;
     const errors = validateFileConstraints("too-many-lines.ts", source);
-    expect(errors.includes("too-many-lines.ts: has 301 lines (max 300).")).toBe(true);
+    expect(
+      errors.some(
+        (error) => error.includes("too-many-lines.ts: has") && error.includes("lines (max 300)."),
+      ),
+    ).toBe(true);
   });
 
   it("accepts dotted kebab-case names", () => {
-    const source = "/** @fileoverview File. @module my-feature.test */\nconst value = 1;";
+    const source = "/**\n * @fileoverview File.\n */\nconst value = 1;";
     expect(validateFileConstraints("my-feature.test.ts", source)).toEqual([]);
   });
 
   it("rejects camelCase file names", () => {
-    const source = "/** @fileoverview File. @module myFeature */\nconst value = 1;";
+    const source = "/**\n * @fileoverview File.\n */\nconst value = 1;";
     const errors = validateFileConstraints("myFeature.ts", source);
     expect(errors.includes("myFeature.ts: file name must be kebab-case.")).toBe(true);
   });
@@ -74,9 +104,16 @@ export function undocumented() {
 
   it("reports missing @example for exported functions", () => {
     const source = `
-/** @fileoverview File. @module exported */
-/** Handles run. */
-export function run() {}
+/**
+ * @fileoverview File.
+ */
+/**
+ * Handles run.
+ * @param input - Input value.
+ */
+export function run(input: string) {
+  void input;
+}
 `;
     const errors = validateFileConstraints("missing-example.ts", source);
     expect(

@@ -1,4 +1,6 @@
-/** @fileoverview Tests execute lambda js content type. @module libs/http-api-contract/src/execute-lambda-js-content-type.test */
+/**
+ * @fileoverview Tests execute lambda js content type.
+ */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";

@@ -1,4 +1,6 @@
-/** @fileoverview Tests create runtime sqs. @module libs/sqs/src/create-runtime-sqs.test */
+/**
+ * @fileoverview Tests create runtime sqs.
+ */
 import { describe, expect, it } from "bun:test";
 import type { SqsClient } from "./types";
 import { createRuntimeSqs } from "./create-runtime-sqs";

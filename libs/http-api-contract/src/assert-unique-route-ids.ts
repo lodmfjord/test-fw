@@ -1,4 +1,6 @@
-/** @fileoverview Implements assert unique route ids. @module libs/http-api-contract/src/assert-unique-route-ids */
+/**
+ * @fileoverview Implements assert unique route ids.
+ */
 type RouteIdentity = {
   method: string;
   path: string;
@@ -10,7 +12,12 @@ function isSameRoute(left: RouteIdentity, right: RouteIdentity): boolean {
   return left.method === right.method && left.path === right.path;
 }
 
-/** Handles assert unique route ids. @example `assertUniqueRouteIds(input)` */
+/**
+ * Handles assert unique route ids.
+ * @param routes - Routes parameter.
+ * @example
+ * assertUniqueRouteIds(routes)
+ */
 export function assertUniqueRouteIds(routes: ReadonlyArray<RouteIdentity>): void {
   const routeById = new Map<string, RouteIdentity>();
 

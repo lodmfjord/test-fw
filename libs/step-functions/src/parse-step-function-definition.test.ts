@@ -1,4 +1,6 @@
-/** @fileoverview Tests parse step function definition. @module libs/step-functions/src/parse-step-function-definition.test */
+/**
+ * @fileoverview Tests parse step function definition.
+ */
 import { describe, expect, it } from "bun:test";
 import { defineStepFunction } from "./define-step-function";
 import { parseStepFunctionDefinition } from "./parse-step-function-definition";

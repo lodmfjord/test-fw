@@ -1,4 +1,6 @@
-/** @fileoverview Implements env schema types. @module libs/http-api-contract/src/env-schema-types */
+/**
+ * @fileoverview Implements env schema types.
+ */
 export type JsonSchemaProperty = {
   default?: string;
   description?: string;

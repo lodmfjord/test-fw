@@ -1,4 +1,6 @@
-/** @fileoverview Tests create dev app context database. @module libs/http-api-contract/src/create-dev-app-context-database.test */
+/**
+ * @fileoverview Tests create dev app context database.
+ */
 import { describe, expect, it } from "bun:test";
 import { createDynamoDatabase } from "@babbstack/dynamodb";
 import { schema } from "@babbstack/schema";

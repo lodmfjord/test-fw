@@ -1,4 +1,6 @@
-/** @fileoverview Implements create step functions terraform json helpers. @module libs/http-api-contract/src/create-step-functions-terraform-json-helpers */
+/**
+ * @fileoverview Implements create step functions terraform json helpers.
+ */
 type TerraformCollections = {
   iamRolePolicies: Record<string, unknown>;
   iamRoles: Record<string, unknown>;

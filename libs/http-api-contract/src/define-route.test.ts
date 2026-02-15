@@ -1,4 +1,6 @@
-/** @fileoverview Tests define route. @module libs/http-api-contract/src/define-route.test */
+/**
+ * @fileoverview Tests define route.
+ */
 import { describe, expect, it } from "bun:test";
 import { createEnv } from "./create-env";
 import { createSecret } from "./create-secret";

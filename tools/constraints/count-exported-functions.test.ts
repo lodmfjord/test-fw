@@ -1,4 +1,6 @@
-/** @fileoverview Tests count exported functions. @module tools/constraints/count-exported-functions.test */
+/**
+ * @fileoverview Tests count exported functions.
+ */
 import { describe, expect, it } from "bun:test";
 import { countExportedFunctions } from "./count-exported-functions";
 

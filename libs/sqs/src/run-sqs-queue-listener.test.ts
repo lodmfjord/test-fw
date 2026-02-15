@@ -1,4 +1,6 @@
-/** @fileoverview Tests run sqs queue listener. @module libs/sqs/src/run-sqs-queue-listener.test */
+/**
+ * @fileoverview Tests run sqs queue listener.
+ */
 import { describe, expect, it } from "bun:test";
 import { defineStepFunction } from "@babbstack/step-functions";
 import { createMemorySqs } from "./create-memory-sqs";

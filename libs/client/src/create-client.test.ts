@@ -1,4 +1,6 @@
-/** @fileoverview Tests create client. @module libs/client/src/create-client.test */
+/**
+ * @fileoverview Tests create client.
+ */
 import { afterEach, describe, expect, it } from "bun:test";
 import { defineGet, definePost, schema } from "@babbstack/http-api-contract";
 import { createClient } from "./create-client";

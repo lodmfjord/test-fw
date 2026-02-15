@@ -1,4 +1,6 @@
-/** @fileoverview Implements render lambda env bootstrap source. @module libs/http-api-contract/src/render-lambda-env-bootstrap-source */
+/**
+ * @fileoverview Implements render lambda env bootstrap source.
+ */
 import { toSecretDefinition } from "./to-secret-definition";
 import type { EndpointRuntimeDefinition } from "./types";
 
@@ -33,7 +35,12 @@ function toEnvConfig(endpoint: EndpointRuntimeDefinition): {
   return { plain, secret };
 }
 
-/** Handles render lambda env bootstrap source. @example `renderLambdaEnvBootstrapSource(input)` */
+/**
+ * Handles render lambda env bootstrap source.
+ * @param endpoint - Endpoint parameter.
+ * @example
+ * renderLambdaEnvBootstrapSource(endpoint)
+ */
 export function renderLambdaEnvBootstrapSource(endpoint: EndpointRuntimeDefinition): string {
   const envConfig = toEnvConfig(endpoint);
 

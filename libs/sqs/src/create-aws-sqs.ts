@@ -1,4 +1,6 @@
-/** @fileoverview Implements create aws sqs. @module libs/sqs/src/create-aws-sqs */
+/**
+ * @fileoverview Implements create aws sqs.
+ */
 import {
   DeleteMessageCommand,
   GetQueueUrlCommand,
@@ -107,7 +109,12 @@ async function createDefaultOperations(): Promise<AwsSqsOperations> {
   };
 }
 
-/** Creates aws sqs. @example `createAwsSqs(input)` */
+/**
+ * Creates aws sqs.
+ * @param input - Input parameter.
+ * @example
+ * createAwsSqs(input)
+ */
 export function createAwsSqs(input: CreateAwsSqsInput = {}): SqsClient {
   const operationsPromise = input.operations
     ? Promise.resolve(input.operations)

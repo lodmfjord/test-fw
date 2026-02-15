@@ -1,4 +1,6 @@
-/** @fileoverview Implements to openapi document from routes. @module libs/http-api-contract/src/to-openapi-document-from-routes */
+/**
+ * @fileoverview Implements to openapi document from routes.
+ */
 import type {
   BuildContractInput,
   OpenApiDocument,
@@ -21,7 +23,12 @@ function toOpenApiSuccessStatusCode(route: RouteDefinition): "200" | "204" {
   return "200";
 }
 
-/** Converts values to open api document from routes. @example `toOpenApiDocumentFromRoutes(input)` */
+/**
+ * Converts values to open api document from routes.
+ * @param input - Input parameter.
+ * @example
+ * toOpenApiDocumentFromRoutes(input)
+ */
 export function toOpenApiDocumentFromRoutes(input: BuildContractInput): OpenApiDocument {
   const paths: Record<string, OpenApiPathItem> = {};
 

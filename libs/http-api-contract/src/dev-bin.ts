@@ -1,5 +1,7 @@
 #!/usr/bin/env bun
-/** @fileoverview Implements dev bin. @module libs/http-api-contract/src/dev-bin */
+/**
+ * @fileoverview Implements dev bin.
+ */
 import { runDevAppFromSettings } from "./run-dev-app-from-settings";
 
 const DEFAULT_SETTINGS_FILE_PATH = "babb.settings.json";

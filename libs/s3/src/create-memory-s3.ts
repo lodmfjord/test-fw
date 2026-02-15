@@ -1,4 +1,6 @@
-/** @fileoverview Implements create memory s3. @module libs/s3/src/create-memory-s3 */
+/**
+ * @fileoverview Implements create memory s3.
+ */
 import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -15,7 +17,12 @@ import type {
   S3RemoveInput,
 } from "./types";
 
-/** Creates memory s3. @example `createMemoryS3(input)` */
+/**
+ * Creates memory s3.
+ * @param input - Input parameter.
+ * @example
+ * createMemoryS3(input)
+ */
 export function createMemoryS3(input: CreateMemoryS3Input = {}): S3Client {
   const rootDir = resolve(input.rootDir ?? join(tmpdir(), "simple-api-s3"));
   const baseUrl = memoryS3Helpers.toBaseUrl(input.baseUrl);

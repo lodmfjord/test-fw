@@ -1,4 +1,6 @@
-/** @fileoverview Tests render terraform stage name. @module libs/http-api-contract/src/render-terraform-stage-name.test */
+/**
+ * @fileoverview Tests render terraform stage name.
+ */
 import { beforeEach, describe, expect, it } from "bun:test";
 import { schema } from "@babbstack/schema";
 import { buildContractFromEndpoints } from "./build-contract-from-endpoints";

@@ -1,8 +1,14 @@
-/** @fileoverview Implements list defined sqs listeners. @module libs/sqs/src/list-defined-sqs-listeners */
+/**
+ * @fileoverview Implements list defined sqs listeners.
+ */
 import { sqsListenerRegistry } from "./sqs-listener-registry-store";
 import type { SqsListenerRuntimeDefinition } from "./types";
 
-/** Handles list defined sqs listeners. @example `listDefinedSqsListeners(input)` */
+/**
+ * Handles list defined sqs listeners.
+ * @example
+ * listDefinedSqsListeners()
+ */
 export function listDefinedSqsListeners(): SqsListenerRuntimeDefinition[] {
   return sqsListenerRegistry.map((listener) => ({
     ...(listener.aws ? { aws: { ...listener.aws } } : {}),

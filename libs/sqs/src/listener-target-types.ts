@@ -1,4 +1,6 @@
-/** @fileoverview Implements listener target types. @module libs/sqs/src/listener-target-types */
+/**
+ * @fileoverview Implements listener target types.
+ */
 import type {
   StepFunctionDefinition,
   StepFunctionDefinitionInput,

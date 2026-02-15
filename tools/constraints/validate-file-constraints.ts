@@ -1,4 +1,6 @@
-/** @fileoverview Validates file-level repository constraints. @module tools/constraints/validate-file-constraints */
+/**
+ * @fileoverview Validates file-level repository constraints.
+ */
 import { basename } from "node:path";
 import { countExportedFunctions } from "./count-exported-functions";
 import { findDocumentationConstraintsErrors } from "./find-documentation-constraints-errors";
@@ -16,7 +18,13 @@ function isKebabCaseFileName(filePath: string): boolean {
   return KEBAB_CASE_FILE_NAME_PATTERN.test(sourceFileName);
 }
 
-/** Validates file constraints. @example `validateFileConstraints("libs/a/src/file.ts", source)` */
+/**
+ * Handles validate file constraints.
+ * @param filePath - File path parameter.
+ * @param source - Source parameter.
+ * @example
+ * validateFileConstraints(filePath, source)
+ */
 export function validateFileConstraints(filePath: string, source: string): string[] {
   const errors: string[] = [
     ...findDocumentationConstraintsErrors(filePath, source),

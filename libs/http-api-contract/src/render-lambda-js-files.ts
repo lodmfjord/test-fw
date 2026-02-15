@@ -1,4 +1,6 @@
-/** @fileoverview Implements render lambda js files. @module libs/http-api-contract/src/render-lambda-js-files */
+/**
+ * @fileoverview Implements render lambda js files.
+ */
 import { assertUniqueRouteIds } from "./assert-unique-route-ids";
 import { renderLambdaEnvBootstrapSource } from "./render-lambda-env-bootstrap-source";
 import { renderLambdaRuntimeSourceBlocks } from "./render-lambda-runtime-source-blocks";
@@ -128,7 +130,13 @@ export async function handler(event) {
 `;
 }
 
-/** Handles render lambda js files. @example `renderLambdaJsFiles(input)` */
+/**
+ * Handles render lambda js files.
+ * @param endpoints - Endpoints parameter.
+ * @param options - Options parameter.
+ * @example
+ * renderLambdaJsFiles(endpoints, options)
+ */
 export function renderLambdaJsFiles(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   options: LambdaJsGenerationOptions,

@@ -1,4 +1,6 @@
-/** @fileoverview Implements write sqs listener js files. @module libs/http-api-contract/src/write-sqs-listener-js-files */
+/**
+ * @fileoverview Implements write sqs listener js files.
+ */
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { isAbsolute, join, resolve } from "node:path";
@@ -94,7 +96,14 @@ function stripBundlerModuleMarkers(source: string): string {
   return source.replace(/^\/\/\s+(?:\.\.\/|\/).+\.(?:[cm]?[jt]s|tsx?)$/gm, "").trimStart();
 }
 
-/** Handles write sqs listener js files. @example `await writeSqsListenerJsFiles(input)` */
+/**
+ * Handles write sqs listener js files.
+ * @param outputDirectory - Output directory parameter.
+ * @param listeners - Listeners parameter.
+ * @param options - Options parameter.
+ * @example
+ * await writeSqsListenerJsFiles(outputDirectory, listeners, options)
+ */
 export async function writeSqsListenerJsFiles(
   outputDirectory: string,
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,

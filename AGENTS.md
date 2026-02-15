@@ -45,14 +45,15 @@
   ```ts
   /**
    * @fileoverview Utilities for date formatting and parsing used across the app.
-   * @module utils/date
-   * @description
-   * Provides stable helpers for parsing ISO strings, formatting dates for UI,
-   * and handling timezone-safe comparisons.
+   * Provides stable helpers for parsing ISO strings and formatting dates.
    */
   ```
+- Do not use `@module` in file headers.
+- File-level JSDoc headers must use multiline format.
 - Every function must have JSDoc.
-- Every exported function JSDoc must include at least one `@example`.
+- Exported function JSDoc must use multiline format.
+- Exported function JSDoc must include `@param` descriptions for all parameters.
+- Exported function JSDoc must include at least one `@example`.
 
 ## Package Export Policy
 

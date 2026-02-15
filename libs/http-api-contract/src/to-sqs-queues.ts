@@ -1,4 +1,6 @@
-/** @fileoverview Implements to sqs queues. @module libs/http-api-contract/src/to-sqs-queues */
+/**
+ * @fileoverview Implements to sqs queues.
+ */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import type { EndpointRuntimeDefinition } from "./types";
 
@@ -7,7 +9,13 @@ function toQueueKey(queueName: string): string {
   return queueName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
-/** Converts values to sqs queues. @example `toSqsQueues(input)` */
+/**
+ * Converts values to sqs queues.
+ * @param endpoints - Endpoints parameter.
+ * @param listeners - Listeners parameter.
+ * @example
+ * toSqsQueues(endpoints, listeners)
+ */
 export function toSqsQueues(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,

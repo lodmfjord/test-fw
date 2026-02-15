@@ -1,4 +1,6 @@
-/** @fileoverview Tests run contract generator from settings. @module libs/http-api-contract/src/run-contract-generator-from-settings.test */
+/**
+ * @fileoverview Tests run contract generator from settings.
+ */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

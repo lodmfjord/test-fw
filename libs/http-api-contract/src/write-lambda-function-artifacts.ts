@@ -1,4 +1,6 @@
-/** @fileoverview Implements write lambda function artifacts. @module libs/http-api-contract/src/write-lambda-function-artifacts */
+/**
+ * @fileoverview Implements write lambda function artifacts.
+ */
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
@@ -33,7 +35,15 @@ async function toLambdaSourceCodeHash(lambdaSourceFilePath: string): Promise<str
   return createHash("sha256").update(source).digest("base64");
 }
 
-/** Handles write lambda function artifacts. @example `await writeLambdaFunctionArtifacts(input)` */
+/**
+ * Handles write lambda function artifacts.
+ * @param outputDirectory - Output directory parameter.
+ * @param lambdasManifest - Lambdas manifest parameter.
+ * @param lambdaOutputDirectory - Lambda output directory parameter.
+ * @param additionalFunctionIds - Additional function ids parameter.
+ * @example
+ * await writeLambdaFunctionArtifacts(outputDirectory, lambdasManifest, lambdaOutputDirectory, additionalFunctionIds)
+ */
 export async function writeLambdaFunctionArtifacts(
   outputDirectory: string,
   lambdasManifest: LambdasManifest,

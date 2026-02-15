@@ -1,4 +1,6 @@
-/** @fileoverview Implements build contract from endpoints. @module libs/http-api-contract/src/build-contract-from-endpoints */
+/**
+ * @fileoverview Implements build contract from endpoints.
+ */
 import { buildContract } from "./build-contract";
 import type { Schema } from "@babbstack/schema";
 import type {
@@ -148,7 +150,12 @@ function withOptionsOperations(
   };
 }
 
-/** Handles build contract from endpoints. @example `buildContractFromEndpoints(input)` */
+/**
+ * Handles build contract from endpoints.
+ * @param input - Input parameter.
+ * @example
+ * buildContractFromEndpoints(input)
+ */
 export function buildContractFromEndpoints(input: BuildContractFromEndpointsInput): Contract {
   const baseContract = buildContract({
     apiName: input.apiName,

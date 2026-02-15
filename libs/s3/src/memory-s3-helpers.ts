@@ -1,4 +1,6 @@
-/** @fileoverview Implements memory s3 helpers. @module libs/s3/src/memory-s3-helpers */
+/**
+ * @fileoverview Implements memory s3 helpers.
+ */
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 

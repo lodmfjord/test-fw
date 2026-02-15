@@ -1,4 +1,6 @@
-/** @fileoverview Implements create default aws s3 operations. @module libs/s3/src/create-default-aws-s3-operations */
+/**
+ * @fileoverview Implements create default aws s3 operations.
+ */
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -19,7 +21,11 @@ import type {
   S3RemoveInput,
 } from "./types";
 
-/** Creates default aws s3 operations. @example `await createDefaultAwsS3Operations(input)` */
+/**
+ * Creates default aws s3 operations.
+ * @example
+ * await createDefaultAwsS3Operations()
+ */
 export async function createDefaultAwsS3Operations(): Promise<AwsS3Operations> {
   const client = new AwsS3Client({});
 

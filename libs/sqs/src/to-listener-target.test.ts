@@ -1,4 +1,6 @@
-/** @fileoverview Tests to listener target. @module libs/sqs/src/to-listener-target.test */
+/**
+ * @fileoverview Tests to listener target.
+ */
 import { describe, expect, it } from "bun:test";
 import { toListenerTarget } from "./to-listener-target";
 

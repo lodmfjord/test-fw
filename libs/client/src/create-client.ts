@@ -1,4 +1,6 @@
-/** @fileoverview Implements create client. @module libs/client/src/create-client */
+/**
+ * @fileoverview Implements create client.
+ */
 import type {
   ClientRequestApi,
   ClientEndpointResponse,
@@ -11,7 +13,6 @@ import type {
 type QueryValue = string | number | boolean | null | undefined | Date;
 type QueryRecord = Record<string, QueryValue | QueryValue[]>;
 const HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"] as const;
-
 /** Converts values to base url. */
 function toBaseUrl(baseUrl: string): string {
   const normalized = baseUrl.trim();
@@ -186,24 +187,27 @@ function toEndpointList(
   return [];
 }
 
-/** Creates client. @example `createClient(input)` */ export function createClient<TEndpoints>(
+export function createClient<TEndpoints>(
   baseUrl: string,
   endpoints: TEndpoints,
 ): HttpApiClient<TEndpoints, TEndpoints>;
-
-/** Creates client. @example `createClient(input)` */ export function createClient<
-  TEndpoints = never,
->(baseUrl: string, endpoints?: undefined): HttpApiClient<TEndpoints, TEndpoints>;
-
-/** Creates client. @example `createClient(input)` */ export function createClient<
-  TEndpoints,
-  TRouteEndpoints = unknown,
->(baseUrl: string, endpoints: TRouteEndpoints): HttpApiClient<TEndpoints, TRouteEndpoints>;
-
-/** Creates client. @example `createClient(input)` */ export function createClient<
-  TEndpoints = never,
-  TRouteEndpoints = TEndpoints,
->(baseUrl: string, endpoints?: TRouteEndpoints): HttpApiClient<TEndpoints, TRouteEndpoints> {
+export function createClient<TEndpoints = never>(
+  baseUrl: string,
+  endpoints?: undefined,
+): HttpApiClient<TEndpoints, TEndpoints>;
+export function createClient<TEndpoints, TRouteEndpoints = unknown>(
+  baseUrl: string,
+  endpoints: TRouteEndpoints,
+): HttpApiClient<TEndpoints, TRouteEndpoints>;
+/**
+ * Creates client.
+ * @param baseUrl - Base url parameter.
+ * @param endpoints - Endpoints parameter.
+ * @example createClient(baseUrl, endpoints)
+ */ export function createClient<TEndpoints = never, TRouteEndpoints = TEndpoints>(
+  baseUrl: string,
+  endpoints?: TRouteEndpoints,
+): HttpApiClient<TEndpoints, TRouteEndpoints> {
   const normalizedBaseUrl = toBaseUrl(baseUrl);
   const endpointList = toEndpointList(endpoints);
   const endpointByRouteId = new Map<string, { method: string; path: string; routeId: string }>();

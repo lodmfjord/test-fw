@@ -1,4 +1,6 @@
-/** @fileoverview Tests render terraform files. @module libs/http-api-contract/src/render-terraform-files.test */
+/**
+ * @fileoverview Tests render terraform files.
+ */
 import { beforeEach, describe, expect, it } from "bun:test";
 import { createDynamoDatabase } from "@babbstack/dynamodb";
 import { schema } from "@babbstack/schema";

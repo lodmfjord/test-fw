@@ -1,4 +1,6 @@
-/** @fileoverview Implements render lambda runtime entry. @module libs/http-api-contract/src/render-lambda-runtime-entry */
+/**
+ * @fileoverview Implements render lambda runtime entry.
+ */
 import { renderLambdaEnvBootstrapSource } from "./render-lambda-env-bootstrap-source";
 import { renderLambdaRuntimeSourceBlocks } from "./render-lambda-runtime-source-blocks";
 import { renderUsedImportLines } from "./render-used-import-lines";
@@ -208,7 +210,14 @@ export async function handler(event) {
 `;
 }
 
-/** Handles render lambda runtime entry source. @example `renderLambdaRuntimeEntrySource(input)` */
+/**
+ * Handles render lambda runtime entry source.
+ * @param endpointModulePath - Endpoint module path parameter.
+ * @param endpointModuleSource - Endpoint module source parameter.
+ * @param endpoint - Endpoint parameter.
+ * @example
+ * renderLambdaRuntimeEntrySource(endpointModulePath, endpointModuleSource, endpoint)
+ */
 export function renderLambdaRuntimeEntrySource(
   endpointModulePath: string,
   endpointModuleSource: string,

@@ -1,7 +1,15 @@
-/** @fileoverview Implements write contract files export. @module libs/http-api-contract/src/write-contract-files-export */
+/**
+ * @fileoverview Implements write contract files export.
+ */
 import type { Contract } from "./types";
 
-/** Handles write contract files. @example `await writeContractFiles(input)` */
+/**
+ * Handles write contract files.
+ * @param outputDirectory - Output directory parameter.
+ * @param contract - Contract parameter.
+ * @example
+ * await writeContractFiles(outputDirectory, contract)
+ */
 export async function writeContractFiles(
   outputDirectory: string,
   contract: Contract,

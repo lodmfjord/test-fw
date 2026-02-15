@@ -1,4 +1,6 @@
-/** @fileoverview Tests render contract files. @module libs/http-api-contract/src/render-contract-files.test */
+/**
+ * @fileoverview Tests render contract files.
+ */
 import { describe, expect, it } from "bun:test";
 import { buildContract } from "./build-contract";
 import { defineRoute } from "./define-route";

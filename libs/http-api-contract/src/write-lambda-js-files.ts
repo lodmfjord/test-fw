@@ -1,4 +1,6 @@
-/** @fileoverview Implements write lambda js files. @module libs/http-api-contract/src/write-lambda-js-files */
+/**
+ * @fileoverview Implements write lambda js files.
+ */
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { isAbsolute, join, resolve } from "node:path";
@@ -77,7 +79,14 @@ function stripBundlerModuleMarkers(source: string): string {
   return source.replace(/^\/\/\s+(?:\.\.\/|\/).+\.(?:[cm]?[jt]s|tsx?)$/gm, "").trimStart();
 }
 
-/** Handles write lambda js files. @example `await writeLambdaJsFiles(input)` */
+/**
+ * Handles write lambda js files.
+ * @param outputDirectory - Output directory parameter.
+ * @param endpoints - Endpoints parameter.
+ * @param options - Options parameter.
+ * @example
+ * await writeLambdaJsFiles(outputDirectory, endpoints, options)
+ */
 export async function writeLambdaJsFiles(
   outputDirectory: string,
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

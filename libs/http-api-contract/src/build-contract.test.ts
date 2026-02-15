@@ -1,4 +1,6 @@
-/** @fileoverview Tests build contract. @module libs/http-api-contract/src/build-contract.test */
+/**
+ * @fileoverview Tests build contract.
+ */
 import { describe, expect, it } from "bun:test";
 import { buildContract } from "./build-contract";
 import { defineRoute } from "./define-route";

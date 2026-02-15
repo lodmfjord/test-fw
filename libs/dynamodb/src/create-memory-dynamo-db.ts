@@ -1,4 +1,6 @@
-/** @fileoverview Implements create memory dynamo db. @module libs/dynamodb/src/create-memory-dynamo-db */
+/**
+ * @fileoverview Implements create memory dynamo db.
+ */
 import type {
   DynamoDbClient,
   DynamoDbItem,
@@ -47,7 +49,11 @@ function readStoredItem(
   return value ? cloneItem(value) : undefined;
 }
 
-/** Creates memory dynamo db. @example `createMemoryDynamoDb(input)` */
+/**
+ * Creates memory dynamo db.
+ * @example
+ * createMemoryDynamoDb()
+ */
 export function createMemoryDynamoDb(): DynamoDbClient {
   const store = new Map<string, DynamoDbItem>();
 

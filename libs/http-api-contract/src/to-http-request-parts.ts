@@ -1,4 +1,6 @@
-/** @fileoverview Implements to http request parts. @module libs/http-api-contract/src/to-http-request-parts */
+/**
+ * @fileoverview Implements to http request parts.
+ */
 type HttpRequestParts = {
   headers: Record<string, string>;
   query: Record<string, string>;
@@ -26,7 +28,13 @@ function toHeaders(headers: Headers): Record<string, string> {
   return result;
 }
 
-/** Converts values to http request parts. @example `toHttpRequestParts(input)` */
+/**
+ * Converts values to http request parts.
+ * @param url - Url parameter.
+ * @param headers - Headers parameter.
+ * @example
+ * toHttpRequestParts(url, headers)
+ */
 export function toHttpRequestParts(url: URL, headers: Headers): HttpRequestParts {
   return {
     headers: toHeaders(headers),

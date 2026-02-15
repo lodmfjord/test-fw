@@ -1,4 +1,6 @@
-/** @fileoverview Implements to step function sqs listeners. @module libs/http-api-contract/src/to-step-function-sqs-listeners */
+/**
+ * @fileoverview Implements to step function sqs listeners.
+ */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 
 type StepFunctionSqsListenerConfig = {
@@ -40,7 +42,12 @@ function toStartAction(
   return "states:StartExecution";
 }
 
-/** Converts values to step function sqs listeners. @example `toStepFunctionSqsListeners(input)` */
+/**
+ * Converts values to step function sqs listeners.
+ * @param listeners - Listeners parameter.
+ * @example
+ * toStepFunctionSqsListeners(listeners)
+ */
 export function toStepFunctionSqsListeners(
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,
 ): Record<string, StepFunctionSqsListenerConfig> {

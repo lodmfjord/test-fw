@@ -1,4 +1,6 @@
-/** @fileoverview Tests package exports consistency. @module tools/constraints/package-exports-consistency.test */
+/**
+ * @fileoverview Tests package exports consistency.
+ */
 import { describe, expect, it } from "bun:test";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";

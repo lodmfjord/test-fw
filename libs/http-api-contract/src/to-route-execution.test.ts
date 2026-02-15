@@ -1,4 +1,6 @@
-/** @fileoverview Tests to route execution. @module libs/http-api-contract/src/to-route-execution.test */
+/**
+ * @fileoverview Tests to route execution.
+ */
 import { describe, expect, it } from "bun:test";
 import { toRouteExecution } from "./to-route-execution";
 

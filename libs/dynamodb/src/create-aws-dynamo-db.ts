@@ -1,4 +1,6 @@
-/** @fileoverview Implements create aws dynamo db. @module libs/dynamodb/src/create-aws-dynamo-db */
+/**
+ * @fileoverview Implements create aws dynamo db.
+ */
 import {
   DeleteItemCommand,
   DynamoDBClient,
@@ -95,7 +97,12 @@ async function createDefaultOperations(): Promise<AwsDynamoDbOperations> {
   };
 }
 
-/** Creates aws dynamo db. @example `createAwsDynamoDb(input)` */
+/**
+ * Creates aws dynamo db.
+ * @param input - Input parameter.
+ * @example
+ * createAwsDynamoDb(input)
+ */
 export function createAwsDynamoDb(input: CreateAwsDynamoDbInput = {}): DynamoDbClient {
   const operationsPromise = input.operations
     ? Promise.resolve(input.operations)

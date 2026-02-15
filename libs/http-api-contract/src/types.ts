@@ -1,4 +1,6 @@
-/** @fileoverview Implements types. @module libs/http-api-contract/src/types */
+/**
+ * @fileoverview Implements types.
+ */
 export type {
   EndpointAccess,
   EndpointContext,

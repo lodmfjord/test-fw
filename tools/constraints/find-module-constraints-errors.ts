@@ -1,4 +1,6 @@
-/** @fileoverview Finds architecture and public-surface constraint violations for module imports/exports. @module tools/constraints/find-module-constraints-errors */
+/**
+ * @fileoverview Finds architecture and public-surface constraint violations for module imports/exports.
+ */
 import { dirname, join, normalize, sep } from "node:path";
 import * as ts from "typescript";
 
@@ -189,7 +191,13 @@ type ModuleLink = {
   return errors;
 }
 
-/** Finds module-level constraint violations for one source file. @example `findModuleConstraintsErrors("libs/client/src/index.ts", source)` */
+/**
+ * Handles find module constraints errors.
+ * @param filePath - File path parameter.
+ * @param source - Source parameter.
+ * @example
+ * findModuleConstraintsErrors(filePath, source)
+ */
 export function findModuleConstraintsErrors(filePath: string, source: string): string[] {
   const scope = toScope(filePath);
   const sourceFile = ts.createSourceFile(

@@ -1,4 +1,6 @@
-/** @fileoverview Implements to step function endpoints. @module libs/http-api-contract/src/to-step-function-endpoints */
+/**
+ * @fileoverview Implements to step function endpoints.
+ */
 import type { EndpointRuntimeDefinition } from "./types";
 
 type StepFunctionEndpointConfig = {
@@ -34,7 +36,12 @@ function toStartAction(
   return "states:StartExecution";
 }
 
-/** Converts values to step function endpoints. @example `toStepFunctionEndpoints(input)` */
+/**
+ * Converts values to step function endpoints.
+ * @param endpoints - Endpoints parameter.
+ * @example
+ * toStepFunctionEndpoints(endpoints)
+ */
 export function toStepFunctionEndpoints(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
 ): Record<string, StepFunctionEndpointConfig> {

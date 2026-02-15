@@ -1,4 +1,6 @@
-/** @fileoverview Implements parse step function definition helpers. @module libs/step-functions/src/parse-step-function-definition-helpers */
+/**
+ * @fileoverview Implements parse step function definition helpers.
+ */
 import type {
   StepFunctionChoiceRule,
   StepFunctionChoiceState,

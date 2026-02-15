@@ -1,4 +1,6 @@
-/** @fileoverview Implements define route. @module libs/http-api-contract/src/define-route */
+/**
+ * @fileoverview Implements define route.
+ */
 import type { HttpMethod, RouteDefinition, RouteInput } from "./types";
 import { toRouteExecution } from "./to-route-execution";
 
@@ -109,7 +111,12 @@ function toRouteEnv(input: RouteInput["env"]): Record<string, string> | undefine
   return Object.keys(env).length > 0 ? env : undefined;
 }
 
-/** Defines route. @example `defineRoute(input)` */
+/**
+ * Defines route.
+ * @param input - Input parameter.
+ * @example
+ * defineRoute(input)
+ */
 export function defineRoute(input: RouteInput): RouteDefinition {
   const method = normalizeMethod(input.method);
   const path = normalizePath(input.path);

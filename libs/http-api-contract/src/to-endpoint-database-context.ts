@@ -1,4 +1,6 @@
-/** @fileoverview Implements to endpoint database context. @module libs/http-api-contract/src/to-endpoint-database-context */
+/**
+ * @fileoverview Implements to endpoint database context.
+ */
 import { createDynamoDatabase, type DynamoDbClient } from "@babbstack/dynamodb";
 import type { EndpointRuntimeDefinition } from "./types";
 
@@ -46,7 +48,13 @@ function toDatabaseForEndpoint(
   return database.bind(scopedDb as EndpointDb);
 }
 
-/** Converts values to endpoint database context. @example `toEndpointDatabaseContext(input)` */
+/**
+ * Converts values to endpoint database context.
+ * @param db - Db parameter.
+ * @param endpoint - Endpoint parameter.
+ * @example
+ * toEndpointDatabaseContext(db, endpoint)
+ */
 export function toEndpointDatabaseContext(
   db: DynamoDbClient,
   endpoint: EndpointRuntimeDefinition,

@@ -1,4 +1,6 @@
-/** @fileoverview Implements to route execution. @module libs/http-api-contract/src/to-route-execution */
+/**
+ * @fileoverview Implements to route execution.
+ */
 import {
   parseStepFunctionDefinition,
   toStepFunctionDefinitionJson,
@@ -55,7 +57,12 @@ function toStepFunctionExecution(
   };
 }
 
-/** Converts values to route execution. @example `toRouteExecution(input)` */
+/**
+ * Converts values to route execution.
+ * @param input - Input parameter.
+ * @example
+ * toRouteExecution(input)
+ */
 export function toRouteExecution(input: RouteExecutionInput | undefined): RouteExecution {
   if (!input || input.kind === "lambda") {
     return {

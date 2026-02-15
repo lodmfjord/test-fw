@@ -1,4 +1,6 @@
-/** @fileoverview Implements create sqs terraform json. @module libs/http-api-contract/src/create-sqs-terraform-json */
+/**
+ * @fileoverview Implements create sqs terraform json.
+ */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import { toSqsQueues } from "./to-sqs-queues";
 import type { EndpointRuntimeDefinition } from "./types";
@@ -9,7 +11,13 @@ function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
 
-/** Creates sqs terraform json. @example `createSqsTerraformJson(input)` */
+/**
+ * Creates sqs terraform json.
+ * @param endpoints - Endpoints parameter.
+ * @param listeners - Listeners parameter.
+ * @example
+ * createSqsTerraformJson(endpoints, listeners)
+ */
 export function createSqsTerraformJson(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   listeners: ReadonlyArray<SqsListenerRuntimeDefinition>,

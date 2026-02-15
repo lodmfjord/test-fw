@@ -1,4 +1,6 @@
-/** @fileoverview Tests run contract generator from settings terraform. @module libs/http-api-contract/src/run-contract-generator-from-settings-terraform.test */
+/**
+ * @fileoverview Tests run contract generator from settings terraform.
+ */
 import { mkdtemp, readdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -10,7 +12,6 @@ import { runContractGeneratorFromSettings } from "./run-contract-generator-from-
 function toTerraformReference(expression: string): string {
   return `\${${expression}}`;
 }
-
 describe("runContractGeneratorFromSettings terraform", () => {
   it("generates split terraform files with region and workspace-aware state backend", async () => {
     const workspaceDirectory = await mkdtemp(join(tmpdir(), "babbstack-generator-settings-"));
@@ -149,7 +150,6 @@ export const contract = buildContractFromEndpoints({
       ),
       "utf8",
     );
-
     const output = await runContractGeneratorFromSettings(settingsPath);
     expect(output.terraformFiles).toEqual([
       "api-gateway-lambda-bindings.tf.json",

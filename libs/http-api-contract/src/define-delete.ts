@@ -1,4 +1,6 @@
-/** @fileoverview Implements define delete. @module libs/http-api-contract/src/define-delete */
+/**
+ * @fileoverview Implements define delete.
+ */
 import { defineEndpoint } from "./define-endpoint";
 import type {
   EndpointContextInput,
@@ -34,7 +36,12 @@ type DeleteEndpointDefinition<
   path: TPath;
 };
 
-/** @example `defineDelete(input)` */ export function defineDelete<
+/**
+ * Defines delete.
+ * @param input - Input parameter.
+ * @example
+ * defineDelete(input)
+ */ export function defineDelete<
   TParams,
   TQuery,
   THeaders,

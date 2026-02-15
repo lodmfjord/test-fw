@@ -1,4 +1,6 @@
-/** @fileoverview Implements build contract helpers. @module libs/http-api-contract/src/build-contract-helpers */
+/**
+ * @fileoverview Implements build contract helpers.
+ */
 import { assertUniqueRouteIds } from "./assert-unique-route-ids";
 import type { EnvSchema } from "./env-schema-types";
 import type {

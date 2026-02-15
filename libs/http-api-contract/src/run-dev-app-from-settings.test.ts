@@ -1,4 +1,6 @@
-/** @fileoverview Tests run dev app from settings. @module libs/http-api-contract/src/run-dev-app-from-settings.test */
+/**
+ * @fileoverview Tests run dev app from settings.
+ */
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

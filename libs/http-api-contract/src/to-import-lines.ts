@@ -1,4 +1,6 @@
-/** @fileoverview Implements to import lines. @module libs/http-api-contract/src/to-import-lines */
+/**
+ * @fileoverview Implements to import lines.
+ */
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 
@@ -44,7 +46,14 @@ function resolveImportSpecifier(moduleSpecifier: string, endpointModulePath: str
   return moduleSpecifier;
 }
 
-/** Converts values to import lines. @example `toImportLines(input)` */
+/**
+ * Converts values to import lines.
+ * @param endpointModulePath - Endpoint module path parameter.
+ * @param handlerSource - Handler source parameter.
+ * @param imports - Imports parameter.
+ * @example
+ * toImportLines(endpointModulePath, handlerSource, imports)
+ */
 export function toImportLines(
   endpointModulePath: string,
   handlerSource: string,

@@ -1,4 +1,6 @@
-/** @fileoverview Implements db. @module apps/test-app/src/db */
+/**
+ * @fileoverview Implements db.
+ */
 import {
   createDynamoDatabase,
   type ReadBoundDynamoDatabase,

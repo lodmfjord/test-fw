@@ -1,4 +1,6 @@
-/** @fileoverview Tests lambda bundle. @module apps/test-app/src/lambda-bundle.test */
+/**
+ * @fileoverview Tests lambda bundle.
+ */
 import { mkdtemp, readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";

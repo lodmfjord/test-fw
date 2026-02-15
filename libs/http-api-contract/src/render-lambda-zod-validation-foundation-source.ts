@@ -1,4 +1,6 @@
-/** @fileoverview Implements render lambda zod validation foundation source. @module libs/http-api-contract/src/render-lambda-zod-validation-foundation-source */
+/**
+ * @fileoverview Implements render lambda zod validation foundation source.
+ */
 const ZOD_VALIDATION_FOUNDATION_SOURCE = `
 const rootValidatorCache = new WeakMap();
 const SUPPORTED_SCHEMA_KEYS = new Set([
@@ -145,7 +147,11 @@ function withCommonModifiers(validator, schema) {
 }
 `;
 
-/** Converts values to zod validation foundation source. @example `toZodValidationFoundationSource(input)` */
+/**
+ * Converts values to zod validation foundation source.
+ * @example
+ * toZodValidationFoundationSource()
+ */
 export function toZodValidationFoundationSource(): string {
   return ZOD_VALIDATION_FOUNDATION_SOURCE;
 }

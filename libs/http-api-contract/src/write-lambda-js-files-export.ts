@@ -1,7 +1,16 @@
-/** @fileoverview Implements write lambda js files export. @module libs/http-api-contract/src/write-lambda-js-files-export */
+/**
+ * @fileoverview Implements write lambda js files export.
+ */
 import type { EndpointRuntimeDefinition, LambdaJsGenerationOptions } from "./types";
 
-/** Handles write lambda js files. @example `await writeLambdaJsFiles(input)` */
+/**
+ * Handles write lambda js files.
+ * @param outputDirectory - Output directory parameter.
+ * @param endpoints - Endpoints parameter.
+ * @param options - Options parameter.
+ * @example
+ * await writeLambdaJsFiles(outputDirectory, endpoints, options)
+ */
 export async function writeLambdaJsFiles(
   outputDirectory: string,
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

@@ -1,4 +1,6 @@
-/** @fileoverview Implements write default generator settings file. @module libs/http-api-contract/src/write-default-generator-settings-file */
+/**
+ * @fileoverview Implements write default generator settings file.
+ */
 import { access, writeFile } from "node:fs/promises";
 
 const DEFAULT_SETTINGS_TEMPLATE = `{
@@ -42,7 +44,12 @@ async function assertFileDoesNotExist(path: string): Promise<void> {
   );
 }
 
-/** Handles write default generator settings file. @example `await writeDefaultGeneratorSettingsFile(input)` */
+/**
+ * Handles write default generator settings file.
+ * @param path - Path parameter.
+ * @example
+ * await writeDefaultGeneratorSettingsFile(path)
+ */
 export async function writeDefaultGeneratorSettingsFile(path: string): Promise<void> {
   await assertFileDoesNotExist(path);
   await writeFile(path, DEFAULT_SETTINGS_TEMPLATE, "utf8");

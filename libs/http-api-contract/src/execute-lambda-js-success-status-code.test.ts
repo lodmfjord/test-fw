@@ -1,4 +1,6 @@
-/** @fileoverview Tests execute lambda js success status code. @module libs/http-api-contract/src/execute-lambda-js-success-status-code.test */
+/**
+ * @fileoverview Tests execute lambda js success status code.
+ */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";

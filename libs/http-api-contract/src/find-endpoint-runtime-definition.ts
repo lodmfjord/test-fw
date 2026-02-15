@@ -1,4 +1,6 @@
-/** @fileoverview Implements find endpoint runtime definition. @module libs/http-api-contract/src/find-endpoint-runtime-definition */
+/**
+ * @fileoverview Implements find endpoint runtime definition.
+ */
 import type { EndpointRuntimeDefinition } from "./types";
 
 /** Handles match path. */
@@ -30,7 +32,14 @@ function matchPath(templatePath: string, requestPath: string): Record<string, st
   return params;
 }
 
-/** Handles find endpoint runtime definition. @example `findEndpointRuntimeDefinition(input)` */
+/**
+ * Handles find endpoint runtime definition.
+ * @param endpoints - Endpoints parameter.
+ * @param method - Method parameter.
+ * @param path - Path parameter.
+ * @example
+ * findEndpointRuntimeDefinition(endpoints, method, path)
+ */
 export function findEndpointRuntimeDefinition(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
   method: string,

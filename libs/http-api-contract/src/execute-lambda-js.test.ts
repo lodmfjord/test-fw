@@ -1,4 +1,6 @@
-/** @fileoverview Tests execute lambda js. @module libs/http-api-contract/src/execute-lambda-js.test */
+/**
+ * @fileoverview Tests execute lambda js.
+ */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";

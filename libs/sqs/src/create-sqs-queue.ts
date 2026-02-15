@@ -1,4 +1,6 @@
-/** @fileoverview Implements create sqs queue. @module libs/sqs/src/create-sqs-queue */
+/**
+ * @fileoverview Implements create sqs queue.
+ */
 import { registerDefinedSqsListener } from "./register-defined-sqs-listener";
 import { toListenerTarget } from "./to-listener-target";
 import type {
@@ -106,9 +108,16 @@ function toRuntimeConfig(queueName: string): SqsQueueRuntimeConfig {
   return listener;
 }
 
-/** Creates sqs queue. @example `createSqsQueue(input)` */ export function createSqsQueue<
-  TMessage extends SqsMessage,
->(parser: Parser<TMessage>, options: CreateSqsQueueOptions): SqsQueue<TMessage> {
+/**
+ * Creates sqs queue.
+ * @param parser - Parser parameter.
+ * @param options - Options parameter.
+ * @example
+ * createSqsQueue(parser, options)
+ */ export function createSqsQueue<TMessage extends SqsMessage>(
+  parser: Parser<TMessage>,
+  options: CreateSqsQueueOptions,
+): SqsQueue<TMessage> {
   const queueName = toQueueName(options);
   const runtimeConfig = toRuntimeConfig(queueName);
 

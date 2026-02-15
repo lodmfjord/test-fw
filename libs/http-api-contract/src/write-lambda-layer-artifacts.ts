@@ -1,10 +1,19 @@
-/** @fileoverview Implements write lambda layer artifacts. @module libs/http-api-contract/src/write-lambda-layer-artifacts */
+/**
+ * @fileoverview Implements write lambda layer artifacts.
+ */
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { lambdaLayerArtifactsHelpers } from "./lambda-layer-artifacts-helpers";
 import type { LambdaLayerMetadata } from "./to-lambda-layer-metadata";
 
-/** Handles write lambda layer artifacts. @example `await writeLambdaLayerArtifacts(input)` */
+/**
+ * Handles write lambda layer artifacts.
+ * @param outputDirectory - Output directory parameter.
+ * @param layerMetadata - Layer metadata parameter.
+ * @param resolveFromDirectory - Resolve from directory parameter.
+ * @example
+ * await writeLambdaLayerArtifacts(outputDirectory, layerMetadata, resolveFromDirectory)
+ */
 export async function writeLambdaLayerArtifacts(
   outputDirectory: string,
   layerMetadata: LambdaLayerMetadata,

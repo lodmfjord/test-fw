@@ -1,4 +1,6 @@
-/** @fileoverview Implements create lambdas terraform json. @module libs/http-api-contract/src/create-lambdas-terraform-json */
+/**
+ * @fileoverview Implements create lambdas terraform json.
+ */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 import { createLambdasTerraformJsonHelpers } from "./create-lambdas-terraform-json-helpers";
 import { createLambdasTerraformJsonResourceHelpers } from "./create-lambdas-terraform-json-resource-helpers";
@@ -10,7 +12,17 @@ import type { Contract, EndpointRuntimeDefinition } from "./types";
 
 type TerraformJson = Record<string, unknown>;
 
-/** Creates lambdas terraform json. @example `createLambdasTerraformJson(input)` */
+/**
+ * Creates lambdas terraform json.
+ * @param contract - Contract parameter.
+ * @param endpoints - Endpoints parameter.
+ * @param sqsListeners - Sqs listeners parameter.
+ * @param lambdaExternalModulesByRoute - Lambda external modules by route parameter.
+ * @param usesManagedDynamodbTables - Uses managed dynamodb tables parameter.
+ * @param usesManagedSqsQueues - Uses managed sqs queues parameter.
+ * @example
+ * createLambdasTerraformJson(contract, endpoints, sqsListeners, lambdaExternalModulesByRoute, usesManagedDynamodbTables, usesManagedSqsQueues)
+ */
 export function createLambdasTerraformJson(
   contract: Contract,
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,

@@ -1,4 +1,6 @@
-/** @fileoverview Implements to dynamodb tables. @module libs/http-api-contract/src/to-dynamodb-tables */
+/**
+ * @fileoverview Implements to dynamodb tables.
+ */
 import type { EndpointRuntimeDefinition } from "./types";
 
 /** Converts values to table key. */
@@ -6,7 +8,12 @@ function toTableKey(tableName: string): string {
   return tableName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
-/** Converts values to dynamodb tables. @example `toDynamodbTables(input)` */
+/**
+ * Converts values to dynamodb tables.
+ * @param endpoints - Endpoints parameter.
+ * @example
+ * toDynamodbTables(endpoints)
+ */
 export function toDynamodbTables(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
 ): Record<string, Record<string, string>> {

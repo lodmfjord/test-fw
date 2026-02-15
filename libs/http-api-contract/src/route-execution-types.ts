@@ -1,4 +1,6 @@
-/** @fileoverview Implements route execution types. @module libs/http-api-contract/src/route-execution-types */
+/**
+ * @fileoverview Implements route execution types.
+ */
 import type {
   StepFunctionDefinition,
   StepFunctionDefinitionInput,

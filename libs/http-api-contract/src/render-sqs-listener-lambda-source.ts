@@ -1,7 +1,16 @@
-/** @fileoverview Implements render sqs listener lambda source. @module libs/http-api-contract/src/render-sqs-listener-lambda-source */
+/**
+ * @fileoverview Implements render sqs listener lambda source.
+ */
 import type { SqsListenerRuntimeDefinition } from "@babbstack/sqs";
 
-/** Handles render sqs listener lambda source. @example `renderSqsListenerLambdaSource(input)` */
+/**
+ * Handles render sqs listener lambda source.
+ * @param listener - Listener parameter.
+ * @param endpointModulePath - Endpoint module path parameter.
+ * @param runtimeSqsImportSpecifier - Runtime sqs import specifier parameter.
+ * @example
+ * renderSqsListenerLambdaSource(listener, endpointModulePath, runtimeSqsImportSpecifier)
+ */
 export function renderSqsListenerLambdaSource(
   listener: SqsListenerRuntimeDefinition,
   endpointModulePath: string,

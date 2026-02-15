@@ -1,4 +1,6 @@
-/** @fileoverview Tests find module constraints errors. @module tools/constraints/find-module-constraints-errors.test */
+/**
+ * @fileoverview Tests find module constraints errors.
+ */
 import { describe, expect, it } from "bun:test";
 import { findModuleConstraintsErrors } from "./find-module-constraints-errors";
 

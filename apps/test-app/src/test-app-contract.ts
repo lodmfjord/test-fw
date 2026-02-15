@@ -1,4 +1,6 @@
-/** @fileoverview Implements test app contract. @module apps/test-app/src/test-app-contract */
+/**
+ * @fileoverview Implements test app contract.
+ */
 import { buildContractFromEndpoints } from "@babbstack/http-api-contract";
 import { endpoints } from "./endpoints";
 

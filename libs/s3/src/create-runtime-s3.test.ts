@@ -1,4 +1,6 @@
-/** @fileoverview Tests create runtime s3. @module libs/s3/src/create-runtime-s3.test */
+/**
+ * @fileoverview Tests create runtime s3.
+ */
 import { describe, expect, it } from "bun:test";
 import type { S3Client } from "./types";
 import { createRuntimeS3 } from "./create-runtime-s3";

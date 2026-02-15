@@ -1,4 +1,6 @@
-/** @fileoverview Implements s3 aws normalizers. @module libs/s3/src/s3-aws-normalizers */
+/**
+ * @fileoverview Implements s3 aws normalizers.
+ */
 import type { S3ObjectSummary, S3PutInput } from "./types";
 
 const DEFAULT_CONTENT_TYPE = "application/octet-stream";

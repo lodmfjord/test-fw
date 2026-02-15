@@ -1,8 +1,15 @@
-/** @fileoverview Implements to normalized global cors. @module libs/http-api-contract/src/to-normalized-global-cors */
+/**
+ * @fileoverview Implements to normalized global cors.
+ */
 import type { GlobalCors } from "./cors-types";
 import type { BuildContractInput } from "./types";
 
-/** Converts values to normalized global cors. @example `toNormalizedGlobalCors(input)` */
+/**
+ * Converts values to normalized global cors.
+ * @param input - Input parameter.
+ * @example
+ * toNormalizedGlobalCors(input)
+ */
 export function toNormalizedGlobalCors(input: BuildContractInput["cors"]): GlobalCors | undefined {
   if (!input) {
     return undefined;

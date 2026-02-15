@@ -1,4 +1,6 @@
-/** @fileoverview Tests render terraform lambda dynamodb prefix. @module libs/http-api-contract/src/render-terraform-lambda-dynamodb-prefix.test */
+/**
+ * @fileoverview Tests render terraform lambda dynamodb prefix.
+ */
 import { beforeEach, describe, expect, it } from "bun:test";
 import { createDynamoDatabase } from "@babbstack/dynamodb";
 import { schema } from "@babbstack/schema";

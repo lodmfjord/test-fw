@@ -1,4 +1,6 @@
-/** @fileoverview Implements cors types. @module libs/http-api-contract/src/cors-types */
+/**
+ * @fileoverview Implements cors types.
+ */
 export type GlobalCors = {
   allowCredentials?: boolean;
   allowHeaders?: string[];

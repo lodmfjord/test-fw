@@ -1,9 +1,16 @@
-/** @fileoverview Implements register defined sqs listener. @module libs/sqs/src/register-defined-sqs-listener */
+/**
+ * @fileoverview Implements register defined sqs listener.
+ */
 import { assertUniqueListenerIds } from "./assert-unique-listener-ids";
 import { sqsListenerRegistry } from "./sqs-listener-registry-store";
 import type { SqsListenerRuntimeDefinition } from "./types";
 
-/** Registers defined sqs listener. @example `registerDefinedSqsListener(input)` */
+/**
+ * Registers defined sqs listener.
+ * @param listener - Listener parameter.
+ * @example
+ * registerDefinedSqsListener(listener)
+ */
 export function registerDefinedSqsListener(listener: SqsListenerRuntimeDefinition): void {
   const existingIndex = sqsListenerRegistry.findIndex((entry) => {
     return entry.listenerId === listener.listenerId;

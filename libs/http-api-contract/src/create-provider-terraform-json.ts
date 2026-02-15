@@ -1,4 +1,6 @@
-/** @fileoverview Implements create provider terraform json. @module libs/http-api-contract/src/create-provider-terraform-json */
+/**
+ * @fileoverview Implements create provider terraform json.
+ */
 import { toStateKey } from "./to-state-key";
 import type { TerraformJson, TerraformRenderSettings } from "./terraform-render-types";
 
@@ -81,7 +83,13 @@ function toTerraformBlock(settings: TerraformRenderSettings, appName: string): T
   return terraformBlock;
 }
 
-/** Creates provider terraform json. @example `createProviderTerraformJson(input)` */
+/**
+ * Creates provider terraform json.
+ * @param settings - Settings parameter.
+ * @param appName - App name parameter.
+ * @example
+ * createProviderTerraformJson(settings, appName)
+ */
 export function createProviderTerraformJson(
   settings: TerraformRenderSettings,
   appName: string,

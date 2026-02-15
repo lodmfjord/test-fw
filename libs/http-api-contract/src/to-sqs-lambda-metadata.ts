@@ -1,4 +1,6 @@
-/** @fileoverview Implements to sqs lambda metadata. @module libs/http-api-contract/src/to-sqs-lambda-metadata */
+/**
+ * @fileoverview Implements to sqs lambda metadata.
+ */
 import type { EndpointRuntimeDefinition } from "./types";
 
 type LambdaSqsSendAccess = {
@@ -14,7 +16,12 @@ function toQueueKey(queueName: string): string {
   return queueName.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
-/** Converts values to route sqs send access. @example `toRouteSqsSendAccess(input)` */
+/**
+ * Converts values to route sqs send access.
+ * @param endpoints - Endpoints parameter.
+ * @example
+ * toRouteSqsSendAccess(endpoints)
+ */
 export function toRouteSqsSendAccess(
   endpoints: ReadonlyArray<EndpointRuntimeDefinition>,
 ): Record<string, LambdaSqsSendAccess> {

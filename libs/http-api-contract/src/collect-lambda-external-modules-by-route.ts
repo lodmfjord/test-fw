@@ -1,4 +1,6 @@
-/** @fileoverview Implements collect lambda external modules by route. @module libs/http-api-contract/src/collect-lambda-external-modules-by-route */
+/**
+ * @fileoverview Implements collect lambda external modules by route.
+ */
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { join } from "node:path";
@@ -39,7 +41,15 @@ function toModuleSpecifiers(
   return specifiersByModule;
 }
 
-/** Handles collect lambda external modules by route. @example `await collectLambdaExternalModulesByRoute(input)` */
+/**
+ * Handles collect lambda external modules by route.
+ * @param lambdaOutputDirectory - Lambda output directory parameter.
+ * @param lambdaFileNames - Lambda file names parameter.
+ * @param externalModules - External modules parameter.
+ * @param resolveFromPath - Resolve from path parameter.
+ * @example
+ * await collectLambdaExternalModulesByRoute(lambdaOutputDirectory, lambdaFileNames, externalModules, resolveFromPath)
+ */
 export async function collectLambdaExternalModulesByRoute(
   lambdaOutputDirectory: string,
   lambdaFileNames: ReadonlyArray<string>,

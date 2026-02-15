@@ -1,4 +1,6 @@
-/** @fileoverview Tests to generate contracts cli command. @module libs/http-api-contract/src/to-generate-contracts-cli-command.test */
+/**
+ * @fileoverview Tests to generate contracts cli command.
+ */
 import { describe, expect, it } from "bun:test";
 import { toGenerateContractsCliCommand } from "./to-generate-contracts-cli-command";
 

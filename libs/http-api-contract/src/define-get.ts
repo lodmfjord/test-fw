@@ -1,4 +1,6 @@
-/** @fileoverview Implements define get. @module libs/http-api-contract/src/define-get */
+/**
+ * @fileoverview Implements define get.
+ */
 import { defineEndpoint } from "./define-endpoint";
 import type {
   EndpointContextInput,
@@ -34,7 +36,12 @@ type GetEndpointDefinition<
   path: TPath;
 };
 
-/** @example `defineGet(input)` */ export function defineGet<
+/**
+ * Defines get.
+ * @param input - Input parameter.
+ * @example
+ * defineGet(input)
+ */ export function defineGet<
   TParams,
   TQuery,
   THeaders,

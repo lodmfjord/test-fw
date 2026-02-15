@@ -1,4 +1,6 @@
-/** @fileoverview Implements to required runtime external modules. @module libs/http-api-contract/src/to-required-runtime-external-modules */
+/**
+ * @fileoverview Implements to required runtime external modules.
+ */
 const REQUIRED_RUNTIME_EXTERNAL_MODULES = ["zod"] as const;
 
 /** Converts values to normalized module names. */
@@ -20,7 +22,12 @@ function toNormalizedModuleNames(
   return [...moduleNames].sort((left, right) => left.localeCompare(right));
 }
 
-/** Converts values to required runtime external modules. @example `toRequiredRuntimeExternalModules(input)` */
+/**
+ * Converts values to required runtime external modules.
+ * @param externalModules - External modules parameter.
+ * @example
+ * toRequiredRuntimeExternalModules(externalModules)
+ */
 export function toRequiredRuntimeExternalModules(
   externalModules: ReadonlyArray<string> | undefined,
 ): string[] {

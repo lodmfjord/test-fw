@@ -1,4 +1,6 @@
-/** @fileoverview Tests client requests. @module apps/test-app-client/src/client-requests.test */
+/**
+ * @fileoverview Tests client requests.
+ */
 import { afterEach, describe, expect, it } from "bun:test";
 import { createClient } from "@babbstack/client";
 import type { endpoints as testAppEndpoints } from "../../test-app/src/endpoints";

@@ -1,4 +1,6 @@
-/** @fileoverview Implements to terraform settings. @module libs/http-api-contract/src/to-terraform-settings */
+/**
+ * @fileoverview Implements to terraform settings.
+ */
 import type {
   TerraformGeneratorSettings,
   TerraformResourceSelection,
@@ -95,7 +97,13 @@ function toTerraformState(
   };
 }
 
-/** Converts values to terraform settings. @example `toTerraformSettings(input)` */
+/**
+ * Converts values to terraform settings.
+ * @param value - Value parameter.
+ * @param toStringSetting - To string setting parameter.
+ * @example
+ * toTerraformSettings(value, toStringSetting)
+ */
 export function toTerraformSettings(
   value: unknown,
   toStringSetting: ToStringSetting,

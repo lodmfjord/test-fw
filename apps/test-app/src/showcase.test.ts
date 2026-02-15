@@ -1,4 +1,6 @@
-/** @fileoverview Tests showcase. @module apps/test-app/src/showcase.test */
+/**
+ * @fileoverview Tests showcase.
+ */
 import { describe, expect, it } from "bun:test";
 import { createDevApp } from "@babbstack/http-api-contract";
 import { runSqsQueueListener } from "@babbstack/sqs";

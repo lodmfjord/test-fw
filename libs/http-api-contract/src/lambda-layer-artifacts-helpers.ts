@@ -1,4 +1,6 @@
-/** @fileoverview Implements lambda layer artifacts helpers. @module libs/http-api-contract/src/lambda-layer-artifacts-helpers */
+/**
+ * @fileoverview Implements lambda layer artifacts helpers.
+ */
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { cp, mkdir, mkdtemp, readFile, readdir, rm } from "node:fs/promises";

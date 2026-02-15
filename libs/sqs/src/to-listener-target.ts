@@ -1,4 +1,6 @@
-/** @fileoverview Implements to listener target. @module libs/sqs/src/to-listener-target */
+/**
+ * @fileoverview Implements to listener target.
+ */
 import {
   parseStepFunctionDefinition,
   toStepFunctionDefinitionJson,
@@ -57,7 +59,12 @@ function toStepFunctionTarget(
   };
 }
 
-/** Converts values to listener target. @example `toListenerTarget(input)` */
+/**
+ * Converts values to listener target.
+ * @param target - Target parameter.
+ * @example
+ * toListenerTarget(target)
+ */
 export function toListenerTarget(target: SqsListenerTargetInput | undefined): SqsListenerTarget {
   if (!target || target.kind === "lambda") {
     return {

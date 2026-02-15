@@ -1,4 +1,6 @@
-/** @fileoverview Tests execute lambda js secrets. @module libs/http-api-contract/src/execute-lambda-js-secrets.test */
+/**
+ * @fileoverview Tests execute lambda js secrets.
+ */
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";

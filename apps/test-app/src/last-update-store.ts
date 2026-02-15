@@ -1,4 +1,6 @@
-/** @fileoverview Implements last update store. @module apps/test-app/src/last-update-store */
+/**
+ * @fileoverview Implements last update store.
+ */
 const bootTime = new Date().toISOString();
 let lastUpdateTime = bootTime;
 

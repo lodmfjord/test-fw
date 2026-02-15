@@ -1,4 +1,6 @@
-/** @fileoverview Implements run sqs queue listener. @module libs/sqs/src/run-sqs-queue-listener */
+/**
+ * @fileoverview Implements run sqs queue listener.
+ */
 import { executeStepFunctionDefinition } from "./execute-step-function-definition";
 import type { RunSqsQueueListenerOptions, SqsClient, SqsMessage, SqsQueueListener } from "./types";
 
@@ -12,9 +14,14 @@ function toBatchSize(listener: SqsQueueListener<SqsMessage>): number {
   return value;
 }
 
-/** Runs sqs queue listener. @example `await runSqsQueueListener(input)` */ export async function runSqsQueueListener<
-  TMessage extends SqsMessage,
->(
+/**
+ * Runs sqs queue listener.
+ * @param listener - Listener parameter.
+ * @param sqs - Sqs parameter.
+ * @param options - Options parameter.
+ * @example
+ * await runSqsQueueListener(listener, sqs, options)
+ */ export async function runSqsQueueListener<TMessage extends SqsMessage>(
   listener: SqsQueueListener<TMessage>,
   sqs: SqsClient,
   options: RunSqsQueueListenerOptions = {},

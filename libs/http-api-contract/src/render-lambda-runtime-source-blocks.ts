@@ -1,4 +1,6 @@
-/** @fileoverview Implements render lambda runtime source blocks. @module libs/http-api-contract/src/render-lambda-runtime-source-blocks */
+/**
+ * @fileoverview Implements render lambda runtime source blocks.
+ */
 import { toLambdaObservabilitySupportSource } from "./render-lambda-observability-source";
 import { toZodValidationSupportSource } from "./render-lambda-zod-validation-source";
 

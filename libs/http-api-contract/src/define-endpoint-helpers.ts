@@ -1,4 +1,6 @@
-/** @fileoverview Implements define endpoint helpers. @module libs/http-api-contract/src/define-endpoint-helpers */
+/**
+ * @fileoverview Implements define endpoint helpers.
+ */
 import type { Schema } from "@babbstack/schema";
 import type { EndpointRuntimeContext } from "./endpoint-context-types";
 import type { RouteExecution } from "./route-execution-types";

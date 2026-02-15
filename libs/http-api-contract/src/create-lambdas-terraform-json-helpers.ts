@@ -1,4 +1,6 @@
-/** @fileoverview Implements create lambdas terraform json helpers. @module libs/http-api-contract/src/create-lambdas-terraform-json-helpers */
+/**
+ * @fileoverview Implements create lambdas terraform json helpers.
+ */
 import type { Contract } from "./types";
 import { toLambdaFunctions } from "./to-lambda-functions";
 

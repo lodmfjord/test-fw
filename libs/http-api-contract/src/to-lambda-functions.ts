@@ -1,7 +1,14 @@
-/** @fileoverview Implements to lambda functions. @module libs/http-api-contract/src/to-lambda-functions */
+/**
+ * @fileoverview Implements to lambda functions.
+ */
 import type { Contract } from "./types";
 
-/** Converts values to lambda functions. @example `toLambdaFunctions(input)` */
+/**
+ * Converts values to lambda functions.
+ * @param contract - Contract parameter.
+ * @example
+ * toLambdaFunctions(contract)
+ */
 export function toLambdaFunctions(contract: Contract): Record<string, Record<string, unknown>> {
   const lambdas = [...contract.lambdasManifest.functions].sort((left, right) =>
     left.routeId.localeCompare(right.routeId),

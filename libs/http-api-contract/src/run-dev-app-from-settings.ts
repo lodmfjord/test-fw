@@ -1,4 +1,6 @@
-/** @fileoverview Implements run dev app from settings. @module libs/http-api-contract/src/run-dev-app-from-settings */
+/**
+ * @fileoverview Implements run dev app from settings.
+ */
 import { readFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import {
@@ -145,7 +147,13 @@ function startSqsListeners(
   log(`babbstack sqs listener polling started for ${listeners.length} listener(s) at ${pollMs}ms`);
 }
 
-/** Runs dev app from settings. @example `await runDevAppFromSettings(input)` */
+/**
+ * Runs dev app from settings.
+ * @param settingsFilePath - Settings file path parameter.
+ * @param options - Options parameter.
+ * @example
+ * await runDevAppFromSettings(settingsFilePath, options)
+ */
 export async function runDevAppFromSettings(
   settingsFilePath: string,
   options: RunDevAppFromSettingsOptions = {},

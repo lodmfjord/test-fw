@@ -1,4 +1,6 @@
-/** @fileoverview Implements create typed dynamo db. @module libs/dynamodb/src/create-typed-dynamo-db */
+/**
+ * @fileoverview Implements create typed dynamo db.
+ */
 import type {
   DynamoDbClient,
   DynamoDbItem,
@@ -19,7 +21,13 @@ import type {
   return key as Pick<TItem, TKeyField>;
 }
 
-/** Creates typed dynamo db. @example `createTypedDynamoDb(input)` */ export function createTypedDynamoDb<
+/**
+ * Creates typed dynamo db.
+ * @param db - Db parameter.
+ * @param tables - Tables parameter.
+ * @example
+ * createTypedDynamoDb(db, tables)
+ */ export function createTypedDynamoDb<
   TTables extends Record<string, DynamoDbTableDefinition<DynamoDbItem, string>>,
 >(db: DynamoDbClient, tables: TTables): TypedDynamoDbClient<TTables> {
   const tableClients: Partial<Record<keyof TTables, unknown>> = {};

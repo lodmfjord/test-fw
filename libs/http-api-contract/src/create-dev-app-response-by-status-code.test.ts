@@ -1,4 +1,6 @@
-/** @fileoverview Tests create dev app response by status code. @module libs/http-api-contract/src/create-dev-app-response-by-status-code.test */
+/**
+ * @fileoverview Tests create dev app response by status code.
+ */
 import { describe, expect, it } from "bun:test";
 import { createDevApp } from "./create-dev-app";
 import { defineEndpoint } from "./define-endpoint";

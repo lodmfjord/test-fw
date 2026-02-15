@@ -1,4 +1,6 @@
-/** @fileoverview Implements order endpoints. @module apps/test-app/src/order-endpoints */
+/**
+ * @fileoverview Implements order endpoints.
+ */
 import {
   defineDelete,
   defineHead,
