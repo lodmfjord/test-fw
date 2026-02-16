@@ -22,4 +22,18 @@ describe("renderLambdaEnvBootstrapSource", () => {
       '"API_KEY":"simple-api:ssm:/service/api-key|local-env:LOCAL_API_KEY"',
     );
   });
+
+  it("emits bootstrap source that preserves non-import SDK failures", () => {
+    const source = renderLambdaEnvBootstrapSource({
+      env: {
+        API_KEY: "simple-api:ssm:/service/api-key",
+      },
+    } as never);
+
+    expect(source).toContain("function isModuleNotFoundImportError(error, moduleName)");
+    expect(source).toContain("catch (error)");
+    expect(source).toContain("if (!isModuleNotFoundImportError(error, v3ModuleName)) {");
+    expect(source).toContain("throw error;");
+    expect(source).not.toContain("catch {}");
+  });
 });

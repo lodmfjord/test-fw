@@ -114,4 +114,32 @@ describe("createDevApp", () => {
     expect(response.status).toBe(201);
     expect((await response.json()) as { id?: string }).toEqual({ id: "sam" });
   });
+
+  it("returns 404 for malformed percent-encoded path params", async () => {
+    const fetch = createDevApp([
+      defineEndpoint({
+        method: "GET",
+        path: "/users/:id",
+        handler: ({ params }) => ({
+          value: { id: params.id },
+        }),
+        request: {
+          params: schema.object({
+            id: schema.string(),
+          }),
+        },
+        response: schema.object({
+          id: schema.string(),
+        }),
+      }),
+    ]);
+
+    const response = await fetch(
+      new Request("http://local/users/%E0%A4%A", {
+        method: "GET",
+      }),
+    );
+
+    expect(response.status).toBe(404);
+  });
 });

@@ -20,7 +20,15 @@ function matchPath(templatePath: string, requestPath: string): Record<string, st
     const paramMatch = templateSegment.match(/^\{(.+)\}$/);
 
     if (paramMatch?.[1]) {
-      params[paramMatch[1]] = decodeURIComponent(requestSegment);
+      try {
+        params[paramMatch[1]] = decodeURIComponent(requestSegment);
+      } catch (error) {
+        if (error instanceof URIError) {
+          return null;
+        }
+
+        throw error;
+      }
       continue;
     }
 

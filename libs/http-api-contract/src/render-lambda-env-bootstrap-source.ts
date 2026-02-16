@@ -49,9 +49,33 @@ export function renderLambdaEnvBootstrapSource(endpoint: EndpointRuntimeDefiniti
 const endpointSecretEnv = ${JSON.stringify(envConfig.secret)};
 let endpointEnvReadyPromise;
 
+/** Returns whether an import error was caused by a missing module. */
+function isModuleNotFoundImportError(error, moduleName) {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const code = typeof error.code === "string" ? error.code : "";
+  if (code !== "ERR_MODULE_NOT_FOUND" && code !== "MODULE_NOT_FOUND") {
+    return false;
+  }
+
+  const message = typeof error.message === "string" ? error.message : "";
+  return message.includes(moduleName);
+}
+
+/** Returns stable detail text for unknown thrown values. */
+function toErrorDetail(error) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
+
 /** Handles load ssm parameter. */
 async function loadSsmParameter(parameterName) {
   const v3ModuleName = "@aws-sdk/client-ssm";
+  let v3ImportError;
   try {
     const ssmModule = await import(v3ModuleName);
     const client = new ssmModule.SSMClient({});
@@ -65,10 +89,16 @@ async function loadSsmParameter(parameterName) {
       throw new Error("Missing parameter value for " + parameterName);
     }
     return value;
-  } catch {}
+  } catch (error) {
+    if (!isModuleNotFoundImportError(error, v3ModuleName)) {
+      throw error;
+    }
+    v3ImportError = error;
+  }
 
   const legacyModuleName = "aws-sdk";
   const legacyImportName = legacyModuleName;
+  let legacyImportError;
   try {
     const legacyModule = await import(legacyImportName);
     const AwsSdk = legacyModule.default ?? legacyModule;
@@ -84,9 +114,19 @@ async function loadSsmParameter(parameterName) {
       throw new Error("Missing parameter value for " + parameterName);
     }
     return value;
-  } catch {}
+  } catch (error) {
+    if (!isModuleNotFoundImportError(error, legacyModuleName)) {
+      throw error;
+    }
+    legacyImportError = error;
+  }
 
-  throw new Error("Missing AWS SDK for SSM secret loading");
+  throw new Error(
+    "Missing AWS SDK for SSM secret loading: " +
+      toErrorDetail(v3ImportError) +
+      "; " +
+      toErrorDetail(legacyImportError)
+  );
 }
 
 /** Handles initialize endpoint env. */

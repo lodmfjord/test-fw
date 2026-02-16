@@ -33,6 +33,8 @@ Monorepo for a reusable API framework library. The framework defines typed endpo
 - Additional responses are declared via `responses` on endpoint definitions.
 - OpenAPI generation includes every entry from `responseByStatusCode`, not just `200`. This keeps contract output aligned with runtime behavior for async and multi-response routes.
 - Generated Lambda runtime entries validate request parts (`params`, `query`, `headers`, `body`) with Zod-backed validators derived from endpoint schemas and return `400` on input validation failures.
+- Query array inputs follow API Gateway HTTP API payload format `2.0` semantics: repeated keys are represented as comma-delimited strings in `queryStringParameters` (for example `a=1&a=2` becomes `a: "1,2"`).
+- For true multi-value query semantics, use payload format `1.0` (`multiValueQueryStringParameters`) or parse `rawQueryString` directly.
 - Generated Lambda runtime entries validate handler output with the response schema selected by status code and return `500` on output validation failures.
 - Generated Lambda runtime entries keep `zod` external (`import "zod"`). Terraform generation now always includes `zod` in lambda layer module planning.
 - Generated Lambda runtime entries emit structured lifecycle and failure logs (`lambda.invocation.start`, `lambda.invocation.complete`, `lambda.validation.input_failed`, `lambda.handler.failed`, `lambda.validation.output_failed`) with request correlation fields using AWS Lambda Powertools Logger.

@@ -29,6 +29,21 @@ describe("findEndpointRuntimeDefinition", () => {
     expect(matched?.endpoint.path).toBe("/users/{id}");
   });
 
+  it("returns undefined for malformed percent-encoded path params", () => {
+    defineGet({
+      handler: ({ params }) => ({ value: { id: params.id } }),
+      path: "/users/:id",
+      request: {
+        params: schema.object({ id: schema.string() }),
+      },
+      response: schema.object({ id: schema.string() }),
+    });
+
+    const matched = findEndpointRuntimeDefinition(listDefinedEndpoints(), "GET", "/users/%E0%A4%A");
+
+    expect(matched).toBeUndefined();
+  });
+
   it("returns undefined for non-matching method", () => {
     defineGet({
       handler: ({ params }) => ({ value: { id: params.id } }),

@@ -2,7 +2,7 @@
  * @fileoverview Tests create client.
  */
 import { afterEach, describe, expect, it } from "bun:test";
-import { defineGet, definePost, schema } from "@babbstack/http-api-contract";
+import { createDevApp, defineGet, definePost, schema } from "@babbstack/http-api-contract";
 import { createClient } from "./create-client";
 
 const getUserEndpoint = defineGet({
@@ -48,6 +48,18 @@ const postUserEndpoint = definePost({
     };
   },
   successStatusCode: 201,
+});
+
+const queryEchoEndpoint = defineGet({
+  path: "/query-echo",
+  handler: ({ query }) => ({
+    value: {
+      value: (query as { a?: string }).a ?? "",
+    },
+  }),
+  response: schema.object({
+    value: schema.string(),
+  }),
 });
 
 const testEndpoints = [[getUserEndpoint], [postUserEndpoint]] as const;
@@ -185,5 +197,25 @@ describe("createClient", () => {
         params: {} as { id: string },
       }),
     ).rejects.toThrow('Missing path param "id" for path "/users/{id}"');
+  });
+
+  it("keeps client array query input aligned with dev runtime v2 semantics", async () => {
+    const devFetch = createDevApp([queryEchoEndpoint]);
+    globalThis.fetch = (async (input, init) => {
+      const request = new Request(String(input), init);
+      return devFetch(request);
+    }) as typeof fetch;
+
+    const client = createClient("http://local", [queryEchoEndpoint] as const);
+    const response = await client.request.endpoint(queryEchoEndpoint, {
+      query: {
+        a: ["1", "2"],
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.data).toEqual({
+      value: "1,2",
+    });
   });
 });

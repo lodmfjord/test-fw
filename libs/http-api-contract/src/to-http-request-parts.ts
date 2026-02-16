@@ -6,12 +6,13 @@ type HttpRequestParts = {
   query: Record<string, string>;
 };
 
-/** Converts to query. */
+/** Converts to query using API Gateway HTTP API payload format 2.0 semantics. */
 function toQuery(url: URL): Record<string, string> {
   const query: Record<string, string> = {};
 
   for (const [key, value] of url.searchParams.entries()) {
-    query[key] = value;
+    const existingValue = query[key];
+    query[key] = existingValue === undefined ? value : `${existingValue},${value}`;
   }
 
   return query;
